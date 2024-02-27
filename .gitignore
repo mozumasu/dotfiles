@@ -1,0 +1,24 @@
+.zshrc.local
+.DS_Store
+.bundle
+
+
+# Vim
+Session.vim
+.vim/bundle/
+.vimrc_sample
+.vim/ftdetect/Dockerfile.vim
+.vim/syntax/Dockerfile.vim
+.vim/snippets/
+.luarc.json
+
+# Karabiner
+.config/karabiner/automatic_backups
+
+# raycast
+.config/raycast/extensions/*
+
+# zsh
+.zsh_history
+.config/zsh/.zsh_sessions/*
+.config/zsh/.zshrc.zwc
