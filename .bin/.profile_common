@@ -1,0 +1,6 @@
+# 全ターミナルの共通設定
+
+# ログイン時に読み込むファイル
+# 環境変数を設定する (export する変数)
+
+export PATH=$HOME/.nodebrew/current/bin:$PATH

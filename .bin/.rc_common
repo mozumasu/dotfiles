@@ -1,6 +1,5 @@
 # 全ターミナルの共通設定
 
-# 対話モードの bash を起動する時に毎回実行読み込まれるファイル
 # エイリアスの定義・シェルプロンプトのカスタマイズ・関数・補完の定義などを行う
 
 #########################################
@@ -10,7 +9,7 @@
 alias ..='cd ..'
 
 # lsした時の色変更
-alias ls='ls -G'
+alias ls='ls -F --color=auto'
 
 # git
 alias gpush='git push'
@@ -37,3 +36,8 @@ alias tiga='tig --all'
 alias cp='cp -i'
 alias mv='mv -i'
 alias rm='rm -i'
+
+# エディタ
+alias vi='nvim'
+alias vim='nvim'
+alias view='nvim -R'

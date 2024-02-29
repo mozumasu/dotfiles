@@ -1,9 +1,21 @@
+#!/bin/zsh
+# 共通設定ファイル読み込み
+RC_COMMON=$HOME/.bin/.rc_common
+
+if [ -e $RC_COMMON ]
+then source $RC_COMMON
+fi
+
+
 # setting
 # 新規ファイル作成時のパーミッション
 umask 022
 
 # homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# fzf
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # antigen
 source $HOME/.local/bin/antigen.zsh
@@ -37,7 +49,6 @@ eval "$(starship init zsh)"
 
 # alias
 alias ls='ls -F --color=auto'
-alias vim='nvim'
 abbr -S ll='ls -l' >>/dev/null
 abbr -S la='ls -A' >>/dev/null
 abbr -S lla='ls -l -A' >>/dev/null
