@@ -1,9 +1,11 @@
 #!/bin/zsh
 # 共通設定ファイル読み込み
-RC_COMMON=$HOME/.bin/.rc_common
+RC_COMMON=$HOME/dotfiles/.bin/.rc_common
 
 if [ -e $RC_COMMON ]
 then source $RC_COMMON
+else
+    echo "$RC_COMMON not found."
 fi
 
 
@@ -44,7 +46,7 @@ antigen theme robbyrussell
 # Tell antigen that you're done
 antigen apply
 
-#　starship
+# starship
 eval "$(starship init zsh)"
 
 # alias
