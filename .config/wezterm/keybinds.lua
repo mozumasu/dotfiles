@@ -77,7 +77,7 @@ return {
     { key = 'P', mods = 'SHIFT|CTRL', action = act.ActivateCommandPalette },
     { key = 'Q', mods = 'CTRL', action = act.QuitApplication },
     { key = 'Q', mods = 'SHIFT|CTRL', action = act.QuitApplication },
-    { key = 'R', mods = 'CTRL', action = act.ReloadConfiguration },
+    -- { key = 'R', mods = 'CTRL', action = act.ReloadConfiguration },
     { key = 'R', mods = 'SHIFT|CTRL', action = act.ReloadConfiguration },
     { key = 'T', mods = 'CTRL', action = act.SpawnTab 'CurrentPaneDomain' },
     { key = 'T', mods = 'SHIFT|CTRL', action = act.SpawnTab 'CurrentPaneDomain' },

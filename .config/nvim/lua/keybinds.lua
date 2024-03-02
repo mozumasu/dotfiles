@@ -1,6 +1,6 @@
 -- Normal to Command
-vim.keymap.set('n', ':', ';')
-vim.keymap.set('n', ';', ':')
+-- vim.keymap.set('n', ':', ';')
+-- vim.keymap.set('n', ';', ':')
 
 -- automatically joump to end of text you pasted
 vim.keymap.set('v', 'y', 'y`]')
