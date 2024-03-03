@@ -156,7 +156,7 @@ return {
       { key = 'Space', mods = 'NONE', action = act.CopyMode{ SetSelectionMode =  'Cell' } },
       { key = '$', mods = 'NONE', action = act.CopyMode 'MoveToEndOfLineContent' },
       { key = '$', mods = 'SHIFT', action = act.CopyMode 'MoveToEndOfLineContent' },
-      { key = ',', mods = 'NONE', action = act.CopyMode 'JumpReverse' },
+      -- { key = ',', mods = 'NONE', action = act.CopyMode 'JumpReverse' },
       { key = '0', mods = 'NONE', action = act.CopyMode 'MoveToStartOfLine' },
       { key = ';', mods = 'NONE', action = act.CopyMode 'JumpAgain' },
       { key = 'F', mods = 'NONE', action = act.CopyMode{ JumpBackward = { prev_char = false } } },

@@ -34,6 +34,17 @@ local plugins = {
   {
     'petertriho/nvim-scrollbar',
     event = { 'BufNewFile', 'BufReadPre' },
+  },
+  {
+    'nvim-tree/nvim-tree.lua',
+    keys = {
+      '<leader>ex',
+    },
+    config = function() require 'extensions.nvim-tree' end,
+    dependencies = {
+      'nvim-tree/nvim-web-devicons',
+      'nvim-telescope/telescope.nvim',
+    }
   }
 }
 local opts = {
@@ -61,6 +72,9 @@ local opts = {
     },
   },
 }
+
+-- Lazy.nvim Installation
+-- https://github.com/folke/lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
