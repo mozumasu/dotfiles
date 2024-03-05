@@ -45,6 +45,20 @@ local plugins = {
       'nvim-tree/nvim-web-devicons',
       'nvim-telescope/telescope.nvim',
     }
+  },
+  {
+    'zbirenbaum/copilot-cmp',
+    event = { 'InsertEnter' },
+    config = function() require('copilot_cmp').setup() end,
+    dependencies = {
+      'hrsh7th/nvim-cmp',
+      'zbirenbaum/copilot.lua',
+    },
+  },
+  {
+    'zbirenbaum/copilot.lua',
+    event = { 'InsertEnter' },
+    config = function() require 'extensions.copilot' end,
   }
 }
 local opts = {
