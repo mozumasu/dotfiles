@@ -66,3 +66,7 @@ abbr -S gcm='git commit' >>/dev/null
 abbr -S gmg='git merge' >>/dev/null
 abbr -S gpsh='git push' >>/dev/null
 abbr -S lg='lazygit' >>/dev/null
+
+# volta ここに記載しないと読み込めない
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$PATH"
