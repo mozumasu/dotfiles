@@ -62,16 +62,13 @@ module.exports = {
       description: '設定ファイル',
       emoji: '⚙',
       value: 'config',
-    }
-
+    },
   },
-    messages: {
-      type: 'プレフィックスを選択してね:',
-      customScope: 'コミットが影響するスコープを選択してね:',
-      subject: 'コミットのタイトル（概要）を入力してね:\n' ,
-      body: '変更内容の詳細があれば入力してね:\n',
-      breaking: '重大な変更があれば入力してね:\n',
-      issues : '解決したissueがあれば入力してね, 例 #123:',
-      confirmCommit: 'このコミットが影響するパッケージがあれば入力してね:',
+  messages: {
+    type: 'プレフィックスを選択してね:',
+    subject: 'コミットのタイトル（概要）を入力してね:\n' ,
+    body: '変更内容の詳細があれば入力してね:\n',
+    breaking: '重大な変更があれば入力してね:\n',
+    issues : '解決したissueがあれば入力してね, 例 #123:',
   },
 };
