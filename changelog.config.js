@@ -1,31 +1,31 @@
 module.exports = {
   disableEmoji: false,
   format: '{type}{scope}: {emoji}{subject}',
-  list: ['test', 'feat', 'fix', 'chore', 'docs', 'refactor', 'style', 'ci', 'perf'],
+  list: ['feat', 'test', 'fix', 'chore', 'docs', 'refactor', 'style', 'ci', 'perf', 'package', 'config'],
   maxMessageLength: 64,
   minMessageLength: 3,
   questions: ['type', 'scope', 'subject', 'body', 'breaking', 'issues', 'lerna'],
   scopes: [],
   types: {
-    chore: {
-      description: 'ドキュメントの生成やビルドプロセス、ライブラリなどの変更',
-      emoji: '🤖',
-      value: 'chore'
-    },
-    ci: {
-      description: 'CI用の設定やスクリプトに関する変更',
-      emoji: '🎡',
-      value: 'ci'
-    },
-    docs: {
-      description: 'ドキュメントのみの変更',
-      emoji: '✏️',
-      value: 'docs'
-    },
     feat: {
       description: '新機能',
       emoji: '🎸',
       value: 'feat'
+    },
+    chore: {
+      description: 'ビルド関連やライブラリの変更',
+      emoji: '🤖',
+      value: 'chore'
+    },
+    ci: {
+      description: 'CI関連の変更',
+      emoji: '🎡',
+      value: 'ci'
+    },
+    docs: {
+      description: 'ドキュメントの更新',
+      emoji: '✏️',
+      value: 'docs'
     },
     fix: {
       description: '不具合の修正',
@@ -38,28 +38,40 @@ module.exports = {
       value: 'perf'
     },
     refactor: {
-      description: 'バグ修正や機能の追加を行わないコードの変更',
+      description: 'リファクタリング',
       emoji: '💡',
       value: 'refactor'
     },
     style: {
-      description: 'コードの処理に影響しない変更（スペースや書式設定など',
+      description: 'コードの処理に影響しない変更（スペースや書式設定など)',
       emoji: '💄',
       value: 'style'
     },
     test: {
-      description: 'テストコードの変更',
+      description: 'テストコード',
       emoji: '💍',
       value: 'test'
     },
-    messages: {
-      type: 'プレフィックスを選択してね',
-      customScope: 'Select the scope this component affects:',
-      subject: 'コミットのタイトル（概要）を入力してね',
-      body: 'コミットの詳細を入力してね',
-      breaking: '重大な変更をリストに追加する？',
-      footer: '解決したissueがあれば入力してね, 例 #123:',
-      confirmCommit: 'このコミットが影響するパッケージがあれば入力してね',
+    //自分用に追加
+    package: {
+      description: 'パッケージ',
+      emoji: '📦',
+      value: 'package',
     },
-  }
+    config: {
+      description: '設定ファイル',
+      emoji: '⚙',
+      value: 'config',
+    }
+
+  },
+    messages: {
+      type: 'プレフィックスを選択してね:',
+      customScope: 'コミットが影響するスコープを選択してね:',
+      subject: 'コミットのタイトル（概要）を入力してね:\n' ,
+      body: '変更内容の詳細があれば入力してね:\n',
+      breaking: '重大な変更があれば入力してね:\n',
+      issues : '解決したissueがあれば入力してね, 例 #123:',
+      confirmCommit: 'このコミットが影響するパッケージがあれば入力してね:',
+  },
 };
