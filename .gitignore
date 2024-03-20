@@ -1,7 +1,7 @@
 .zshrc.local
 .DS_Store
 .bundle
-
+.config/zsh/.zcompdump-*
 
 # Vim
 Session.vim

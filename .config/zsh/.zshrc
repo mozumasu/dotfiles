@@ -70,3 +70,21 @@ abbr -S lg='lazygit' >>/dev/null
 # volta ここに記載しないと読み込めない
 export VOLTA_HOME="$HOME/.volta"
 export PATH="$VOLTA_HOME/bin:$PATH"
+
+# zshのみの独自設定
+# cd時に自動でスタック
+setopt auto_pushd
+# スタックを重複させない
+setopt pushd_ignore_dups
+# cd無しで指定したパスへ移動
+setopt auto_cd
+# historyを重複させない
+setopt hist_ignore_dups
+setopt share_history
+# 即座に履歴を保存
+setopt inc_append_history
+
+# zshのHistory設定
+export HISTFILE=~/.config/zsh/.zsh_history
+export HISTSIZE=100000
+export SAVEHIST=100000
