@@ -1,0 +1,26 @@
+[include]
+  path = ~/.gitconfig.local
+[alias]
+	ci = commit
+	st = status
+	br = branch
+	co = checkout
+  hist = log --pretty=format:\"%Cgreen%h %Creset%cd %Cblue[%cn] %Creset%s%C(yellow)%d%C(reset)\" --graph --date=relative --decorate --all
+[push]
+	autoSetupRemote = true
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+[safe]
+	directory = %(prefix)///wsl.localhost/Ubuntu/home/mozumasu/study-terraform
+[secrets]
+	providers = git secrets --aws-provider
+	patterns = (A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}
+	patterns = (\"|')?(AWS|aws|Aws)?_?(SECRET|secret|Secret)?_?(ACCESS|access|Access)?_?(KEY|key|Key)(\"|')?\\s*(:|=>|=)\\s*(\"|')?[A-Za-z0-9/\\+=]{40}(\"|')?
+	patterns = (\"|')?(AWS|aws|Aws)?_?(ACCOUNT|account|Account)_?(ID|id|Id)?(\"|')?\\s*(:|=>|=)\\s*(\"|')?[0-9]{4}\\-?[0-9]{4}\\-?[0-9]{4}(\"|')?
+	allowed = AKIAIOSFODNN7EXAMPLE
+	allowed = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+[init]
+	templatedir = ~/.git-templates/git-secrets
