@@ -22,3 +22,4 @@ Session.vim
 .zsh_history
 .config/zsh/.zsh_sessions/*
 .config/zsh/.zshrc.zwc
+.config/zsh/.zcompdump
