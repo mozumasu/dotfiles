@@ -12,6 +12,7 @@ alias ..='cd ..'
 alias ls='ls -F --color=auto'
 
 # git
+alias g='git'
 alias gpush='git push'
 alias gpull='git pull'
 alias gmerge='git merge'
