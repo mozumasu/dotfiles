@@ -18,6 +18,9 @@ Session.vim
 # raycast
 .config/raycast/extensions/*
 
+# dpl
+.config/dpl/
+
 # zsh
 .zsh_history
 .config/zsh/.zsh_sessions/*
