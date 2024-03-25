@@ -36,3 +36,9 @@ vim.keymap.set('n', 'sl', '<C-w>l')
 -- buffer
 vim.keymap.set('n', '<Tab>', ':bnext<CR>')
 vim.keymap.set('n', '<S-Tab>', ':bprev<CR>')
+
+-- markdown-preview.nvim
+vim.keymap.set('n', '<C-s>', ':MarkdownPreview<CR>')
+vim.keymap.set('n', '<M-s>', ':MarkdownPreviewStop<CR>')
+vim.keymap.set('n', '<C-p>', 'MarkdownPreviewToggle<CR>')
+
