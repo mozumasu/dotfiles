@@ -1,7 +1,8 @@
 # キーバインド覚えられない無理すぎ
 キーバインド覚えられ無さすぎるのでチートシート作成
 - [vim](/.config/nvim/lua/keybinds.lua)
-- [alias]()
+- [vimのプラグイン一覧](./vim.md)
+- [alias](./alias.md)
 ## tmux
 設定ファイル：`~/.tmux.conf`  
 Prefix： Ctrl + G に設定
@@ -60,3 +61,5 @@ Control + g [ → 移動(jklh) → v → 移動(jklh) → y → enter → Comman
 | z ディレクトリ名 | 直近でアクセスしたディレクトリに移動 | zsh |
 | google 検索するもの | Chromeで検索 | web-search |
 | control + T | fzfを起動 | fzf |
+
+![Alt](https://repobeats.axiom.co/api/embed/d195a3f40c76c2bedc77aaa70f5c15cb9966cc7b.svg "Repobeats analytics image")
