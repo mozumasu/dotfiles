@@ -11,6 +11,11 @@ alias ..='cd ..'
 # lsした時の色変更
 alias ls='ls -F --color=auto'
 
+# awsのプロファイル切り替え
+awsp(){
+  export AWS_DEFAULT_PROFILE="$1"
+}
+
 # git
 alias g='git'
 alias gpush='git push'
