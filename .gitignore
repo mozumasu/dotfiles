@@ -26,3 +26,6 @@ Session.vim
 .config/zsh/.zsh_sessions/*
 .config/zsh/.zshrc.zwc
 .config/zsh/.zcompdump
+
+# nvm
+.config/nvm/

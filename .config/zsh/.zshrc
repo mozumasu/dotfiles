@@ -106,3 +106,7 @@ zstyle ':completion:*' group-name ''
 # 補完侯補をメニューから選択
 # select=2: 補完候補を一覧から選択,補完候補が2つ以上なければすぐに補完
 zstyle ':completion:*:default' menu select=2
+
+export NVM_DIR="$HOME/.config/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
