@@ -1,20 +1,22 @@
+local wezterm = require 'wezterm'
 
--- pcallで、エラーが発生してもプログラムの実行を中断させないようにする
-local ok, _ = pcall(require, 'module_with_error')
-if not ok then
-  -- not loaded
+local config = {}
+
+if wezterm.config_builder then
+  config = wezterm.config_builder()
 end
 
-
--- Pull in the wezterm API
-local wezterm = require 'wezterm'
--- This will hold the configuration.
-local config = wezterm.config_builder()
+-- keybinds
+config.disable_default_key_bindings = true
+config.keys = require("keybinds").keys
+config.key_tables = require("keybinds").key_tables
+config.leader = { key = "q", mods = "CTRL", timeout_milliseconds = 2000 }
 
 -- colors
 -- config.color_scheme = "AdventureTime"
 config.macos_window_background_blur = 20
 config.window_background_opacity = 0.8
+
 -- font
 config.font = wezterm.font("HackGen")
 config.font_size = 13.0
@@ -28,3 +30,4 @@ end)
 
 -- and finally, return the configuration to wezterm
 return config
+

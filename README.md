@@ -1,5 +1,6 @@
 # キーバインド覚えられない無理すぎ
 キーバインド覚えられ無さすぎるのでチートシート作成
+- [Wezterm](/.config/wezterm/keybinds.lua)
 - [vim](/.config/nvim/lua/keybinds.lua)
 - [vimのプラグイン一覧](./vim.md)
 - [alias](./alias.md)

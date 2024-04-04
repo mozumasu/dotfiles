@@ -29,3 +29,5 @@ Session.vim
 
 # nvm
 .config/nvm/
+# npm
+.config/configstore/update-notifier-npm.json
