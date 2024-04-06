@@ -31,3 +31,6 @@ Session.vim
 .config/nvm/
 # npm
 .config/configstore/update-notifier-npm.json
+
+# lsp
+.config/coc/

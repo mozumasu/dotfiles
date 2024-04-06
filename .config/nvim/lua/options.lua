@@ -1,4 +1,6 @@
 -- global
+-- ステータスラインを一つにまとめる
+vim.opt.laststatus = 3
 -- 24ビットRGBカラー有効化
 vim.api.nvim_set_option('termguicolors', true)
 -- ファイル末尾に移動した際に4行分の余白設定
@@ -23,8 +25,6 @@ vim.api.nvim_win_set_option(0, 'cursorline', true)
 vim.api.nvim_win_set_option(0, 'signcolumn', 'yes:1')
 -- テキストの折り返しを無効化
 vim.api.nvim_win_set_option(0, 'wrap', false)
--- 非表示文字の可視化
-vim.api.nvim_win_set_option(0, 'list', true)
 -- 指定したカラム列を強調
 -- vim.api.nvim_win_set_option(0, 'colorcolumn', '100')
 
