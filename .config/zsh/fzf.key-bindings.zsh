@@ -7,20 +7,27 @@
 # - $FZF_DEFAULT_OPT
 # - $FZF_TMUX_OPTS
 # - $FZF_CTRL_T_COMMAND
-#   カレントディレクトリ配下の検索オプション
-#
 # - $FZF_CTRL_T_OPTS
 # - $FZF_CTRL_R_OPTS
 # - $FZF_ALT_C_COMMAND
-#
 # - $FZF_ALT_C_OPTS
-#   カレントディレクトリ配下のディレクトリ移動を可能にするオプション
 
 # fzfの検索対象をカスタマイズ
-# デフォルトオプションで表示方法を設定
+# デフォルトオプション
+export FZF_DEFAULT_COMMAND="rg --files --hidden --follow --glob '!.git/*'"
 export FZF_DEFAULT_OPTS='--height 40% --reverse --border --preview "head -100 {}"'
+
+# Control + t デフォルトの検索
+export FZF_CTRL_T_COMMAND="rg --files --hidden --follow --glob '!.git/*'"
+export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=header,grid --line-range :100 {}'"
+
 # Alt + c でディレクトリツリー表示
+# Todo: 隠しフォルダも対象にする
+# export FZF_ALT_C_COMMAND=""
 export FZF_ALT_C_OPTS="--preview 'tree -C {} | head -200'"
+
+# Cntrol + r でコマンド検索時に？を押すとプレビュー表示する
+export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview'"
 
 [[ -o interactive ]] || return 0
 
