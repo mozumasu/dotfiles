@@ -28,12 +28,15 @@ vim.cmd([[
   au FileType html let b:coc_root_patterns = ['.git', '.env', 'tailwind.config.js', 'tailwind.config.cjs', 'tailwind.config.ts']
 ]])
 
+-- キーマップ
 local keyset = vim.api.nvim_set_keymap
 local opts = {
-  default = { silent = true, nowait = true, expr = true },
+  default = { silent = true, noremap = true, nowait = true, expr = true, replace_keycodes = false },
   silent_only =  { silent = true }
 }
 
+-- Enterで補完を選択
+keyset("i", "<cr>", [[coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"]], opts.default)
 -- ヒントを表示
 keyset('n', '<space>h', ':<C-u>call CocAction("doHover")<cr>', opts.silent_only)
 
