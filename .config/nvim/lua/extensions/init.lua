@@ -1,8 +1,10 @@
 local plugins = {
+  -- ハイライト
 	{
 		"nvim-treesitter/nvim-treesitter",
 		event = { "BufNewFile", "BufReadPre" },
 	},
+  -- フォーマッターとリンター
 	{
 		"JohnnyMorganz/StyLua",
 	},
@@ -20,15 +22,17 @@ local plugins = {
 			}
 		end,
 	},
+  -- 補完や定義ジャンプなど
 	{
 		"neoclide/coc.nvim",
 		branch = "release",
 	},
 	{
 		"dinhhuy258/git.nvim",
-		keys = {
-			"<leader>gh",
-		},
+    event = { "VimEnter" },
+    config = function()
+      require("extensions.git-nvim")
+  end,
 	},
 	{
 		"rmehri01/onenord.nvim",
