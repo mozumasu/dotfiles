@@ -47,3 +47,26 @@ alias rm='rm -i'
 alias vi='nvim'
 alias vim='nvim'
 alias view='nvim -R'
+
+# fzf
+alias fzc="git branch --list | cut -c 3- | fzf --preview \"git log --pretty=format:'%h %cd %s' --date=format:'%Y-%m-%d %H:%M' {}\" | xargs git checkout"
+
+#########################################
+# 関数
+#########################################
+
+# ブランチの変更「control + b」
+function select-git-switch() {
+  target_br=$(
+    git branch -a |
+      fzf --exit-0 --layout=reverse --info=hidden --no-multi --preview-window="right,65%" --prompt="CHECKOUT BRANCH > " --preview="echo {} | tr -d ' *' | xargs git llog --color=always" |
+      head -n 1 |
+      perl -pe "s/\s//g; s/\*//g; s/remotes\/origin\///g"
+  )
+  if [ -n "$target_br" ]; then
+    BUFFER="git switch $target_br"
+    zle accept-line
+  fi
+}
+zle -N select-git-switch
+bindkey "^b" select-git-switch
