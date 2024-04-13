@@ -12,7 +12,7 @@ alias ..='cd ..'
 alias ls='ls -F --color=auto'
 
 # awsのプロファイル切り替え
-awsp(){
+awsex(){
   export AWS_DEFAULT_PROFILE="$1"
 }
 
@@ -70,3 +70,43 @@ function select-git-switch() {
 }
 zle -N select-git-switch
 bindkey "^b" select-git-switch
+
+# fzfでawsプロファイル変更
+alias awsp=set_aws_profile
+
+function set_aws_profile() {
+  local selected_profile=$(aws configure list-profiles |
+    grep -v "default" |
+    sort |
+    fzf --prompt "Select PROFILE. If press Ctrl-C, unset PROFILE. > " \
+        --height 50% --layout=reverse --border --preview-window 'right:50%' \
+        --preview "grep {} -A5 ~/.aws/config")
+
+  # プロファイルが選択されていない時は設定を解除する 
+  if [ -z "$selected_profile" ]; then
+    echo "Unset aws profile!"
+    unset AWS_PROFILE
+    unset AWS_ACCESS_KEY_ID
+    unset AWS_SECRET_ACCESS_KEY
+    return
+  fi
+
+  # 選択されたプロファイルに設定
+  echo "Set the environment variable 'AWS_PROFILE' to '${selected_profile}'!"
+  export AWS_PROFILE="$selected_profile"
+  unset AWS_ACCESS_KEY_ID
+  unset AWS_SECRET_ACCESS_KEY
+  
+  # ssoのセッションを確認し、期限切れの場合は再度ログイン
+  local AWS_SSO_SESSION_NAME="mozumasu"
+
+  check_sso_session=$(aws sts get-caller-identity 2>&1)
+  if [[ "$check_sso_session" == *"Token has expired"* ]]; then
+    echo -e "\n----------------------------\nYour Session has expired! Please login...\n----------------------------\n"
+    aws sso login --sso-session "${AWS_SSO_SESSION_NAME}"
+    aws sts get-caller-identity
+  else
+    echo ${check_sso_session}
+  fi
+}
+
