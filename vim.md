@@ -11,3 +11,5 @@ control + p でONOFFできるようにするはずが、何者かが邪魔をし
 ターミナル上でmdファイルを確認
 起動:Grow
 
+## [fern.nvim](https://github.com/lambdalisue/fern.vim)
+ファイラー

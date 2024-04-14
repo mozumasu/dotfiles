@@ -27,6 +27,7 @@ local plugins = {
 		"neoclide/coc.nvim",
 		branch = "release",
 	},
+  -- diffとblame、コードのGitHubページ表示
 	{
 		"dinhhuy258/git.nvim",
     event = { "VimEnter" },
@@ -34,6 +35,24 @@ local plugins = {
       require("extensions.git-nvim")
   end,
 	},
+  -- ファイラー
+  {
+    "lambdalisue/fern.vim",
+    event = { "VimEnter" },
+    config = function()
+      require("extensions.fern")
+    end,
+    dependencies = {
+      "lambdalisue/fern-git-status.vim",
+      -- ステージへの追加と解除
+      "lambdalisue/fern-mapping-git.vim",
+      -- フォント表示
+      "lambdalisue/nerdfont.vim",
+      "lambdalisue/fern-renderer-nerdfont.vim",
+      -- ファイルツリーのアイコンの色を設定
+      "lambdalisue/glyph-palette.vim",
+    },
+  },
 	{
 		"rmehri01/onenord.nvim",
 		event = { "VimEnter" },
@@ -42,6 +61,7 @@ local plugins = {
 			require("extensions.onenord")
 		end,
 	},
+  -- ステータスライン
 	{
 		"nvim-lualine/lualine.nvim",
 		event = { "VimEnter" },
@@ -57,6 +77,7 @@ local plugins = {
 		"lewis6991/gitsigns.nvim",
 		event = { "BufReadPre" },
 	},
+  -- ファイル検索
 	{
 		"nvim-telescope/telescope.nvim",
 		keys = {
@@ -79,19 +100,7 @@ local plugins = {
 		"petertriho/nvim-scrollbar",
 		event = { "BufNewFile", "BufReadPre" },
 	},
-	{
-		"nvim-tree/nvim-tree.lua",
-		keys = {
-			"<leader>ex",
-		},
-		config = function()
-			require("extensions.nvim-tree")
-		end,
-		dependencies = {
-			"nvim-tree/nvim-web-devicons",
-			"nvim-telescope/telescope.nvim",
-		},
-	},
+  -- copilot
 	{
 		"zbirenbaum/copilot-cmp",
 		event = { "InsertEnter" },
@@ -103,6 +112,7 @@ local plugins = {
 			"zbirenbaum/copilot.lua",
 		},
 	},
+  -- mdプレビュー
 	{
 		"iamcco/markdown-preview.nvim",
 		cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
@@ -119,6 +129,7 @@ local plugins = {
 		end,
 	},
 }
+
 local opts = {
 	checker = {
 		enabled = true,
