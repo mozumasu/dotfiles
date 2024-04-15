@@ -1,58 +1,50 @@
 local plugins = {
-  -- ハイライト
+	-- ハイライト
 	{
 		"nvim-treesitter/nvim-treesitter",
 		event = { "BufNewFile", "BufReadPre" },
 	},
-  -- フォーマッターとリンター
+	-- フォーマッターとリンター
 	{
 		"JohnnyMorganz/StyLua",
 	},
 	{
 		"dense-analysis/ale",
 		config = function()
-			-- Configuration goes here.
-			local g = vim.g
-
-			g.ale_ruby_rubocop_auto_correct_all = 1
-
-			g.ale_linters = {
-				ruby = { "rubocop", "ruby" },
-				lua = { "lua_language_server" },
-			}
+			require("extensions.ale")
 		end,
 	},
-  -- 補完や定義ジャンプなど
+	-- 補完や定義ジャンプなど
 	{
 		"neoclide/coc.nvim",
 		branch = "release",
 	},
-  -- diffとblame、コードのGitHubページ表示
+	-- diffとblame、コードのGitHubページ表示
 	{
 		"dinhhuy258/git.nvim",
-    event = { "VimEnter" },
-    config = function()
-      require("extensions.git-nvim")
-  end,
+		event = { "VimEnter" },
+		config = function()
+			require("extensions.git-nvim")
+		end,
 	},
-  -- ファイラー
-  {
-    "lambdalisue/fern.vim",
-    event = { "VimEnter" },
-    config = function()
-      require("extensions.fern")
-    end,
-    dependencies = {
-      "lambdalisue/fern-git-status.vim",
-      -- ステージへの追加と解除
-      "lambdalisue/fern-mapping-git.vim",
-      -- フォント表示
-      "lambdalisue/nerdfont.vim",
-      "lambdalisue/fern-renderer-nerdfont.vim",
-      -- ファイルツリーのアイコンの色を設定
-      "lambdalisue/glyph-palette.vim",
-    },
-  },
+	-- ファイラー
+	{
+		"lambdalisue/fern.vim",
+		event = { "VimEnter" },
+		config = function()
+			require("extensions.fern")
+		end,
+		dependencies = {
+			"lambdalisue/fern-git-status.vim",
+			-- ステージへの追加と解除
+			"lambdalisue/fern-mapping-git.vim",
+			-- フォント表示
+			"lambdalisue/nerdfont.vim",
+			"lambdalisue/fern-renderer-nerdfont.vim",
+			-- ファイルツリーのアイコンの色を設定
+			"lambdalisue/glyph-palette.vim",
+		},
+	},
 	{
 		"rmehri01/onenord.nvim",
 		event = { "VimEnter" },
@@ -61,23 +53,23 @@ local plugins = {
 			require("extensions.onenord")
 		end,
 	},
-  -- ステータスライン
+	-- ステータスライン
 	{
 		"nvim-lualine/lualine.nvim",
 		event = { "VimEnter" },
 		config = function()
 			require("lualine").setup({
-        options = {
-          globalstatus = true,
-        }
-      })
+				options = {
+					globalstatus = true,
+				},
+			})
 		end,
 	},
 	{
 		"lewis6991/gitsigns.nvim",
 		event = { "BufReadPre" },
 	},
-  -- ファイル検索
+	-- ファイル検索
 	{
 		"nvim-telescope/telescope.nvim",
 		keys = {
@@ -100,7 +92,7 @@ local plugins = {
 		"petertriho/nvim-scrollbar",
 		event = { "BufNewFile", "BufReadPre" },
 	},
-  -- copilot
+	-- copilot
 	{
 		"zbirenbaum/copilot.lua",
 		event = { "InsertEnter" },
@@ -119,20 +111,22 @@ local plugins = {
 			"zbirenbaum/copilot.lua",
 		},
 	},
-  {
-    'hrsh7th/nvim-cmp',
-    event = { 'VimEnter' },
-    config = function() require 'extensions.nvim-cmp' end,
-    dependencies = {
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-buffer',
-      'hrsh7th/cmp-cmdline',
-      'hrsh7th/cmp-path',
-      'onsails/lspkind-nvim',
-      'L3MON4D3/LuaSnip',
-    },
-  },
-  -- mdプレビュー
+	{
+		"hrsh7th/nvim-cmp",
+		event = { "VimEnter" },
+		config = function()
+			require("extensions.nvim-cmp")
+		end,
+		dependencies = {
+			"hrsh7th/cmp-nvim-lsp",
+			"hrsh7th/cmp-buffer",
+			"hrsh7th/cmp-cmdline",
+			"hrsh7th/cmp-path",
+			"onsails/lspkind-nvim",
+			"L3MON4D3/LuaSnip",
+		},
+	},
+	-- mdプレビュー
 	{
 		"iamcco/markdown-preview.nvim",
 		cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
