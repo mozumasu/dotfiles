@@ -102,6 +102,13 @@ local plugins = {
 	},
   -- copilot
 	{
+		"zbirenbaum/copilot.lua",
+		event = { "InsertEnter" },
+		config = function()
+			require("extensions.copilot")
+		end,
+	},
+	{
 		"zbirenbaum/copilot-cmp",
 		event = { "InsertEnter" },
 		config = function()
@@ -112,6 +119,19 @@ local plugins = {
 			"zbirenbaum/copilot.lua",
 		},
 	},
+  {
+    'hrsh7th/nvim-cmp',
+    event = { 'VimEnter' },
+    config = function() require 'extensions.nvim-cmp' end,
+    dependencies = {
+      'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/cmp-buffer',
+      'hrsh7th/cmp-cmdline',
+      'hrsh7th/cmp-path',
+      'onsails/lspkind-nvim',
+      'L3MON4D3/LuaSnip',
+    },
+  },
   -- mdプレビュー
 	{
 		"iamcco/markdown-preview.nvim",
@@ -119,13 +139,6 @@ local plugins = {
 		ft = { "markdown" },
 		build = function()
 			vim.fn["mkdp#util#install"]()
-		end,
-	},
-	{
-		"zbirenbaum/copilot.lua",
-		event = { "InsertEnter" },
-		config = function()
-			require("extensions.copilot")
 		end,
 	},
 }

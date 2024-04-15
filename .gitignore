@@ -34,3 +34,6 @@ Session.vim
 
 # lsp
 .config/coc/
+
+# copilot
+.config/github-copilot/hosts.json
