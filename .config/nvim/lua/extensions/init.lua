@@ -126,6 +126,14 @@ local plugins = {
 			"L3MON4D3/LuaSnip",
 		},
 	},
+	-- コメントアウト
+	{
+		"numToStr/Comment.nvim",
+		opts = {
+			-- add any options here
+		},
+		lazy = false,
+	},
 	-- mdプレビュー
 	{
 		"iamcco/markdown-preview.nvim",

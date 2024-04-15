@@ -1,4 +1,5 @@
 {
+  "Comment.nvim": { "branch": "master", "commit": "0236521ea582747b58869cb72f70ccfa967d2e89" },
   "LuaSnip": { "branch": "master", "commit": "be7be2ca7f55bb881a7ffc16b2efa5af034ab06b" },
   "StyLua": { "branch": "main", "commit": "049bb7c2c5ff0f764eec8ab3627e114ff23ddabf" },
   "ale": { "branch": "master", "commit": "6db58b33795430a6165f27c7f796c420c0e098e4" },
