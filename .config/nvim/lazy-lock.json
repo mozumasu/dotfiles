@@ -10,6 +10,7 @@
   "coc.nvim": { "branch": "release", "commit": "196d8f0314bc6199f8243f00411ca7d87adc3c30" },
   "copilot-cmp": { "branch": "master", "commit": "72fbaa03695779f8349be3ac54fa8bd77eed3ee3" },
   "copilot.lua": { "branch": "master", "commit": "f7612f5af4a7d7615babf43ab1e67a2d790c13a6" },
+  "emmet-vim": { "branch": "master", "commit": "def5d57a1ae5afb1b96ebe83c4652d1c03640f4d" },
   "fern-git-status.vim": { "branch": "master", "commit": "151336335d3b6975153dad77e60049ca7111da8e" },
   "fern-mapping-git.vim": { "branch": "master", "commit": "df5e7466df8596c95dd355d49a72893018919cf1" },
   "fern-renderer-nerdfont.vim": { "branch": "master", "commit": "84fae1b9caf2ec9e185bf150ce5e85cf8f18a268" },

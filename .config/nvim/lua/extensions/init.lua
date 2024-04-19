@@ -134,6 +134,13 @@ local plugins = {
 		},
 		lazy = false,
 	},
+	{
+		"mattn/emmet-vim",
+		ft = { "html", "css", "javascript", "typescript", "php", "vue", "svelte", "markdown" },
+		config = function()
+			require("extensions.emmet")
+		end,
+	},
 	-- mdプレビュー
 	{
 		"iamcco/markdown-preview.nvim",
