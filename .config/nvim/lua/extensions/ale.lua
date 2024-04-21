@@ -32,7 +32,7 @@ vim.g.ale_fixers = {
 	go = { "trim_whitespace", "remove_trailing_lines", "goimports", "gofmt" },
 	lua = { "stylua" },
 	html = { "prettier" },
-	php = { "phpcbf" },
+	php = { "php_cs_fixer" },
 }
 
 -- ファイル保存時に実行
