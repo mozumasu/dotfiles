@@ -3,7 +3,7 @@
 export ZSH="$HOME/.oh-my-zsh"
 
 # oh-my-zshでロードするプラグインの設定
-plugins=(git z web-search fzf)
+plugins=(git z web-search fzf rye)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -41,6 +41,8 @@ antigen bundles <<EOBUNDLES
     # Extra zsh completions
     zsh-users/zsh-completions
     # z
+mkdir $ZSH_CUSTOM/plugins/rye
+rye self completion -s zsh > $ZSH_CUSTOM/plugins/rye/_rye
     rupa/z z.sh
     # abbr
     olets/zsh-abbr@main

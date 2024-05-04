@@ -30,5 +30,6 @@
   "onenord.nvim": { "branch": "main", "commit": "ce4aacbaa50b6b44a3e69eee6a3f380e96ccdbd0" },
   "plenary.nvim": { "branch": "master", "commit": "8aad4396840be7fc42896e3011751b7609ca4119" },
   "telescope-fzf-native.nvim": { "branch": "main", "commit": "9ef21b2e6bb6ebeaf349a0781745549bbb870d27" },
-  "telescope.nvim": { "branch": "master", "commit": "7011eaae0ac1afe036e30c95cf80200b8dc3f21a" }
+  "telescope.nvim": { "branch": "master", "commit": "7011eaae0ac1afe036e30c95cf80200b8dc3f21a" },
+  "vdebug": { "branch": "master", "commit": "66517871178779ac54e19ed0f34d66805b820664" }
 }
