@@ -11,18 +11,18 @@ local has_words_before = function()
 end
 
 cmp.setup({
-	mapping = map.preset.insert {
+	mapping = map.preset.insert({
 		["<C-d>"] = map.scroll_docs(-4),
 		["<C-f>"] = map.scroll_docs(4),
 		["<C-Space>"] = map.complete(),
 		["<C-e>"] = map.abort(),
 		["<CR>"] = map.confirm({
-			select = true,
-      behavior = cmp.ConfirmBehavior.Replace,
+			select = false,
+			behavior = cmp.ConfirmBehavior.Replace,
 		}),
 		["<Tab>"] = map(act.tab, { "i", "s" }),
 		["<S-Tab>"] = map(act.shift_tab, { "i", "s" }),
-	},
+	}),
 	sources = cmp.config.sources({
 		{ name = "nvim_lsp" },
 		{ name = "luasnip" },
