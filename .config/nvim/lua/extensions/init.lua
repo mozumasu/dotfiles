@@ -141,6 +141,10 @@ local plugins = {
 			require("extensions.emmet")
 		end,
 	},
+	--デバッグ
+	{
+		"vim-vdebug/vdebug",
+	},
 	-- mdプレビュー
 	{
 		"iamcco/markdown-preview.nvim",
