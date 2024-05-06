@@ -28,6 +28,9 @@ vim.api.nvim_win_set_option(0, 'wrap', false)
 -- 指定したカラム列を強調
 -- vim.api.nvim_win_set_option(0, 'colorcolumn', '100')
 
+-- python3
+vim.g.python3_host_prog = vim.fn.system('/opt/homebrew/bin/python3')
+
 -- buffer
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   pattern = '*',

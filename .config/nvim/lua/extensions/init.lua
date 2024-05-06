@@ -144,6 +144,9 @@ local plugins = {
 	--デバッグ
 	{
 		"vim-vdebug/vdebug",
+    dependencies = {
+      "neovim/pynvim",
+    }
 	},
 	-- mdプレビュー
 	{
