@@ -7,6 +7,10 @@ plugins=(git z web-search fzf rye)
 
 source $ZSH/oh-my-zsh.sh
 
+# ryeのプラグインを読み込む
+export PATH=$PATH:$HOME/.rye/shims
+
+export PATH=$PATH:$HOME/Library/Python/2.7/bin
 # 共通設定ファイル読み込み
 RC_COMMON=$HOME/dotfiles/.bin/.rc_common
 

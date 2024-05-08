@@ -29,7 +29,7 @@ vim.api.nvim_win_set_option(0, 'wrap', false)
 -- vim.api.nvim_win_set_option(0, 'colorcolumn', '100')
 
 -- python3
-vim.g.python3_host_prog = vim.fn.system('/opt/homebrew/bin/python3')
+vim.g.python3_host_prog = "/opt/homebrew/bin/python3"
 
 -- buffer
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
