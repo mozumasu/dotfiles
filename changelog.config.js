@@ -1,7 +1,7 @@
 module.exports = {
   disableEmoji: false,
   format: '{type}{scope}: {emoji}{subject}',
-  list: ['feat', 'test', 'fix', 'chore', 'docs', 'refactor', 'style', 'ci', 'perf', 'package', 'config'],
+  list: ['feat', 'test', 'fix', 'chore', 'docs', 'refactor', 'style', 'ci', 'perf', 'package', 'config', 'WIP'],
   maxMessageLength: 64,
   minMessageLength: 3,
   questions: ['type', 'scope', 'subject', 'body', 'breaking', 'issues', 'lerna'],
@@ -62,6 +62,11 @@ module.exports = {
       description: '設定ファイル',
       emoji: '⚙',
       value: 'config',
+    },
+    WIP: {
+      description: '作業途中',
+      emoji: '🚧',
+      value: 'WIP',
     },
   },
   messages: {
