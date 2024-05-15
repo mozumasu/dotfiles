@@ -55,7 +55,7 @@ alias fzc="git branch --list | cut -c 3- | fzf --preview \"git log --pretty=form
 # 関数
 #########################################
 
-# ブランチの変更「control + b」
+# ブランチの変更「control + s」
 function select-git-switch() {
   target_br=$(
     git branch -a |
@@ -69,7 +69,7 @@ function select-git-switch() {
   fi
 }
 zle -N select-git-switch
-bindkey "^b" select-git-switch
+bindkey "^s" select-git-switch
 
 # fzfでawsプロファイル変更
 alias awsp=set_aws_profile
@@ -82,7 +82,7 @@ function set_aws_profile() {
         --height 50% --layout=reverse --border --preview-window 'right:50%' \
         --preview "grep {} -A5 ~/.aws/config")
 
-  # プロファイルが選択されていない時は設定を解除する 
+  # プロファイルが選択されていない時は設定を解除する
   if [ -z "$selected_profile" ]; then
     echo "Unset aws profile!"
     unset AWS_PROFILE
@@ -96,7 +96,7 @@ function set_aws_profile() {
   export AWS_PROFILE="$selected_profile"
   unset AWS_ACCESS_KEY_ID
   unset AWS_SECRET_ACCESS_KEY
-  
+
   # ssoのセッションを確認し、期限切れの場合は再度ログイン
   local AWS_SSO_SESSION_NAME="mozumasu"
 
@@ -109,4 +109,3 @@ function set_aws_profile() {
     echo ${check_sso_session}
   fi
 }
-
