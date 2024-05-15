@@ -18,11 +18,11 @@
                 },
                 "rules": [
                     {
-                        "description": "control + b to control + h",
+                        "description": "Control-O to move to end of line and insert newline",
                         "manipulators": [
                             {
                                 "from": {
-                                    "key_code": "b",
+                                    "key_code": "o",
                                     "modifiers": {
                                         "mandatory": [
                                             "control"
@@ -34,16 +34,63 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "h",
+                                        "key_code": "right_arrow",
                                         "modifiers": [
-                                            "control"
+                                            "right_command"
                                         ]
+                                    },
+                                    {
+                                        "key_code": "return_or_enter"
                                     }
                                 ],
                                 "type": "basic"
                             }
                         ],
-                        "title": "Control B to Control H"
+                        "title": "Control-O to move to end of line and insert newline"
+                    },
+                    {
+                        "description": "control + f to BackSpace, control + d to forward delete",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "f",
+                                    "modifiers": {
+                                        "mandatory": [
+                                            "control"
+                                        ],
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "delete_or_backspace"
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "d",
+                                    "modifiers": {
+                                        "mandatory": [
+                                            "control"
+                                        ],
+                                        "optional": [
+                                            "any"
+                                        ]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "delete_forward"
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ],
+                        "title": "Control F to BackSpace and Control D to Forward Delete"
                     },
                     {
                         "description": "control + i to control + k",
