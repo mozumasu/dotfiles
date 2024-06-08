@@ -63,14 +63,14 @@
                         "title": "Control+Shift+I to copy the current line"
                     },
                     {
-                        "description": "control + o → control + m",
+                        "description": "option + o → control + o",
                         "manipulators": [
                             {
                                 "from": {
-                                    "key_code": "m",
+                                    "key_code": "o",
                                     "modifiers": {
                                         "mandatory": [
-                                            "control"
+                                            "option"
                                         ],
                                         "optional": [
                                             "any"
@@ -88,17 +88,17 @@
                                 "type": "basic"
                             }
                         ],
-                        "title": "Control O → Control M"
+                        "title": "Option O → Control M"
                     },
                     {
-                        "description": "control + i → control + n",
+                        "description": "control + i → option + i",
                         "manipulators": [
                             {
                                 "from": {
-                                    "key_code": "n",
+                                    "key_code": "i",
                                     "modifiers": {
                                         "mandatory": [
-                                            "control"
+                                            "option"
                                         ],
                                         "optional": [
                                             "any"
@@ -116,12 +116,20 @@
                                 "type": "basic"
                             }
                         ],
-                        "title": "Control I → Control N"
+                        "title": "Control I → Option i"
                     },
                     {
                         "description": "Control-O to move to end of line and insert newline",
                         "manipulators": [
                             {
+                                "conditions": [
+                                    {
+                                        "bundle_identifiers": [
+                                            "com.github.wez.wezterm"
+                                        ],
+                                        "type": "frontmost_application_unless"
+                                    }
+                                ],
                                 "from": {
                                     "key_code": "o",
                                     "modifiers": {
@@ -194,14 +202,14 @@
                         "title": "Control F to BackSpace and Control D to Forward Delete"
                     },
                     {
-                        "description": "control + i to control + k",
+                        "description": "option + k to control + k",
                         "manipulators": [
                             {
                                 "from": {
-                                    "key_code": "i",
+                                    "key_code": "k",
                                     "modifiers": {
                                         "mandatory": [
-                                            "control"
+                                            "option"
                                         ],
                                         "optional": [
                                             "any"
@@ -219,7 +227,7 @@
                                 "type": "basic"
                             }
                         ],
-                        "title": "Control I to Control K"
+                        "title": "Option I to Control K"
                     },
                     {
                         "description": "Left ctrl + hjkl to arrow keys Vim",
