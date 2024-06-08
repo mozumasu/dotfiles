@@ -142,12 +142,12 @@ local plugins = {
 		end,
 	},
 	--デバッグ
-	{
-		"vim-vdebug/vdebug",
-    dependencies = {
-      "neovim/pynvim",
-    }
-	},
+	-- {
+	-- 	"vim-vdebug/vdebug",
+	--    dependencies = {
+	--      "neovim/pynvim",
+	--    }
+	-- },
 	-- mdプレビュー
 	{
 		"iamcco/markdown-preview.nvim",
