@@ -13,6 +13,8 @@ vim.api.nvim_set_option('smartcase', true)
 vim.api.nvim_set_option('inccommand', 'split')
 -- クリップボードの有効化
 vim.api.nvim_set_option('clipboard', 'unnamedplus')
+-- クリップボードの有効化
+vim.opt.clipboard:append('unnamed')
 
 -- window
 -- 行番号表示
