@@ -1,9 +1,9 @@
-local wezterm = require 'wezterm'
+local wezterm = require("wezterm")
 
 local config = {}
 
 if wezterm.config_builder then
-  config = wezterm.config_builder()
+	config = wezterm.config_builder()
 end
 
 -- keybinds
@@ -24,10 +24,9 @@ config.font_size = 13.0
 -- 最初からフルスクリーンで起動
 local mux = wezterm.mux
 wezterm.on("gui-startup", function(cmd)
-    local tab, pane, window = mux.spawn_window(cmd or {})
-    window:gui_window():toggle_fullscreen()
+	local tab, pane, window = mux.spawn_window(cmd or {})
+	window:gui_window():toggle_fullscreen()
 end)
 
 -- and finally, return the configuration to wezterm
 return config
-
