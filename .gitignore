@@ -37,3 +37,6 @@ Session.vim
 
 # copilot
 .config/github-copilot/hosts.json
+
+# lazygit
+.config/lazygit/state.yml

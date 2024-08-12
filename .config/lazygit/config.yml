@@ -1,0 +1,4 @@
+customCommands:
+  - command: git cz
+    context: files
+    subprocess: true
