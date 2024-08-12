@@ -117,3 +117,7 @@ zstyle ':completion:*:default' menu select=2
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# java
+export JAVA_HOME=/opt/homebrew/Cellar/openjdk@11/11.0.24/libexec/openjdk.jdk/Contents/Home
+export PATH=$JAVA_HOME/bin:$PATH
+export CPPFLAGS="-I/opt/homebrew/opt/openjdk@11/include"

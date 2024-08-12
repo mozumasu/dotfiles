@@ -1,3 +1,4 @@
 {
-  "svelte.enable-ts-plugin": false
+  "svelte.enable-ts-plugin": false,
+  "java.import.gradle.java.home": "/opt/homebrew/Cellar/openjdk@11/11.0.24/libexec/openjdk.jdk/Contents/Home"
 }
