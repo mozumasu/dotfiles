@@ -122,3 +122,6 @@ export NVM_DIR="$HOME/.config/nvm"
 export JAVA_HOME=/opt/homebrew/Cellar/openjdk@11/11.0.24/libexec/openjdk.jdk/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH
 export CPPFLAGS="-I/opt/homebrew/opt/openjdk@11/include"
+
+# TiDB
+export PATH=/Users/mozumasu/.tiup/bin:$PATH
