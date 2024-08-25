@@ -12,6 +12,8 @@ end)
 
 return {
 	keys = {
+		-- コマンドパレット表示
+		{ key = "p", mods = "SUPER", action = act.ActivateCommandPalette },
 		-- Tab移動
 		{ key = "Tab", mods = "CTRL", action = act.ActivateTabRelative(1) },
 		{ key = "Tab", mods = "SHIFT|CTRL", action = act.ActivateTabRelative(-1) },
