@@ -136,7 +136,7 @@ local plugins = {
 	},
 	{
 		"mattn/emmet-vim",
-		ft = { "html", "css", "javascript", "typescript", "php", "vue", "svelte", "markdown" },
+		ft = { "html", "css", "javascript", "typescript", "typescriptreact", "php", "vue", "svelte", "markdown" },
 		config = function()
 			require("extensions.emmet")
 		end,
