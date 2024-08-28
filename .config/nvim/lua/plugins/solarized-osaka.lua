@@ -9,10 +9,10 @@ return {
     },
   },
   -- 起動時のデフォルト設定
-  {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "solarized-osaka",
-    },
-  },
+  -- {
+  --   "LazyVim/LazyVim",
+  --   opts = {
+  --     colorscheme = "solarized-osaka",
+  --   },
+  -- },
 }
