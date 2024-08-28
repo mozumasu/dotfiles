@@ -1,7 +1,7 @@
 return {
   {
     "catppuccin/nvim",
-    lazy = false, -- この指定がないと反映されない
+    lazy = false, -- 起動時に読み込まないと、uiリストに追加されない
     name = "catppuccin",
     opts = {
       integrations = {
@@ -42,10 +42,11 @@ return {
       },
     },
   },
-  {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "catppuccin",
-    },
-  },
+  -- 起動時のデフォルト設定に使用したい場合は下記を有効化する
+  -- {
+  --   "LazyVim/LazyVim",
+  --   opts = {
+  --     colorscheme = "catppuccin",
+  --   },
+  -- },
 }
