@@ -1,12 +1,11 @@
-#!/bin/sh
-echo "precommit"
+#!/bin/bash
 
-if [ -z "`git config --local user.name`" ]; then
-  echo "fatal: user.name is not set locally"
-  exit 1
-fi
+# 変更差分をチェックしたい場合
+# git diff --cached --diff-filter=AM | typos -
+# 変更ファイル全体をチェックしたい場合
+git diff --cached --name-only --diff-filter=AM | xargs typos
 
-if [ -z "`git config --local user.email`" ]; then
-  echo "fatal: user.email is not set locally"
+# typoがある場合にコミットを防ぐ
+if [[ $? -ne 0 ]]; then
   exit 1
 fi
