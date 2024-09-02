@@ -1,2 +1,4 @@
 [default.extend-words]
 mozumasu = "mozumasu"
+iterm = "iterm"
+args = "args"
