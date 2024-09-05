@@ -32,3 +32,6 @@ github
 actionlint
 yml
 jsonschema
+Ansible
+hoge
+role
