@@ -1,6 +1,10 @@
 local keymap = vim.keymap
 local opts = { noremap = true, silent = true }
 
+-- Control + I と Tab をデフォルトの状態に戻す
+vim.api.nvim_set_keymap("n", "<C-i>", "<C-i>", { noremap = true })
+vim.api.nvim_set_keymap("i", "<C-i>", "<C-i>", { noremap = true })
+
 -- Increment / Decrement
 keymap.set("n", "+", "<C-a>", opts)
 keymap.set("n", "-", "<C-x>", opts)
