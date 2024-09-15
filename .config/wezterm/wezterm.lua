@@ -1,75 +1,61 @@
 local wezterm = require("wezterm")
-local config = {}
-
-if wezterm.config_builder then
-  config = wezterm.config_builder()
-end
+local config = wezterm.config_builder()
 
 config.automatically_reload_config = true
-
-config.window_decorations = "RESIZE"
-config.window_background_opacity = 0.8
-config.macos_window_background_blur = 20
-
-config.window_padding = {
-  bottom = 0,
-}
-
 config.font_size = 12.0
+config.use_ime = true
+config.window_background_opacity = 0.85
+config.macos_window_background_blur = 20
 
 ----------------------------------------------------
 -- Tab
 ----------------------------------------------------
-config.show_new_tab_button_in_tab_bar = false
-config.show_close_tab_button_in_tabs = false
+-- タイトルバーを非表示
+config.window_decorations = "RESIZE"
 -- falseにするとタブバーの透過が効かなくなる
 -- config.use_fancy_tab_bar = false
--- タブバーを透過する
+
+-- タブバーの透過
+config.window_frame = {
+  inactive_titlebar_bg = "none",
+  active_titlebar_bg = "none",
+}
+
+-- タブバーを背景色に合わせる
 config.window_background_gradient = {
   colors = { "#000000" },
 }
 
-config.window_frame = {
-  active_titlebar_bg = "none",
-}
+-- タブの追加ボタンを非表示
+config.show_new_tab_button_in_tab_bar = false
+-- nightlyのみ使用可能
+-- タブの閉じるボタンを非表示
+config.show_close_tab_button_in_tabs = false
 
--- config.tab_bar.inactive_tab_edge = "none"
+-- タブ同士の境界線を非表示
 config.colors = {
   tab_bar = {
     inactive_tab_edge = "none",
-    active_tab = {
-      bg_color = "none",
-      fg_color = "none",
-    },
   },
 }
 
--- The filled in variant of the < symbol
+-- タブの形をカスタマイズ
+-- タブの左側の装飾
 local SOLID_LEFT_ARROW = wezterm.nerdfonts.ple_lower_right_triangle
--- The filled in variant of the > symbol
+-- タブの右側の装飾
 local SOLID_RIGHT_ARROW = wezterm.nerdfonts.ple_upper_left_triangle
 
 wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
-  local edge_background = "none"
   local background = "#5c6d74"
   local foreground = "#FFFFFF"
-
+  local edge_background = "none"
   if tab.is_active then
     background = "#ae8b2d"
     foreground = "#FFFFFF"
-    -- Copy mode
-  elseif hover then
-    background = "#3b3052"
-    foreground = "#FFFFFF"
   end
-
   local edge_foreground = background
-
-  -- local title = wezterm.truncate_right(tab.active_pane.title, max_width - 2)
   local title = "   " .. wezterm.truncate_right(tab.active_pane.title, max_width - 1) .. "   "
-
   return {
-    -- { string.format(" %d ", tab_index) },
     { Background = { Color = edge_background } },
     { Foreground = { Color = edge_foreground } },
     { Text = SOLID_LEFT_ARROW },
@@ -85,16 +71,19 @@ end)
 ----------------------------------------------------
 -- keybinds
 ----------------------------------------------------
+-- local act = require("wezterm").action
+
 config.disable_default_key_bindings = true
 config.keys = require("keybinds").keys
 config.key_tables = require("keybinds").key_tables
 config.leader = { key = "q", mods = "CTRL", timeout_milliseconds = 2000 }
 
--- 最初からフルスクリーンで起動
-local mux = wezterm.mux
-wezterm.on("gui-startup", function(cmd)
-  local tab, pane, window = mux.spawn_window(cmd or {})
-  window:gui_window():toggle_fullscreen()
-end)
+-- config.keys = {
+--   {
+--     mods = "LEADER",
+--     key = "s",
+--     action = act.ShowLauncherArgs({ flags = "WORKSPACES", title = "Select workspace" }),
+--   },
+-- }
 
 return config
