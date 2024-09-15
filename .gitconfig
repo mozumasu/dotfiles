@@ -29,3 +29,5 @@
 [init]
 	defaultBranch = main
 	templatedir = ~/.git-templates
+[http]
+	postBuffer = 524288000
