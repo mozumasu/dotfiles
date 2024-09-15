@@ -42,4 +42,4 @@ Session.vim
 .config/lazygit/state.yml
 
 # colima
-.confgi/colima/*
+.config/colima/*
