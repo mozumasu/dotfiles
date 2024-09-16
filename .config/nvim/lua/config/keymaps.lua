@@ -34,3 +34,10 @@ keymap.set("n", "<C-w><down>", "<C-w>-")
 keymap.set("n", "<C-j>", function()
   vim.diagnostic.goto_next()
 end, opts)
+
+-- lazydocker
+if vim.fn.executable("lazydocker") == 1 then
+  vim.keymap.set("n", "<leader>d", function()
+    LazyVim.terminal("lazydocker", { esc_esc = false, ctrl_hjkl = false })
+  end, { desc = "LazyDocker" })
+end
