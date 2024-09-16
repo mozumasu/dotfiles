@@ -1,7 +1,8 @@
 return {
   {
     "catppuccin/nvim",
-    lazy = false, -- 起動時に読み込まないと、uiリストに追加されない
+    enabled = false,
+    lazy = true, -- この指定がないと反映されない
     name = "catppuccin",
     opts = {
       integrations = {
