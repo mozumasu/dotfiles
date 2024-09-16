@@ -1,6 +1,7 @@
 return {
   {
     "folke/tokyonight.nvim",
+    enable = false,
     lazy = false, -- 起動時に読み込まないと、uiリストに追加されない
     opts = { style = "moon" },
   },
