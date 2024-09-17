@@ -31,3 +31,5 @@
 	templatedir = ~/.git-templates
 [http]
 	postBuffer = 524288000
+[ghq]
+	root = /Users/mozumasu/src
