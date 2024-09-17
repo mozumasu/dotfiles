@@ -43,3 +43,6 @@ Session.vim
 
 # colima
 .config/colima/*
+
+# lazydocker
+.config/lazydocker/*
