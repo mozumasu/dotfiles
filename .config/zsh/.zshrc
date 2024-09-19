@@ -209,3 +209,6 @@ function ghq-fzf() {
 }
 zle -N ghq-fzf
 bindkey '^g' ghq-fzf
+
+export PATH=$PATH:$HOME/go/bin
+
