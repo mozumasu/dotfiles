@@ -12,6 +12,8 @@ config.macos_window_background_blur = 20
 ----------------------------------------------------
 -- タイトルバーを非表示
 config.window_decorations = "RESIZE"
+-- タブが一つの時は非表示
+config.hide_tab_bar_if_only_one_tab = true
 -- falseにするとタブバーの透過が効かなくなる
 -- config.use_fancy_tab_bar = false
 
