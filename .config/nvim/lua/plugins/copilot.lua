@@ -37,6 +37,10 @@ return {
         group_index = 1,
         priority = 100,
       })
+      -- Change the key mapping for completion from Enter to Tab
+      opts.mapping = {
+        ["<Tab>"] = require("cmp").mapping.confirm({ select = true }),
+      }
     end,
   },
   {
