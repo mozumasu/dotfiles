@@ -104,6 +104,10 @@ return {
     { key = "8", mods = "SUPER", action = act.ActivateTab(7) },
     { key = "9", mods = "SUPER", action = act.ActivateTab(-1) },
 
+    -- スクロール
+    { key = "b", mods = "CTRL", action = act.ScrollByPage(-1) },
+    { key = "f", mods = "CTRL", action = act.ScrollByPage(1) },
+
     -- コマンドパレット
     { key = "p", mods = "SHIFT|CTRL", action = act.ActivateCommandPalette },
     -- 設定再読み込み
