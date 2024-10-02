@@ -32,15 +32,34 @@ return {
     },
     ---@param opts cmp.ConfigSchema
     opts = function(_, opts)
+      local cmp, copilot = require("cmp"), require("copilot.suggestion")
+      local snip_status_ok, luasnip = pcall(require, "luasnip")
+      if not snip_status_ok then
+        return
+      end
+      local function has_words_before()
+        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+      end
+
       table.insert(opts.sources, 1, {
         name = "copilot",
         group_index = 1,
         priority = 100,
       })
-      -- Change the key mapping for completion from Enter to Tab
-      opts.mapping = {
-        ["<Tab>"] = require("cmp").mapping.confirm({ select = true }),
-      }
+      opts.mapping["<Tab>"] = cmp.mapping(function(fallback)
+        if copilot.is_visible() then
+          copilot.accept()
+        elseif cmp.visible() then
+          cmp.confirm({ select = true })
+        elseif luasnip.expand_or_jumpable() then
+          luasnip.expand_or_jump()
+        elseif has_words_before() then
+          cmp.complete()
+        else
+          fallback()
+        end
+      end, { "i", "s" })
     end,
   },
   {
