@@ -60,6 +60,10 @@ return {
           fallback()
         end
       end, { "i", "s" })
+      -- Enterで補完を確定せずに改行する
+      opts.mapping["<CR>"] = cmp.mapping(function(fallback)
+        fallback()
+      end)
     end,
   },
   {
