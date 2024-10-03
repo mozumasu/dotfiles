@@ -3,6 +3,8 @@
 -- vim標準スペルチェックから日本語を除外
 vim.opt.spelllang:append("cjk")
 
+-- ヘルプの言語を日本語に設定
+vim.opt.helplang = "ja"
 -- ターミナルでもTrue Colorを有効にする
 vim.opt.termguicolors = true
 -- floating windowの背景を透過
