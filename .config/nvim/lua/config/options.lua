@@ -2,13 +2,26 @@
 -- vim.opt.winbar = "%=%m %f"
 -- vim標準スペルチェックから日本語を除外
 vim.opt.spelllang:append("cjk")
-
 -- ヘルプの言語を日本語に設定
 vim.opt.helplang = "ja"
 -- ターミナルでもTrue Colorを有効にする
 vim.opt.termguicolors = true
--- floating windowの背景を透過
+
+-- 初期状態で floating window の透過を有効にする
 vim.opt.winblend = 20
+-- コマンドラインモードに入ったときに透過を無効にする
+vim.api.nvim_create_autocmd("CmdlineEnter", {
+  callback = function()
+    vim.opt.winblend = 0 -- 透過効果を無効にする
+  end,
+})
+-- コマンドラインモードを終了したときに透過を再び有効にする
+vim.api.nvim_create_autocmd("CmdlineLeave", {
+  callback = function()
+    vim.opt.winblend = 20 -- 透過効果を再び有効にする
+  end,
+})
+
 -- 補完メニューの背景を透過
 vim.opt.pumblend = 50
 
