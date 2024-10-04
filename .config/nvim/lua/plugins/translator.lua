@@ -1,10 +1,13 @@
 return {
   {
     "voldikss/vim-translator",
+    cmd = { "TranslateW", "TranslateW --target_lang=en" },
     keys = {
       { "<leader>t", "", desc = "Translate" },
-      { "<leader>tj", "<cmd>TranslateW<CR>", mode = { "n", "v" }, desc = "to Japanese" },
-      { "<leader>te", "<cmd>TranslateW --target_lang=en<CR>", mode = { "n", "v" }, desc = "to English" },
+      { "<leader>tj", "<cmd>TranslateW<CR>", mode = "n", desc = "to Japanese" },
+      { "<leader>tj", ":'<,'>TranslateW<CR>", mode = "v", desc = "to Japanese" },
+      { "<leader>te", "<cmd>TranslateW --target_lang=en<CR>", mode = "n", desc = "to English" },
+      { "<leader>te", ":'<,'>TranslateW --target_lang=en<CR>", mode = "v", desc = "to English" },
     },
     config = function()
       vim.g.translator_target_lang = "ja"
