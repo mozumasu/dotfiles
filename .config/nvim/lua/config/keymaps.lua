@@ -66,3 +66,13 @@ keydel("t", "<C-h>", { desc = "Go to Left Window" })
 keydel("t", "<C-j>", { desc = "Go to Lower Window" })
 keydel("t", "<C-k>", { desc = "Go to Upper Window" })
 keydel("t", "<C-l>", { desc = "Go to Right Window" })
+
+-- substitution word under cursor
+keymap("n", "#", function()
+  local current_word = vim.fn.expand("<cword>")
+  vim.api.nvim_feedkeys(":%s/" .. current_word .. "//g", "n", false)
+  -- :%s/word/CURSOR/g
+  local ll = vim.api.nvim_replace_termcodes("<Left><Left>", true, true, true)
+  vim.api.nvim_feedkeys(ll, "n", false)
+  vim.opt.hlsearch = true
+end, { desc = "substitusion word under cursor", opts })
