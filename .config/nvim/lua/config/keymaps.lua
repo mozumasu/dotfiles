@@ -67,6 +67,26 @@ keydel("t", "<C-j>", { desc = "Go to Lower Window" })
 keydel("t", "<C-k>", { desc = "Go to Upper Window" })
 keydel("t", "<C-l>", { desc = "Go to Right Window" })
 
+-- browse under cursor
+keymap("n", "gh", function()
+  local cfile = vim.fn.expand("<cfile>")
+  if cfile:match("^https?://") then
+    os.execute("open '" .. cfile .. "'") -- for macOS
+  else
+    vim.cmd("normal! gF!")
+  end
+end, { desc = "link open" })
+
+-- browse github repogitory
+keymap("n", "<leader>gR", function()
+  local github_repogitory_name = vim.fn.expand("<cfile>")
+  if github_repogitory_name:match(".+/[^/]+") then
+    os.execute("open 'https://github.com/" .. github_repogitory_name .. "'") -- for macOS
+  else
+    vim.cmd("normal!, gF!")
+  end
+end, { desc = "GitHub repogitory" })
+
 -- substitution word under cursor
 keymap("n", "#", function()
   local current_word = vim.fn.expand("<cword>")
