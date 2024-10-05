@@ -1,6 +1,6 @@
 return {
   "vim-jp/vimdoc-ja",
-  lazy = true,
+  -- lazy = true,
   keys = {
     { "h", mode = "c" },
   },
