@@ -3,11 +3,43 @@ return {
     "voldikss/vim-translator",
     cmd = { "TranslateW", "TranslateW --target_lang=en" },
     keys = {
+      -- Popup
+      -- Translate words into Japanese -- Translate lines into Japanese
       { "<leader>t", "", desc = "Translate" },
-      { "<leader>tj", "<cmd>TranslateW<CR>", mode = "n", desc = "to Japanese" },
-      { "<leader>tj", ":'<,'>TranslateW<CR>", mode = "v", desc = "to Japanese" },
-      { "<leader>te", "<cmd>TranslateW --target_lang=en<CR>", mode = "n", desc = "to English" },
-      { "<leader>te", ":'<,'>TranslateW --target_lang=en<CR>", mode = "v", desc = "to English" },
+      { "<leader>tj", "<cmd>TranslateW<CR>", mode = "n", desc = "Translate words into Japanese" },
+      { "<leader>tj", ":'<,'>TranslateW<CR>", mode = "v", desc = "Translate lines into Japanese" },
+      { "<leader>te", "<cmd>TranslateW --target_lang=en<CR>", mode = "n", desc = "Translate words into English" },
+      { "<leader>te", ":'<,'>TranslateW --target_lang=en<CR>", mode = "v", desc = "Translate lines into English" },
+      -- Replace
+      { "<leader>tr", "", desc = "Translate Replace" },
+      -- Replace to Japanese
+      { "<leader>trj", ":'<,'>TranslateR<CR>", mode = "v", desc = "Replace to Japanese" },
+      {
+        "<leader>trj",
+        function()
+          vim.api.nvim_feedkeys("V", "n", false)
+          -- Run translator command after a short delay
+          vim.defer_fn(function()
+            vim.api.nvim_feedkeys(":TranslateR\n", "n", false)
+          end, 100) -- 100ms delay
+        end,
+        mode = "n",
+        desc = "to Japanese",
+      },
+      -- Replace to English
+      { "<leader>tre", ":'<,'>TranslateR --target_lang=en<CR>", mode = "v", desc = "Replace to English" },
+      {
+        "<leader>tre",
+        function()
+          vim.api.nvim_feedkeys("V", "n", false)
+          -- Run translator command after a short delay
+          vim.defer_fn(function()
+            vim.api.nvim_feedkeys(":TranslateR --target_lang=en\n", "n", false)
+          end, 100) -- 100ms delay
+        end,
+        mode = "n",
+        desc = "Replace to English",
+      },
     },
     config = function()
       vim.g.translator_target_lang = "ja"
@@ -15,6 +47,7 @@ return {
       vim.g.translator_history_enable = true
     end,
   },
+
   {
     "potamides/pantran.nvim",
     keys = {
