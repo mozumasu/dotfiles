@@ -53,7 +53,7 @@ return {
   {
     "potamides/pantran.nvim",
     keys = {
-      { "<leader>tw", "<cmd>Pantran<CR>", mode = "n", desc = "Show Translate Window" },
+      { "<leader>tw", "<cmd>Pantran<CR>", mode = { "n", "v" }, desc = "Show Translate Window" },
     },
     config = function()
       require("pantran").setup({
@@ -61,7 +61,7 @@ return {
         engines = {
           google = {
             fallback = {
-              default_source = "auto",
+              default_source = "en",
               default_target = "ja",
             },
             -- NOTE: must set `DEEPL_AUTH_KEY` env-var
@@ -80,17 +80,38 @@ return {
           window_config = { border = "rounded" },
         },
         controls = {
-          mappings = {
+          mappings = { -- Help Popup order cannot be changed
             edit = {
               -- normal mode mappings
               n = {
-                ["j"] = "gj",
-                ["k"] = "gk",
+                -- ["j"] = "gj",
+                -- ["k"] = "gk",
+                ["S"] = require("pantran.ui.actions").switch_languages,
+                ["e"] = require("pantran.ui.actions").select_engine,
+                ["s"] = require("pantran.ui.actions").select_source,
+                ["t"] = require("pantran.ui.actions").select_target,
+                ["<C-y>"] = require("pantran.ui.actions").yank_close_translation,
+                ["g?"] = require("pantran.ui.actions").help,
+                --disable default mappings
+                ["<C-Q>"] = false,
+                ["gA"] = false,
+                ["gS"] = false,
+                ["gR"] = false,
+                ["ga"] = false,
+                ["ge"] = false,
+                ["gr"] = false,
+                ["gs"] = false,
+                ["gt"] = false,
+                ["gY"] = false,
+                ["gy"] = false,
               },
               -- insert mode mappings
               i = {
-                ["<C-y>"] = false,
-                ["<C-a>"] = require("pantran.ui.actions").yank_close_translation,
+                ["<C-y>"] = require("pantran.ui.actions").yank_close_translation,
+                ["<C-t>"] = require("pantran.ui.actions").select_target,
+                ["<C-s>"] = require("pantran.ui.actions").select_source,
+                ["<C-e>"] = require("pantran.ui.actions").select_engine,
+                ["<C-S>"] = require("pantran.ui.actions").switch_languages,
               },
             },
             -- Keybindings here are used in the selection window.
