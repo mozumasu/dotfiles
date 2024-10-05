@@ -6,3 +6,4 @@ debug
 foo.*
 *.log
 data
+en.utf-8.add.spl

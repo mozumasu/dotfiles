@@ -76,7 +76,6 @@ colima
 ｯ
 ω
 mozumasu
-NeoVim
 LazyVim
 nvim
 Vimmer
@@ -84,3 +83,8 @@ lazydocker
 keymap
 keymappings
 avante
+cmp
+AstroNvim
+gif
+scutil
+jp
