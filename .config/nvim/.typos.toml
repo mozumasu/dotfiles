@@ -2,3 +2,6 @@
 mozumasu = "mozumasu"
 iterm = "iterm"
 args = "args"
+
+[default]
+extend-ignore-re = ["<cmd>.+<cr>", "<leader>.+\""]
