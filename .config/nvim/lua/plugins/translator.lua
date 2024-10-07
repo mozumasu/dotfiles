@@ -16,8 +16,8 @@ return {
       {
         "<leader>trj",
         function()
-          vim.api.nvim_feedkeys("V", "n", false)
-          -- Run translator command after a short delay
+          vim.api.nvim_feedkeys("^vg_", "n", false)
+          -- Execute the conversion command after a short delay.
           vim.defer_fn(function()
             vim.api.nvim_feedkeys(":TranslateR\n", "n", false)
           end, 100) -- 100ms delay
