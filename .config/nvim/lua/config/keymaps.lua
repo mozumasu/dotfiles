@@ -95,4 +95,4 @@ keymap("n", "#", function()
   local ll = vim.api.nvim_replace_termcodes("<Left><Left>", true, true, true)
   vim.api.nvim_feedkeys(ll, "n", false)
   vim.opt.hlsearch = true
-end, { desc = "substitusion word under cursor", opts })
+end, { desc = "substitusion word under cursor" })
