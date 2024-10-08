@@ -1,4 +1,4 @@
-# 💤 LazyVim
+# 💤 Neovim
 
-A starter template for [LazyVim](https://github.com/LazyVim/LazyVim).
-Refer to the [documentation](https://lazyvim.github.io/installation) to get started.
+- [folke/lazy.nvim: 💤 A modern plugin manager for Neovim](https://github.com/folke/lazy.nvim)
+- [🚀 Getting Started | LazyVim](https://www.lazyvim.org/)
