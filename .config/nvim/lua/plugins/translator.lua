@@ -30,7 +30,7 @@ return {
       {
         "<leader>tre",
         function()
-          vim.api.nvim_feedkeys("V", "n", false)
+          vim.api.nvim_feedkeys("^vg_", "n", false)
           -- Run translator command after a short delay
           vim.defer_fn(function()
             vim.api.nvim_feedkeys(":TranslateR --target_lang=en\n", "n", false)
