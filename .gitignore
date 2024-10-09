@@ -46,3 +46,9 @@ Session.vim
 
 # lazydocker
 .config/lazydocker/*
+
+# zenn
+zenn-cli.json
+
+# octo.nvim
+(rite)
