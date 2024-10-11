@@ -48,6 +48,8 @@ return {
         end),
       }),
     },
+    -- Convert ¥ key to \
+    { key = "¥", mods = "NONE", action = wezterm.action.SendString("\\") },
     -- コマンドパレット表示
     { key = "p", mods = "SUPER", action = act.ActivateCommandPalette },
     -- Tab移動

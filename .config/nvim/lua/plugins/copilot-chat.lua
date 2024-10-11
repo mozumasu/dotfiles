@@ -21,9 +21,9 @@ return {
   end,
   keys = {
     { "<c-s>", "<CR>", ft = "copilot-chat", desc = "Submit Prompt", remap = true },
-    { "<leader>a", "", desc = "+ai", mode = { "n", "v" } },
+    { "<leader>C", "", desc = "CopilotChat", mode = { "n", "v" } },
     {
-      "<leader>aa",
+      "<leader>Ca",
       function()
         return require("CopilotChat").toggle()
       end,
@@ -31,7 +31,7 @@ return {
       mode = { "n", "v" },
     },
     {
-      "<leader>ax",
+      "<leader>Cx",
       function()
         return require("CopilotChat").reset()
       end,
@@ -39,7 +39,7 @@ return {
       mode = { "n", "v" },
     },
     {
-      "<leader>aq",
+      "<leader>Cq",
       function()
         local input = vim.fn.input("Quick Chat: ")
         if input ~= "" then
@@ -50,9 +50,9 @@ return {
       mode = { "n", "v" },
     },
     -- Show help actions with telescope
-    { "<leader>ad", M.pick("help"), desc = "Diagnostic Help (CopilotChat)", mode = { "n", "v" } },
+    { "<leader>Cd", LazyVim.pick("help"), desc = "Diagnostic Help (CopilotChat)", mode = { "n", "v" } },
     -- Show prompts actions with telescope
-    { "<leader>ap", M.pick("prompt"), desc = "Prompt Actions (CopilotChat)", mode = { "n", "v" } },
+    { "<leader>Cp", LazyVim.pick("prompt"), desc = "Prompt Actions (CopilotChat)", mode = { "n", "v" } },
   },
   config = function(_, opts)
     local chat = require("CopilotChat")
