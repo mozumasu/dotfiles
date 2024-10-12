@@ -7,4 +7,5 @@ foo.*
 *.log
 data
 en.utf-8.add.spl
+en.utf-8.add
 zenn-cli.json
