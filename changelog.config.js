@@ -91,10 +91,10 @@ module.exports = {
     },
   },
   messages: {
-    type: "プレフィックスを選択してね:",
-    subject: "コミットのタイトル（概要）を入力してね:\n",
-    body: "変更内容の詳細があれば入力してね:\n",
-    breaking: "重大な変更があれば入力してね:\n",
-    issues: "解決したissueがあれば入力してね, 例 #123:",
+    type: "プレフィックスを選択:",
+    subject: "コミットのタイトル（概要）を入力(option):\n",
+    body: "変更内容の詳細を入力(option):\n",
+    breaking: "重大な変更を入力(option):\n",
+    issues: "関連するisuueを入力(option), 例 #123:",
   },
 };
