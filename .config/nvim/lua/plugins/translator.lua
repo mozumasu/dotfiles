@@ -23,7 +23,7 @@ return {
           end, 100) -- 100ms delay
         end,
         mode = "n",
-        desc = "to Japanese",
+        desc = "Replace to Japanese",
       },
       -- Replace to English
       { "<leader>tre", ":'<,'>TranslateR --target_lang=en<CR>", mode = "v", desc = "Replace to English" },
