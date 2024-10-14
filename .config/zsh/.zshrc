@@ -81,6 +81,7 @@ abbr -S gcm='git commit' >>/dev/null
 abbr -S gmg='git merge' >>/dev/null
 abbr -S gpsh='git push' >>/dev/null
 abbr -S lg='lazygit' >>/dev/null
+abbr -S f='open .' >>/dev/null
 alias ap='ansible-playbook'
 
 # volta ここに記載しないと読み込めない
@@ -199,6 +200,7 @@ function chpwd_volta_install() {
 }
 add-zsh-hook chpwd chpwd_volta_install
 
+# ghq
 function ghq-fzf() {
   local src=$(ghq list | fzf --preview "bat --color=always --style=header,grid --line-range :80 $(ghq root)/{}/README.*")
   if [ -n "$src" ]; then
@@ -212,3 +214,12 @@ bindkey '^g' ghq-fzf
 
 export PATH=$PATH:$HOME/go/bin
 
+# Move to the open finder directory
+cdf() {
+  target=`osascript -e 'tell application "Finder" to if (count of Finder windows) > 0 then get POSIX path of (target of front Finder window as text)'`
+  if [ "$target" != "" ]; then
+    cd "$target"; pwd
+  else
+    echo 'No Finder window found' >&2
+  fi
+}
