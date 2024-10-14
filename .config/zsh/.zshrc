@@ -66,6 +66,7 @@ alias zshconfig="vim ~/.zshrc"
 alias ohmyzsh="vim ~/.oh-my-zsh"
 alias ls='ls -F --color=auto'
 alias mul='multipass'
+alias ggrks='google'
 abbr -S ll='ls -l' >>/dev/null
 abbr -S la='ls -A' >>/dev/null
 abbr -S lla='ls -l -A' >>/dev/null
