@@ -35,90 +35,37 @@
 
 ```text
 
-                       MMMMMMMMMMMMC>>?MMMMMMN,    ,MMMMM^  .MMMMMMMMMMMM
-                       MMMMMMMMMMMp>>>>?MMMMMMN,    ,MMM^    .MMMMMMMMMMM
-                       MMMMMMMMMMMMe>>>>?MMMMMMN,    ,M'    .MMMMMMMMMMMM
-                       MMMMMMMMMMMMMe>>>>?MMMMMMN,         .MMMMMMMMMMMMM
-                       MMMMMMM#YYYYY"1>>>>?YYYYYYB,       .MMMMMMMMMMMMMM
-                       MMMMMM#>>>>>>>>>>>>>>>>>>>>d,     .MMMMMM#<MMMMMMM
-                       MMMMM#>>>>>>>>>>>>>>>>>>>>>>d,    .MMMMM#<>>HMMMMM
-                       MMMMMMMMMMMMM#"""""4MMMMMMMMMM,    .MMM#>>>>>MMMMM
-                       MMMMMMMMMMMMM!    .MMMMMMMMMMMMx    .M#>>>>>dMMMMM
-                       MMMMMMMMMMMM`    .MMMMMMMMMMMMMMe    J>>>>>dMMMMMM
-                       MMHHHMMMMMB`    .MMMMMMMMMMMMMMMMp .Z>>>>>dMMMMMMM
-                       F              .MMMMMMMMMMMMMMMMMMpf>>>>>>>>>>>>>d
-                       p             .WMMMMMMMMMMMMMMMMMM@>>>>>>>>>>>>>>j
-                       MNgggg+J     ,3>dMMMMMMMMMMMMMMMM@>>>>+ggggggggggM
-                       MMMMMM@     ,C>>>dMMMMMMMMMMMMMM@>>>>+MMMMMMMMMMMM
-                       MMMMMD     .N+>>>>dMMMMMMMMMMMME>>>>jMMMMMMMMMMMMM
-                       MMMM#     (MMNx>>>>dMMMMMMMMMMN&&&&&MMMMMMMMMMMMMM
-                       MMMMMb   JMMMMNx>>>>d,                      (MMMMM
-                       MMMMMMR JMMMMMME>>>>>d,                    JMMMMMM
-                       MMMMMMMMMMMMMME>>>>>>>?&.......     ......JMMMMMMM
-                       MMMMMMMMMMMMM8>>>>>>>>>?MMMMMMN,    -MMMMMMMMMMMMM
-                       MMMMMMMMMMMM5>>>>jMe>>>>?MMMMMMN,    ,MMMMMMMMMMMM
-                       MMMMMMMMMMMD>>>>uMMMe>>>>?MMMMMMN,    ,MMMMMMMMMMM
-                       MMMMMMMMMMMNx>>uMMMMMe>>>>?MMMMMMN,  .dMMMMMMMMMMM
 
+                               .---\         "MMMMN,     #MM#.
+                              /     \         "MMMMM,   MMMMM7
+                               \     \         "MMMMM,vMMMMM"
+                                \     \         "MMMMMMMMMM"
+                          .------?     4--------\"MMMMMMMM"
+                         /                       \"MMMMM4      /\
+                        /_________________________\"MMMMM.    /  \
+                                .MMMMM"             "MMMMM.  /    \
+                               .MMMMM"               "MMMMM,/      /
+                              .MMMMM"                 "MMMM/      /
+                             .MMMMM"                   "MM/      /
+                    MMMMMMMMMMMMMM"                     "/      4------.
+                   pMMMMMMMMMMMMM",                     /               '
+                    NMMMMMMMMMMM"/ \                   /      _________/
+                         ,#MMMM"/   \                 /      /
+                        ,MMMMM"/     \               /      /
+                       "MMMMM"  \     \             /______/
+                        "MMM"    \     \"MMMMMMMMMMMMMMMMMMMMMMMMMP
+                         "M"     /      \"MMMMMMMMMMMMMMMMMMMMMMMP
+                          "     /        \"MMMMMMMMMMMMMMMMMMMMMP
+                               /          \         "NMMMM,
+                              /     /\     \         "NMMMMM
+                             4     /  \     \         "NMMMM"
+                              \___/    \_____\         "NMM"
 
-
-                                   C>>?      N,>>>>,     ^>>.
-                                  pMMMM?      N,>>>>,   ^>>>>.
-                                   eMMMM?      N,>>>>, '>>>>.
-                                    eMMMM?      N,>>>>>>>>>.
-                              #YYYYY"1MMMM?YYYYYYB,       .
-                             #MMMMMMMMMMMMMMMMMMMMd,     .      #<
-                            #MMMMMMMMMMMMMMMMMMMMMMd,    .     #<>>H
-                                     """""4          ,    .   #MMMMM
-                                    !>>>>d            x    . #MMMMMd
-                                   `>>>>d              e    JMMMMMd
-                         ________B`>>>>d                p .ZMMMMMd
-                        >>>>>>>>>>>>>>d                  pfMMMMMMMMMMMMMd
-                       p>>>>>>>>>>>>>.W                  @MMMMMMMMMMMMMMj
-                        Ngggg+J     ,3>d                @MMMMMggggggggggM
-                             @     ,CMMMd              @MMMM+
-                            D     .N+MMM>d            EMMMMj
-                           #     (  NxMMMMd         dN&&&&&
-                            b   J    NxMMMMd,>>>>>>>>>>>>>>>>>>>>>>(
-                             R J      EMMMMMd,>>>>>>>>>>>>>>>>>>>>J
-                                     EMMMMMMM?&>>>>>>>>>>>>>>>>>>J
-                                    8MMMMMMMMM?       ,>>>>>
-                                   5MMMMj e>>>>?       ,>>>>>
-                                  DMMMMu   e>>>>?       ,>>>>>
-                                  Nx>>u     e>>>>?       ,>>>>/
-
-
-
-                                   .---\         "MMMMN,     #MM#.
-                                  /     \         "MMMMM,   MMMMM7
-                                   \     \         "MMMMM,vMMMMM"
-                                    \     \         "MMMMMMMMMM"
-                              .------?     4--------\"MMMMMMMM"
-                             /                       \"MMMMM4      /\
-                            /_________________________\"MMMMM.    /  \
-                                    .MMMMM"             "MMMMM.  /    \
-                                   .MMMMM"               "MMMMM,/      /
-                                  .MMMMM"                 "MMMM/      /
-                                 .MMMMM"                   "MM/      /
-                        MMMMMMMMMMMMMM"                     "/      4------.
-                       pMMMMMMMMMMMMM",                     /               '
-                        NMMMMMMMMMMM"/ \                   /      _________/
-                             ,#MMMM"/   \                 /      /
-                            ,MMMMM"/     \               /      /
-                           "MMMMM"  \     \             /______/
-                            "MMM"    \     \"MMMMMMMMMMMMMMMMMMMMMMMMMP
-                             "M"     /      \"MMMMMMMMMMMMMMMMMMMMMMMP
-                              "     /        \"MMMMMMMMMMMMMMMMMMMMMP
-                                   /          \         "NMMMM,
-                                  /     /\     \         "NMMMMM
-                                 4     /  \     \         "NMMMM"
-                                  \___/    \_____\         "NMM"
-
-                                        ███╗   ██╗██╗██╗  ██╗
-                                        ████╗  ██║██║╚██╗██╔╝
-                                        ██╔██╗ ██║██║ ╚███╔╝
-                                        ██║╚██╗██║██║ ██╔██╗
-                                        ██║ ╚████║██║██╔╝╚██╗
-                                        ╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝
+                                     ███╗   ██╗██╗██╗  ██╗
+                                     ████╗  ██║██║╚██╗██╔╝
+                                     ██╔██╗ ██║██║ ╚███╔╝
+                                     ██║╚██╗██║██║ ██╔██╗
+                                     ██║ ╚████║██║██╔╝╚██╗
+                                     ╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝
 
 ```
