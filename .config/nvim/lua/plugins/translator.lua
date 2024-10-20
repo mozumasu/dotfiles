@@ -7,6 +7,21 @@ return {
       { "<leader>t", "", desc = "Translate" },
       { "<leader>tj", "<cmd>TranslateW<CR>", mode = "n", desc = "Translate words into Japanese" },
       { "<leader>tj", ":'<,'>TranslateW<CR>", mode = "v", desc = "Translate lines into Japanese" },
+      {
+        "<leader>tj",
+        function()
+          -- Yanks the selected range in visual mode and stores it in a register.
+          vim.cmd('normal! "vy')
+          -- Store the contents of register 'v' to a variable
+          local selected_text = vim.fn.getreg("v")
+          vim.cmd("'<,'>TranslateW")
+          -- Execute the say command asynchronously to read the text stored in a variable
+          vim.uv.spawn("say", { args = { "-v", "Ava", selected_text } }, function() end)
+        end,
+        mode = "v",
+        desc = "Read aloud the selected text using say command and register",
+      },
+
       { "<leader>te", "<cmd>TranslateW --target_lang=en<CR>", mode = "n", desc = "Translate words into English" },
       { "<leader>te", ":'<,'>TranslateW --target_lang=en<CR>", mode = "v", desc = "Translate lines into English" },
       -- Replace

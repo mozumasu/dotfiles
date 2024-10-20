@@ -96,3 +96,9 @@ keymap("n", "#", function()
   vim.api.nvim_feedkeys(ll, "n", false)
   vim.opt.hlsearch = true
 end, { desc = "substitusion word under cursor" })
+
+-- say command
+keymap("n", "<leader>say", function()
+  local current_word = vim.fn.expand("<cword>")
+  vim.api.nvim_feedkeys(":!say -v Ava " .. current_word .. "\n", "n", false)
+end, { desc = "say command" })
