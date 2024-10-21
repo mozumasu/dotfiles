@@ -14,14 +14,65 @@ return {
           vim.cmd('normal! "vy')
           -- Store the contents of register 'v' to a variable
           local selected_text = vim.fn.getreg("v")
-          vim.cmd("'<,'>TranslateW")
-          -- Execute the say command asynchronously to read the text stored in a variable
-          vim.uv.spawn("say", { args = { "-v", "Ava", selected_text } }, function() end)
+          local words = vim.split(selected_text, "%s+")
+
+          -- Takes the rows and columns of the current visual mode selection.
+          local start_line = vim.fn.line("'<") -- Start of selection
+          local start_col = vim.fn.col("'<") -- starting color of selection range
+          local current_search_pos = 1 -- Control search start position
+
+          -- Function to highlight a specific word using matchaddpos
+          local function highlight_word(word_start_col, word_end_col, line)
+            -- Clear any previous matches
+            vim.fn.clearmatches()
+            -- Highlight the specific range for the word
+            vim.fn.matchaddpos("Search", { { line, word_start_col, word_end_col - word_start_col + 1 } })
+          end
+
+          -- Function to spawn the say command
+          local function spawn_say(index)
+            if index <= #words then
+              local word = words[index]
+
+              -- Calculate word column position based on strings in selection
+              local word_start_col, word_end_col = string.find(selected_text, word, current_search_pos, true)
+              if word_start_col == nil then
+                -- Terminates if no matching word is found.
+                return
+              end
+
+              -- Update search position and open next search.
+              current_search_pos = word_end_col + 1
+
+              -- Highlight the word asynchronously
+              vim.schedule(function()
+                -- Make sure the word is on a line within the selection.
+                if start_line then
+                  highlight_word(start_col + word_start_col - 1, start_col + word_end_col - 1, start_line)
+                end
+              end)
+
+              -- Asynchronous call to say command
+              vim.uv.spawn("say", { args = { "-v", "Ava", word } }, function()
+                -- Move to the next word after this one is read
+                vim.defer_fn(function()
+                  spawn_say(index + 1)
+                end, 1000) -- Adjust timing as needed for the next word
+              end)
+            else
+              -- Clear matches after reading is finished
+              vim.schedule(function()
+                vim.fn.clearmatches()
+              end)
+            end
+          end
+
+          -- Start highlighting and reading aloud the first word on the current line
+          spawn_say(1)
         end,
         mode = "v",
-        desc = "Read aloud the selected text using say command and register",
+        desc = "Read aloud the selected text using say command and highlight words",
       },
-
       { "<leader>te", "<cmd>TranslateW --target_lang=en<CR>", mode = "n", desc = "Translate words into English" },
       { "<leader>te", ":'<,'>TranslateW --target_lang=en<CR>", mode = "v", desc = "Translate lines into English" },
       -- Replace
