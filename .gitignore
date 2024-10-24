@@ -52,3 +52,6 @@ zenn-cli.json
 
 # octo.nvim
 (rite)
+
+# Vagrant
+.vagrant
