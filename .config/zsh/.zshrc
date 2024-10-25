@@ -224,3 +224,32 @@ cdf() {
     echo 'No Finder window found' >&2
   fi
 }
+
+# extend which
+function wch() {
+  result=`type $1`
+
+  if [ "`echo $result | grep 'not found'`" ]; then
+    echo 'not found'
+  elif [ "`echo $result | grep 'shell builtin'`" ]; then
+    echo 'shell built-in'
+  else
+    found=`echo $result | rev | cut -d ' ' -f 1 | rev`
+    dir=`dirname $found`
+    if [ $# = 1 ]; then
+      echo $found
+    elif [ $2 = 'ls' ]; then
+      ls $dir
+    elif [ $2 = 'dir' ]; then
+      echo $dir
+    elif [ $2 = 'cd' ]; then
+      cd $dir
+    elif [ $2 = 'vi' ]; then
+      if [ "`file $found | grep 'ASCII text'`" ]; then
+        vi $found
+      else
+        echo 'not a text'
+      fi
+    fi
+  fi
+}
