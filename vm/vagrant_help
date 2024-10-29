@@ -1,0 +1,66 @@
+Usage: vagrant [オプション] <コマンド> [<引数>]
+
+    -h, --help                       このヘルプを表示します。
+
+一般的なコマンド:
+     autocomplete    ホスト上のオートコンプリートのインストールを管理
+     box             ボックスの管理: インストール、削除など
+     cloud           Vagrant Cloudに関連するすべてを管理
+     destroy         Vagrantマシンを停止し、すべての痕跡を削除
+     global-status   このユーザーのVagrant環境のステータスを出力
+     halt            Vagrantマシンを停止
+     help            サブコマンドのヘルプを表示
+     init            Vagrantfileを作成して新しいVagrant環境を初期化
+     login           
+     package         実行中のVagrant環境をボックスにパッケージ化
+     plugin          プラグインの管理: インストール、アンインストール、更新など
+     port            ゲストポートマッピングに関する情報を表示
+     powershell      PowerShellリモート接続でマシンに接続
+     provision       Vagrantマシンをプロビジョニング
+     push            この環境のコードを設定された宛先にデプロイ
+     rdp             RDPでマシンに接続
+     reload          Vagrantマシンを再起動し、新しいVagrantfile設定を読み込む
+     resume          一時停止したVagrantマシンを再開
+     serve           Vagrantサーバーを起動
+     snapshot        スナップショットの管理: 保存、復元など
+     ssh             SSHでマシンに接続
+     ssh-config      マシンに接続するためのOpenSSH有効な設定を出力
+     status          Vagrantマシンのステータスを出力
+     suspend         マシンを一時停止
+     up              Vagrant環境を起動し、プロビジョニング
+     upload          コミュニケーターを介してマシンにアップロード
+     validate        Vagrantfileを検証
+     version         現在のVagrantバージョンと最新バージョンを表示
+     winrm           WinRMを介してマシン上でコマンドを実行
+     winrm-config    マシンに接続するためのWinRM設定を出力
+
+個々のコマンドのヘルプを表示するには `vagrant COMMAND -h` を実行してください
+
+追加のサブコマンドも利用可能ですが、より高度なものか、一般的に使用されないものです。すべてのサブコマンドを表示するには、`vagrant list-commands` コマンドを実行してください。
+        --[no-]color                 カラー出力を有効または無効にする
+        --machine-readable           機械可読出力を有効にする
+    -v, --version                    Vagrantバージョンを表示
+        --debug                      デバッグ出力を有効にする
+        --timestamp                  ログ出力にタイムスタンプを有効にする
+        --debug-timestamp            タイムスタンプ付きのデバッグ出力を有効にする
+        --no-tty                     非対話型出力を有効にする
+
+Usage: vagrant box <subcommand> [<args>]
+
+Available subcommands:
+     add
+     list
+     outdated
+     prune
+     remove
+     repackage
+     update
+
+For help on any individual subcommand run `vagrant box <subcommand> -h`
+        --[no-]color                 カラー出力を有効または無効にする
+        --machine-readable           機械可読出力を有効にする
+    -v, --version                    Vagrantバージョンを表示
+        --debug                      デバッグ出力を有効にする
+        --timestamp                  ログ出力にタイムスタンプを有効にする
+        --debug-timestamp            タイムスタンプ付きのデバッグ出力を有効にする
+        --no-tty                     非対話型出力を有効にする
