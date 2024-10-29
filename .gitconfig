@@ -28,7 +28,7 @@
 	allowed = wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 [init]
 	defaultBranch = main
-	templatedir = ~/.git-templates
+	templatedir = ~/.git_template/git-secrets
 [http]
 	postBuffer = 524288000
 [ghq]
