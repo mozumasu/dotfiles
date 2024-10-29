@@ -224,6 +224,11 @@ cdf() {
     echo 'No Finder window found' >&2
   fi
 }
+# mise
+if type mise &>/dev/null; then
+  eval "$(mise activate zsh)"
+  eval "$(mise activate --shims)"
+fi
 
 # extend which
 function wch() {
