@@ -85,6 +85,9 @@ abbr -S lg='lazygit' >>/dev/null
 abbr -S f='open .' >>/dev/null
 alias ap='ansible-playbook'
 
+# Laravel sail
+alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
+
 # volta ここに記載しないと読み込めない
 export VOLTA_HOME="$HOME/.volta"
 export PATH="$VOLTA_HOME/bin:$PATH"
