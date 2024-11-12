@@ -3,7 +3,7 @@
 export ZSH="$HOME/.oh-my-zsh"
 
 # oh-my-zshでロードするプラグインの設定
-plugins=(git z web-search fzf rye)
+plugins=(git z web-search rye)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -28,6 +28,8 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+zle -N fzf-history-widget
+bindkey '^R' fzf-history-widget
 
 # antigen
 source $HOME/.local/bin/antigen.zsh
@@ -86,6 +88,9 @@ abbr -S f='open .' >>/dev/null
 abbr -S relogin='exec $SHELL -l' >>/dev/null
 abbr -S ap='ansible-playbook' >>/dev/null
 abbr -S awsl='aws configure list' >>/dev/null
+abbr -S hosts='sudo nvim /etc/hosts' >>/dev/null
+abbr -S dhosts='nvim ~/.ssh/conf.d/hosts/' >>/dev/null
+
 
 # Laravel sail
 alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
