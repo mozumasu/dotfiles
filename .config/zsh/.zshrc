@@ -62,7 +62,7 @@ antigen apply
 eval "$(starship init zsh)"
 
 # alias
-alias zshconfig="vim ~/.zshrc"
+alias zshconf="vim ~/.zshrc"
 alias ohmyzsh="vim ~/.oh-my-zsh"
 alias ls='ls -F --color=auto'
 alias mul='multipass'
@@ -83,7 +83,9 @@ abbr -S gmg='git merge' >>/dev/null
 abbr -S gpsh='git push' >>/dev/null
 abbr -S lg='lazygit' >>/dev/null
 abbr -S f='open .' >>/dev/null
-alias ap='ansible-playbook'
+abbr -S relogin='exec $SHELL -l' >>/dev/null
+abbr -S ap='ansible-playbook' >>/dev/null
+abbr -S awsl='aws configure list' >>/dev/null
 
 # Laravel sail
 alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
