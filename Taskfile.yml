@@ -1,0 +1,30 @@
+version: "3"
+
+tasks:
+  default:
+    desc: "Show available tasks and execute the selected one using fzf"
+    cmds:
+      - |
+        selected_task=$(task -l | awk 'NR > 1 { sub(/:$/, "", $2); print $2 }' | fzf --prompt="Select a Task> ")
+        if [ -n "$selected_task" ]; then
+          task "$selected_task"
+        else
+          echo "No task selected."
+        fi
+
+  # HomeBrew
+  brew:
+    desc: Update Brewfile
+    cmds:
+      - |
+        if [ "$(uname)" != "Darwin" ]; then
+          echo "Not macOS!"
+          exit 1
+        fi
+
+        brew bundle dump --force
+
+  brew-install:
+    desc: install brew
+    cmds:
+      - brew bundle
