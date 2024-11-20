@@ -90,7 +90,7 @@ abbr -S ap='ansible-playbook' >>/dev/null
 abbr -S awsl='aws configure list' >>/dev/null
 abbr -S hosts='sudo nvim /etc/hosts' >>/dev/null
 abbr -S dhosts='nvim ~/.ssh/conf.d/hosts/' >>/dev/null
-abbr -S pjroot='cd $(git rev-parse --show-toplevel)' >>/dev/null
+abbr -S proot='cd $(git rev-parse --show-toplevel)' >>/dev/null
 
 # Laravel sail
 alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
