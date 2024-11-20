@@ -31,6 +31,18 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 zle -N fzf-history-widget
 bindkey '^R' fzf-history-widget
 
+fzf-ssh() {
+  local ssh_hosts_dir="$HOME/.ssh/conf.d/hosts"
+  local selected_host=$(grep -h -E -v '^#' "$ssh_hosts_dir"/* | grep -E '^HOST ' | awk '{print $2}' | fzf --prompt="Select SSH Host> ")
+
+  if [[ -n "$selected_host" ]]; then
+    echo "Connecting to $selected_host..."
+    ssh "$selected_host"
+  else
+    echo "No host selected."
+  fi
+}
+
 # antigen
 source $HOME/.local/bin/antigen.zsh
 
@@ -69,6 +81,7 @@ alias ohmyzsh="vim ~/.oh-my-zsh"
 alias ls='ls -F --color=auto'
 alias mul='multipass'
 alias ggrks='google'
+alias sshf='fzf-ssh'
 abbr -S ll='ls -l' >>/dev/null
 abbr -S la='ls -A' >>/dev/null
 abbr -S lla='ls -l -A' >>/dev/null
