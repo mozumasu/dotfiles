@@ -105,6 +105,15 @@ abbr -S hosts='sudo nvim /etc/hosts' >>/dev/null
 abbr -S dhosts='nvim ~/.ssh/conf.d/hosts/' >>/dev/null
 abbr -S proot='cd $(git rev-parse --show-toplevel)' >>/dev/null
 
+# zsh hook
+zshaddhistory() {
+    local line="${1%%$'\n'}"
+    if [ $? -ne 0 ]; then
+        return 1
+    fi
+    [[ ! "$line" =~ "^(cd|jj?|lazygit|la|ll|ls|rm|rmdir|z)($| )" ]]
+}
+
 # Laravel sail
 alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
 
