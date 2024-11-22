@@ -3,7 +3,7 @@
 export ZSH="$HOME/.oh-my-zsh"
 
 # oh-my-zshでロードするプラグインの設定
-plugins=(git z web-search rye)
+plugins=(git web-search rye)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -290,3 +290,6 @@ function wch() {
     fi
   fi
 }
+
+# Must be at the end of the file
+eval "$(zoxide init zsh)"
