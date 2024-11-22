@@ -46,26 +46,40 @@ if vim.fn.executable("lazydocker") == 1 then
 end
 
 -- terminal
-local lazyterm = function()
-  util.terminal(nil, { cwd = util.root(), border = "rounded" })
-end
+-- local lazyterm = function()
+--   util.terminal(nil, { cwd = util.root(), border = "rounded" })
+-- end
 
 -- floating terminal
-keymap("n", "<c-_>", lazyterm, { desc = "Terminal (cwd)" })
+-- keymap("n", "<c-_>", lazyterm, { desc = "Terminal (cwd)" })
+-- keymap("n", "<c-/>", function()
+--   util.terminal(nil, { border = "double" })
+-- end, { desc = "Terminal (root)" })
+-- keymap("t", "<esc>", "<c-\\><c-n>", { desc = "Enter Normal Mode" })
+-- keymap("t", "<C-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
+-- keymap("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
+
+-- floating terminal
+keymap("n", "<leader>fT", function()
+  Snacks.terminal()
+end, { desc = "Terminal (cwd)" })
+keymap("n", "<leader>ft", function()
+  Snacks.terminal(nil, { cwd = LazyVim.root() })
+end, { desc = "Terminal (Root Dir)" })
 keymap("n", "<c-/>", function()
-  util.terminal(nil, { border = "double" })
-end, { desc = "Terminal (root)" })
-keymap("t", "<esc>", "<c-\\><c-n>", { desc = "Enter Normal Mode" })
-keymap("t", "<C-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
-keymap("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
+  Snacks.terminal(nil, { cwd = LazyVim.root() })
+end, { desc = "Terminal (Root Dir)" })
+keymap("n", "<c-_>", function()
+  Snacks.terminal(nil, { cwd = LazyVim.root() })
+end, { desc = "which_key_ignore" })
 
 -- disable default keymappings
-keydel("n", "<leader>ft", { desc = "Terminal (cwd)" })
-keydel("n", "<leader>fT", { desc = "Terminal (root)" })
-keydel("t", "<C-h>", { desc = "Go to Left Window" })
-keydel("t", "<C-j>", { desc = "Go to Lower Window" })
-keydel("t", "<C-k>", { desc = "Go to Upper Window" })
-keydel("t", "<C-l>", { desc = "Go to Right Window" })
+-- keydel("n", "<leader>ft", { desc = "Terminal (cwd)" })
+-- keydel("n", "<leader>fT", { desc = "Terminal (root)" })
+-- keydel("t", "<C-h>", { desc = "Go to Left Window" })
+-- keydel("t", "<C-j>", { desc = "Go to Lower Window" })
+-- keydel("t", "<C-k>", { desc = "Go to Upper Window" })
+-- keydel("t", "<C-l>", { desc = "Go to Right Window" })
 
 -- browse under cursor
 keymap("n", "gh", function()
