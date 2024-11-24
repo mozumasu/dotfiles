@@ -5,6 +5,22 @@
             "complex_modifications": {
                 "rules": [
                     {
+                        "description": "^M to Enter",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "m",
+                                    "modifiers": {
+                                        "mandatory": ["left_control"],
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [{ "key_code": "return_or_enter" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "Ctrl+[を押したときに、escキーと英数キーを送信する",
                         "manipulators": [
                             {
@@ -123,6 +139,7 @@
                     },
                     {
                         "description": "option + o → control + o",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
