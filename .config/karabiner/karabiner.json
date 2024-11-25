@@ -193,6 +193,7 @@
                     },
                     {
                         "description": "control + f to BackSpace, control + d to forward delete",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "conditions": [
