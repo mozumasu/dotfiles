@@ -108,6 +108,8 @@ return {
     { key = "8", mods = "SUPER", action = act.ActivateTab(7) },
     { key = "9", mods = "SUPER", action = act.ActivateTab(-1) },
 
+    { key = "n", mods = "SUPER", action = act.SpawnWindow },
+
     -- スクロール
     { key = "b", mods = "CTRL", action = act.ScrollByPage(-1) },
     { key = "f", mods = "CTRL", action = act.ScrollByPage(1) },
