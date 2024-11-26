@@ -1,0 +1,10 @@
+{ "msg_showcmd", "sl:1", "tick:507", false, { { 0, "gj" } } }
+{ "msg_showcmd", "sl:1", "tick:509", false, { { 0, "gj" } } }
+{ "msg_showcmd", "sl:1", "tick:511", false, { { 0, "gk" } } }
+{ "msg_showcmd", "sl:1", "tick:513", false, { { 0, "gk" } } }
+{ "msg_showcmd", "sl:1", "tick:515", false, { { 0, "gk" } } }
+{ "msg_showcmd", "sl:1", "tick:517", false, { { 0, "gk" } } }
+{ "msg_showcmd", "sl:1", "tick:521", false, { { 0, ":" } } }
+{ "cmdline_show", "sl:1", "tick:522", "mode:c", { { 0, "" } } }
+{ "cmdline_show", "sl:1", "tick:525", "mode:c", { { 0, "q" } } }
+{ "cmdline_hide", "sl:1", "tick:527", false, 1 }
