@@ -7,13 +7,13 @@ sbar.default({
   icon = {
     font = {
       family = settings.font.text,
-      style = settings.font.style_map["Bold"],
-      size = 16.0,
+      style = settings.font.style_map["Semibold"],
+      size = 10.0,
     },
     color = colors.yellow,
     highlight = colors.background,
-    padding_left = 6,
-    padding_right = 2,
+    padding_left = 4,
+    padding_right = 1,
     corner_radius = 6,
     background = { image = { corner_radius = 12 } },
   },
@@ -21,7 +21,7 @@ sbar.default({
     font = {
       family = settings.font.text,
       style = settings.font.style_map["Semibold"],
-      size = 13.0,
+      size = 10.0,
     },
     color = colors.yellow,
     highlight = colors.background,
@@ -29,9 +29,9 @@ sbar.default({
     padding_right = settings.paddings,
   },
   background = {
-    height = 34,
+    height = 30,
     corner_radius = 10,
-    border_width = 2,
+    border_width = 1,
     border_color = colors.yellow,
     image = {
       corner_radius = 0,
