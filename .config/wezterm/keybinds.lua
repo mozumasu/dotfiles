@@ -111,8 +111,8 @@ return {
     { key = "n", mods = "SUPER", action = act.SpawnWindow },
 
     -- スクロール
-    { key = "b", mods = "CTRL", action = act.ScrollByPage(-1) },
-    { key = "f", mods = "CTRL", action = act.ScrollByPage(1) },
+    -- { key = "b", mods = "CTRL", action = act.ScrollByPage(-1) },
+    -- { key = "f", mods = "CTRL", action = act.ScrollByPage(1) },
 
     -- コマンドパレット
     { key = "p", mods = "SHIFT|CTRL", action = act.ActivateCommandPalette },
