@@ -259,19 +259,8 @@
                         "title": "Option I to Control K"
                     },
                     {
-                        "description": "Left ctrl + hjkl to arrow keys Vim",
+                        "description": "Left ctrl + jkl to arrow keys Vim",
                         "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "h",
-                                    "modifiers": {
-                                        "mandatory": ["left_control"],
-                                        "optional": ["any"]
-                                    }
-                                },
-                                "to": [{ "key_code": "left_arrow" }],
-                                "type": "basic"
-                            },
                             {
                                 "from": {
                                     "key_code": "j",
