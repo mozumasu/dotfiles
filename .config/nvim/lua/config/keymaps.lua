@@ -4,6 +4,11 @@ local keydel = vim.keymap.del
 local opts = { noremap = true, silent = true }
 local util = require("lazyvim.util")
 
+-- emacs like keybind
+keymap("i", "<C-a>", "<Home>", opts)
+keymap("i", "<C-e>", "<End>", opts)
+keymap("i", "<C-d>", "<Del>", opts)
+
 -- Control + I と Tab をデフォルトの状態に戻す
 vim.api.nvim_set_keymap("n", "<C-i>", "<C-i>", { noremap = true })
 vim.api.nvim_set_keymap("i", "<C-i>", "<C-i>", { noremap = true })
@@ -46,40 +51,16 @@ if vim.fn.executable("lazydocker") == 1 then
 end
 
 -- terminal
--- local lazyterm = function()
---   util.terminal(nil, { cwd = util.root(), border = "rounded" })
--- end
-
--- floating terminal
--- keymap("n", "<c-_>", lazyterm, { desc = "Terminal (cwd)" })
--- keymap("n", "<c-/>", function()
---   util.terminal(nil, { border = "double" })
--- end, { desc = "Terminal (root)" })
--- keymap("t", "<esc>", "<c-\\><c-n>", { desc = "Enter Normal Mode" })
--- keymap("t", "<C-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
--- keymap("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
-
--- floating terminal
-keymap("n", "<leader>fT", function()
-  Snacks.terminal()
-end, { desc = "Terminal (cwd)" })
-keymap("n", "<leader>ft", function()
-  Snacks.terminal(nil, { cwd = LazyVim.root() })
-end, { desc = "Terminal (Root Dir)" })
 keymap("n", "<c-/>", function()
-  Snacks.terminal(nil, { cwd = LazyVim.root() })
+  Snacks.terminal()
 end, { desc = "Terminal (Root Dir)" })
 keymap("n", "<c-_>", function()
   Snacks.terminal(nil, { cwd = LazyVim.root() })
-end, { desc = "which_key_ignore" })
+end, { desc = "Terminal (cwd)" })
 
 -- disable default keymappings
--- keydel("n", "<leader>ft", { desc = "Terminal (cwd)" })
--- keydel("n", "<leader>fT", { desc = "Terminal (root)" })
--- keydel("t", "<C-h>", { desc = "Go to Left Window" })
--- keydel("t", "<C-j>", { desc = "Go to Lower Window" })
--- keydel("t", "<C-k>", { desc = "Go to Upper Window" })
--- keydel("t", "<C-l>", { desc = "Go to Right Window" })
+keydel("n", "<leader>ft", { desc = "Terminal (cwd)" })
+keydel("n", "<leader>fT", { desc = "Terminal (root)" })
 
 -- browse under cursor
 keymap("n", "gh", function()
