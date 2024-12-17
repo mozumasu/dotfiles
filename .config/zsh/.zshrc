@@ -104,6 +104,7 @@ abbr -S -qq awsl='aws configure list'
 abbr -S -qq hosts='sudo nvim /etc/hosts'
 abbr -S -qq dhosts='nvim ~/.ssh/conf.d/hosts/'
 abbr -S -qq proot='cd $(git rev-parse --show-toplevel)'
+abbr -S -qq myip='curl ifconfig.me'
 
 # zsh hook
 zshaddhistory() {
