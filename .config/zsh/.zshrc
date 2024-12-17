@@ -105,8 +105,13 @@ abbr -S -qq hosts='sudo nvim /etc/hosts'
 abbr -S -qq dhosts='nvim ~/.ssh/conf.d/hosts/'
 abbr -S -qq proot='cd $(git rev-parse --show-toplevel)'
 abbr -S -qq myip='curl ifconfig.me'
+# vpnutil
+abbr -S -qq vpn='vpnutil'
+alias vpns='check_vpn_status'
+alias vpnc='vpn_connect_with_fzf'
+alias vpnd='vpn_disconnect_if_connected'
 
-# zsh hook
+# zsh hook ( for Mac )
 zshaddhistory() {
     local line="${1%%$'\n'}"
     if [ $? -ne 0 ]; then
@@ -168,6 +173,69 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+# vpnutil ( for Mac )
+# https://github.com/Timac/VPNStatus
+check_vpn_status() {
+  # Extract the output of vpnutil list as json.
+  vpn_data=$(vpnutil list)
+
+  # Extract connected vpn.
+  connected_vpns=$(echo "$vpn_data" | jq -r '.VPNs[] | select(.status == "Connected") | "\(.name) (\(.status))"')
+
+  if [[ -z "$connected_vpns" ]]; then
+    echo "No Connected"
+  else
+    echo "Connected VPN:"
+    echo "$connected_vpns"
+  fi
+}
+
+vpn_connect_with_fzf() {
+  # Extract the output of vpnutil list as json.
+  vpn_data=$(vpnutil list)
+
+  # Get the name and status of the VPN and select it with fzf.
+  selected_vpn=$(echo "$vpn_data" | jq -r '.VPNs[] | "\(.name) (\(.status))"' | fzf --prompt="choose a vpn: ")
+
+  # If there is no selected VPN, exit
+  if [[ -z "$selected_vpn" ]]; then
+    echo "VPN selection canceled."
+    return
+  fi
+
+  # Extract the vpn name
+  vpn_name=$(echo "$selected_vpn" | sed 's/ (.*)//')
+
+  # Connection place
+  echo "connection: $vpn_name"
+  vpnutil start "$vpn_name"
+
+  check_vpn_status
+}
+
+vpn_disconnect_if_connected() {
+  # Extract the output of vpnutil list as json.
+  vpn_data=$(vpnutil list)
+
+  # Extract connected VPN
+  connected_vpns=$(echo "$vpn_data" | jq -r '.VPNs[] | select(.status == "Connected") | .name')
+
+  if [[ -z "$connected_vpns" ]]; then
+    echo "No vpn connected."
+  else
+    echo "Disconnect the following VPN connections:"
+    echo "$connected_vpns"
+    
+    # Turn off each connected VPN.
+    for vpn in $connected_vpns; do
+      echo "cutting: $vpn"
+      vpnutil stop "$vpn"
+    done
+    echo "Disconnected all vpn connections."
+  fi
+}
+
 
 # volta
 autoload -Uz add-zsh-hook
