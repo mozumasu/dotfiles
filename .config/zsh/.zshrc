@@ -105,13 +105,13 @@ abbr -S -qq hosts='sudo nvim /etc/hosts'
 abbr -S -qq dhosts='nvim ~/.ssh/conf.d/hosts/'
 abbr -S -qq proot='cd $(git rev-parse --show-toplevel)'
 abbr -S -qq myip='curl ifconfig.me'
-# vpnutil
+# vpnutil ( for Mac )
 abbr -S -qq vpn='vpnutil'
 alias vpns='check_vpn_status'
 alias vpnc='vpn_connect_with_fzf'
 alias vpnd='vpn_disconnect_if_connected'
 
-# zsh hook ( for Mac )
+# zsh hook
 zshaddhistory() {
     local line="${1%%$'\n'}"
     if [ $? -ne 0 ]; then
