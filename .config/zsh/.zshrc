@@ -111,6 +111,11 @@ alias vpns='check_vpn_status'
 alias vpnc='vpn_connect_with_fzf'
 alias vpnd='vpn_disconnect_if_connected'
 
+# SVN
+alias svnbat='bat ~/dotfiles/docs/svn.md'
+alias svna='svn st | grep "^?" | awk "{print $2}" | xargs svn add'
+alias svnr='svn st | grep "^!" | awk "{print $2}" | xargs svn rm'
+
 # zsh hook
 zshaddhistory() {
     local line="${1%%$'\n'}"
