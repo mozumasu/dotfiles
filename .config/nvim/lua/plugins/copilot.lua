@@ -1,121 +1,118 @@
 return {
+  recommended = true,
+  -- copilot
   {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",
     build = ":Copilot auth",
+    event = "InsertEnter",
     opts = {
-      suggestion = { enabled = false },
+      suggestion = {
+        enabled = not vim.g.ai_cmp,
+        auto_trigger = true,
+        keymap = {
+          accept = false, -- handled by nvim-cmp / blink.cmp
+          next = "<M-]>",
+          prev = "<M-[>",
+        },
+      },
       panel = { enabled = false },
       filetypes = {
         markdown = true,
-        yaml = true,
         help = true,
       },
     },
   },
-  {
-    "nvim-cmp",
-    dependencies = {
-      {
-        "zbirenbaum/copilot-cmp",
-        dependencies = "copilot.lua",
-        opts = {},
-        config = function(_, opts)
-          local copilot_cmp = require("copilot_cmp")
-          copilot_cmp.setup(opts)
-          -- attach cmp source whenever copilot attaches
-          -- fixes lazy-loading issues with the copilot cmp source
-          LazyVim.lsp.on_attach(function(client)
-            copilot_cmp._on_insert_enter({})
-          end, "copilot")
-        end,
-      },
-    },
-    ---@param opts cmp.ConfigSchema
-    opts = function(_, opts)
-      local cmp, copilot = require("cmp"), require("copilot.suggestion")
-      local snip_status_ok, luasnip = pcall(require, "luasnip")
-      if not snip_status_ok then
-        return
-      end
-      local function has_words_before()
-        local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-        return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
-      end
 
-      table.insert(opts.sources, 1, {
-        name = "copilot",
-        group_index = 1,
-        priority = 100,
-      })
-      opts.mapping["<Tab>"] = cmp.mapping(function(fallback)
-        if copilot.is_visible() then
-          copilot.accept()
-        elseif cmp.visible() then
-          cmp.confirm({ select = true })
-        elseif luasnip.expand_or_jumpable() then
-          luasnip.expand_or_jump()
-        elseif has_words_before() then
-          cmp.complete()
-        else
-          fallback()
-        end
-      end, { "i", "s" })
-      -- Enterで補完を確定せずに改行する
-      opts.mapping["<CR>"] = cmp.mapping(function(fallback)
-        fallback()
-      end)
-    end,
-  },
+  -- add ai_accept action
   {
-    "zbirenbaum/copilot-cmp",
-    dependencies = "copilot.lua",
-    opts = {},
-    config = function(_, opts)
-      local copilot_cmp = require("copilot_cmp")
-      copilot_cmp.setup(opts)
-      -- attach cmp source whenever copilot attaches
-      -- fixes lazy-loading issues with the copilot cmp source
-      LazyVim.lsp.on_attach(function(client)
-        copilot_cmp._on_insert_enter({})
-      end, "copilot")
+    "zbirenbaum/copilot.lua",
+    opts = function()
+      LazyVim.cmp.actions.ai_accept = function()
+        if require("copilot.suggestion").is_visible() then
+          LazyVim.create_undo()
+          require("copilot.suggestion").accept()
+          return true
+        end
+      end
     end,
   },
+
+  -- lualine
   {
     "nvim-lualine/lualine.nvim",
     optional = true,
     event = "VeryLazy",
     opts = function(_, opts)
-      local colors = {
-        [""] = LazyVim.ui.fg("Special"),
-        ["Normal"] = LazyVim.ui.fg("Special"),
-        ["Warning"] = LazyVim.ui.fg("DiagnosticError"),
-        ["InProgress"] = LazyVim.ui.fg("DiagnosticWarn"),
-      }
-      table.insert(opts.sections.lualine_x, 2, {
-        function()
-          local icon = LazyVim.config.icons.kinds.Copilot
-          local status = require("copilot.api").status.data
-          return icon .. (status.message or "")
-        end,
-        cond = function()
-          if not package.loaded["copilot"] then
-            return
+      table.insert(
+        opts.sections.lualine_x,
+        2,
+        LazyVim.lualine.status(LazyVim.config.icons.kinds.Copilot, function()
+          local clients = package.loaded["copilot"] and LazyVim.lsp.get_clients({ name = "copilot", bufnr = 0 }) or {}
+          if #clients > 0 then
+            local status = require("copilot.api").status.data.status
+            return (status == "InProgress" and "pending") or (status == "Warning" and "error") or "ok"
           end
-          local ok, clients = pcall(LazyVim.lsp.get_clients, { name = "copilot", bufnr = 0 })
-          if not ok then
-            return false
-          end
-          return ok and #clients > 0
-        end,
-        color = function()
-          if not package.loaded["copilot"] then
-            return
-          end
-          local status = require("copilot.api").status.data
-          return colors[status.status] or colors[""]
-        end,
-      })
+        end)
+      )
     end,
   },
+
+  vim.g.ai_cmp
+      and {
+        -- copilot cmp source
+        {
+          "hrsh7th/nvim-cmp",
+          optional = true,
+          dependencies = { -- this will only be evaluated if nvim-cmp is enabled
+            {
+              "zbirenbaum/copilot-cmp",
+              opts = {},
+              config = function(_, opts)
+                local copilot_cmp = require("copilot_cmp")
+                copilot_cmp.setup(opts)
+                -- attach cmp source whenever copilot attaches
+                -- fixes lazy-loading issues with the copilot cmp source
+                LazyVim.lsp.on_attach(function()
+                  copilot_cmp._on_insert_enter({})
+                end, "copilot")
+              end,
+              specs = {
+                {
+                  "hrsh7th/nvim-cmp",
+                  optional = true,
+                  ---@param opts cmp.ConfigSchema
+                  opts = function(_, opts)
+                    table.insert(opts.sources, 1, {
+                      name = "copilot",
+                      group_index = 1,
+                      priority = 100,
+                    })
+                  end,
+                },
+              },
+            },
+          },
+        },
+        {
+          "saghen/blink.cmp",
+          optional = true,
+          dependencies = { "giuxtaposition/blink-cmp-copilot" },
+          opts = {
+            sources = {
+              default = { "copilot" },
+              providers = {
+                copilot = {
+                  name = "copilot",
+                  module = "blink-cmp-copilot",
+                  kind = "Copilot",
+                  score_offset = 100,
+                  async = true,
+                },
+              },
+            },
+          },
+        },
+      }
+    or nil,
 }
