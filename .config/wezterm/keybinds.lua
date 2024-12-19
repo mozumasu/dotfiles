@@ -112,7 +112,9 @@ return {
 
     -- スクロール
     -- { key = "b", mods = "CTRL", action = act.ScrollByPage(-1) },
-    -- { key = "f", mods = "CTRL", action = act.ScrollByPage(1) },
+
+    -- QuickSelect
+    { key = "Enter", mods = "SHIFT", action = "QuickSelect" }, -- { key = "f", mods = "CTRL", action = act.ScrollByPage(1) },
 
     -- コマンドパレット
     { key = "p", mods = "SHIFT|CTRL", action = act.ActivateCommandPalette },
