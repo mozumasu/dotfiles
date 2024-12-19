@@ -12,8 +12,6 @@ return {
         auto_trigger = true,
         keymap = {
           accept = false, -- handled by nvim-cmp / blink.cmp
-          next = "<M-]>",
-          prev = "<M-[>",
         },
       },
       panel = { enabled = false },
@@ -100,6 +98,7 @@ return {
           optional = true,
           dependencies = { "giuxtaposition/blink-cmp-copilot" },
           opts = {
+            keymap = { preset = "super-tab" },
             sources = {
               default = { "copilot" },
               providers = {
