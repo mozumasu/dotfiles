@@ -99,13 +99,25 @@ return {
             n = {
               -- ["j"] = "gj",
               -- ["k"] = "gk",
-              ["S"] = require("pantran.ui.actions").switch_languages,
-              ["e"] = require("pantran.ui.actions").select_engine,
-              ["s"] = require("pantran.ui.actions").select_source,
-              ["t"] = require("pantran.ui.actions").select_target,
-              ["<C-y>"] = require("pantran.ui.actions").yank_close_translation,
-              ["g?"] = require("pantran.ui.actions").help,
-              --disable default mappings
+              ["S"] = function()
+                require("pantran").actions.switch_languages()
+              end,
+              ["e"] = function()
+                require("pantran").actions.select_engine()
+              end,
+              ["s"] = function()
+                require("pantran").actions.select_source()
+              end,
+              ["t"] = function()
+                require("pantran").actions.select_target()
+              end,
+              ["<C-y>"] = function()
+                require("pantran").actions.yank_close_translation()
+              end,
+              ["g?"] = function()
+                require("pantran").actions.help()
+              end,
+              -- disable default mappings
               ["<C-Q>"] = false,
               ["gA"] = false,
               ["gS"] = false,
@@ -120,11 +132,21 @@ return {
             },
             -- insert mode mappings
             i = {
-              ["<C-y>"] = require("pantran.ui.actions").yank_close_translation,
-              ["<C-t>"] = require("pantran.ui.actions").select_target,
-              ["<C-s>"] = require("pantran.ui.actions").select_source,
-              ["<C-e>"] = require("pantran.ui.actions").select_engine,
-              ["<C-S>"] = require("pantran.ui.actions").switch_languages,
+              ["<C-y>"] = function()
+                require("pantran").actions.yank_close_translation()
+              end,
+              ["<C-t>"] = function()
+                require("pantran").actions.select_target()
+              end,
+              ["<C-s>"] = function()
+                require("pantran").actions.select_source()
+              end,
+              ["<C-e>"] = function()
+                require("pantran").actions.select_engine()
+              end,
+              ["<C-S>"] = function()
+                require("pantran").actions.switch_languages()
+              end,
             },
           },
           -- Keybindings here are used in the selection window.
