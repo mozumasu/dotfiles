@@ -215,8 +215,6 @@ vpn_connect_with_fzf() {
   # Connection place
   echo "connection: $vpn_name"
   vpnutil start "$vpn_name"
-
-  check_vpn_status
 }
 
 vpn_disconnect_if_connected() {
