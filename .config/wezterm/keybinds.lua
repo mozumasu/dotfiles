@@ -108,6 +108,7 @@ return {
     { key = "8", mods = "SUPER", action = act.ActivateTab(7) },
     { key = "9", mods = "SUPER", action = act.ActivateTab(-1) },
 
+    { key = "k", mods = "SUPER", action = act.ClearScrollback("ScrollbackAndViewport") },
     { key = "n", mods = "SUPER", action = act.SpawnWindow },
 
     -- スクロール
