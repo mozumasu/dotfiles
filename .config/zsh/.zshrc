@@ -117,8 +117,21 @@ create_gitignore() {
         input_file=".gitignore"
     fi
 
-    gibo list | fzf -m | xargs gibo dump >> "$input_file"
+    # Capture the selected templates from fzf
+    local selected=$(gibo list | fzf \
+        --multi \
+        --preview "gibo dump {} | bat --style=numbers --color=always --paging=never")
 
+    # If no selection was made, exit the function
+    if [[ -z "$selected" ]]; then
+        echo "No templates selected. Exiting."
+        return
+    fi
+
+    # Dump the selected templates into the specified file
+    echo "$selected" | xargs gibo dump >> "$input_file"
+
+    # Display the resulting file with bat
     bat "$input_file"
 }
 
