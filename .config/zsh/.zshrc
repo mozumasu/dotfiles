@@ -83,6 +83,7 @@ alias mul='multipass'
 alias ggrks='google'
 alias sshf='fzf-ssh'
 alias awsv='aws-vault'
+alias gia='create_gitignore'
 abbr -S -qq ll='ls -l'
 abbr -S -qq la='ls -A'
 abbr -S -qq lla='ls -l -A'
@@ -106,6 +107,21 @@ abbr -S -qq hosts='sudo nvim /etc/hosts'
 abbr -S -qq dhosts='nvim ~/.ssh/conf.d/hosts/'
 abbr -S -qq proot='cd $(git rev-parse --show-toplevel)'
 abbr -S -qq myip='curl ifconfig.me'
+
+# Create .gitignore file by gibo
+create_gitignore() {
+    local input_file="$1"
+
+    # If the input is empty, set .gitignore to the default value.
+    if [[ -z "$input_file" ]]; then
+        input_file=".gitignore"
+    fi
+
+    gibo list | fzf -m | xargs gibo dump >> "$input_file"
+
+    bat "$input_file"
+}
+
 # vpnutil ( for Mac )
 abbr -S -qq vpn='vpnutil'
 alias vpns='check_vpn_status'
