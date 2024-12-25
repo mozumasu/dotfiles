@@ -146,6 +146,15 @@ alias svnbat='bat ~/dotfiles/docs/svn.md'
 alias svna='svn st | grep "^?" | awk "{print $2}" | xargs svn add'
 alias svnr='svn st | grep "^!" | awk "{print $2}" | xargs svn rm'
 
+# Ansible init
+ansible_init() {
+  mkdir -p group_vars/{development,production}/server_account group_vars/all/{secret,server_account} playbooks roles/{account,os_settings,pre_setup}/{defaults,tasks}
+}
+
+ansible_create_role(){
+  mkdir -p roles/$1/{tasks,handlers,templates,files,vars,defaults,meta}
+}
+
 # zsh hook
 zshaddhistory() {
     local line="${1%%$'\n'}"
