@@ -108,6 +108,23 @@ abbr -S -qq dhosts='nvim ~/.ssh/conf.d/hosts/'
 abbr -S -qq proot='cd $(git rev-parse --show-toplevel)'
 abbr -S -qq myip='curl ifconfig.me'
 
+# Open the selected application with new window
+function newapp() {
+  local app=$(find /Applications -name "*.app" -maxdepth 1 | sed 's|/Applications/||' | fzf \
+    --prompt="Select an application: " \
+    --height=20% \
+    --preview="echo '🍎 Application Name: {1}\n' && echo '' && mdls -name kMDItemDisplayName -name kMDItemVersion -name kMDItemKind /Applications/{1} || echo 'No metadata available'" \
+    --preview-window=right:40%)
+
+  if [[ -z "$app" ]]; then
+    echo "No application selected."
+    return 1
+  fi
+
+  echo "Opening $app..."
+  open -n "/Applications/$app"
+}
+
 # Create .gitignore file by gibo
 create_gitignore() {
     local input_file="$1"
