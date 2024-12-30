@@ -1,32 +1,99 @@
 #!/bin/zsh
-# oh-my-zshをインストールしたパス
-export ZSH="$HOME/.oh-my-zsh"
 
-# oh-my-zshでロードするプラグインの設定
-plugins=(git web-search rye)
+# ----------------------------------------------------
+# .zshrc
+#
+# initial setup file for only interactive zsh
+# This file is read after .zshenv file is read.
+#
+# ----------------------------------------------------
 
-source $ZSH/oh-my-zsh.sh
+# ----------------------------------------------------
+# History
+# ----------------------------------------------------
 
-# ryeのプラグインを読み込む
-export PATH=$PATH:$HOME/.rye/shims
+export HISTFILE=${HOME}/.config/zsh/.zsh_history
+# Limits memory-stored history
+export HISTSIZE=100000
+# Manage history persistence in files
+export SAVEHIST=100000
+export HISTFILESIZE=100000
+# Record additional information (execution time, exit status)
+setopt EXTENDED_HISTORY
+setopt share_history
+# Make history editable between recall and execution.
+setopt hist_verify
 
-export PATH=$PATH:$HOME/Library/Python/2.7/bin
-# 共通設定ファイル読み込み
-RC_COMMON=$HOME/dotfiles/.bin/.rc_common
 
-if [ -e $RC_COMMON ]
-then source $RC_COMMON
-else
-    echo "$RC_COMMON not found."
-fi
+# Setting the command to add
+# Excludes only if it is the same as the previous command.
+setopt hist_ignore_dups
+# Except when the same command exists throughout the history.
+setopt hist_ignore_all_dups
+# Command lines starting with a space are removed from the history list.
+setopt hist_ignore_space
+# The history command is not registered in the history.
+setopt hist_no_store
+# Fill in any extra spaces.
+setopt hist_reduce_blanks
+# Nothing is the same as the old command.
+setopt hist_save_no_dups
+# Automatically expand history when saving
+setopt hist_expand
+# Keep history instantly
+setopt inc_append_history
 
-# 新規ファイル作成時のパーミッション
+# ----------------------------------------------------
+# cd
+# ----------------------------------------------------
+
+setopt auto_cd
+setopt auto_pushd
+setopt pushd_ignore_dups
+
+# ----------------------------------------------------
+# other
+# ----------------------------------------------------
+
+# Permissions when creating a new file
 umask 022
 
+# When zsh's completion candidates overflow from the screen, check whether they are still displayed.
+export LISTMAX=50
+# Background job priority (ionice) behaves the same as bash
+unsetopt bg_nice
+# List of completion candidates
+setopt list_packed
+# ピープオンを鳴らさない
+setopt no_beep
+# Do not display file type launch at the end of completion candidates.
+unsetopt list_types
+
+# ----------------------------------------------------
+# oh-my-zsh
+# ----------------------------------------------------
+
+export ZSH="$HOME/.oh-my-zsh"
+plugins=(git web-search rye)
+source $ZSH/oh-my-zsh.sh
+
+# ----------------------------------------------------
+# Python
+# ----------------------------------------------------
+
+export PATH=$PATH:$HOME/.rye/shims
+export PATH=$PATH:$HOME/Library/Python/2.7/bin
+
+# ----------------------------------------------------
 # homebrew
+# ----------------------------------------------------
+
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
+# ----------------------------------------------------
 # fzf
+# ----------------------------------------------------
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 zle -N fzf-history-widget
 bindkey '^R' fzf-history-widget
@@ -43,7 +110,10 @@ fzf-ssh() {
   fi
 }
 
+# ----------------------------------------------------
 # antigen
+# ----------------------------------------------------
+
 source $HOME/.local/bin/antigen.zsh
 
 # Load the oh-my-zsh's library
@@ -75,7 +145,10 @@ antigen apply
 # starship
 eval "$(starship init zsh)"
 
+# ----------------------------------------------------
 # alias
+# ----------------------------------------------------
+
 alias zshconf="vim ~/.zshrc"
 alias ohmyzsh="vim ~/.oh-my-zsh"
 alias ls='ls -F --color=auto'
@@ -85,10 +158,10 @@ alias sshf='fzf-ssh'
 alias awsv='aws-vault'
 alias gia='create_gitignore'
 alias zenn='vim ~/src/private/zenn'
+alias v='nvim'
 abbr -S -qq ll='ls -l'
 abbr -S -qq la='ls -A'
 abbr -S -qq lla='ls -l -A'
-abbr -S -qq v='nvim'
 abbr -S -qq g='git'
 abbr -S -qq gst='git status'
 abbr -S -qq gsw='git switch'
@@ -108,6 +181,10 @@ abbr -S -qq hosts='sudo nvim /etc/hosts'
 abbr -S -qq dhosts='nvim ~/.ssh/conf.d/hosts/'
 abbr -S -qq proot='cd $(git rev-parse --show-toplevel)'
 abbr -S -qq myip='curl ifconfig.me'
+
+# ----------------------------------------------------
+# Functions
+# ----------------------------------------------------
 
 # Open the selected application with new window
 function newapp() {
@@ -189,23 +266,7 @@ alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
 export VOLTA_HOME="$HOME/.volta"
 export PATH="$VOLTA_HOME/bin:$PATH"
 
-# zshのみの独自設定
-# cd時に自動でスタック
-setopt auto_pushd
-# スタックを重複させない
-setopt pushd_ignore_dups
-# cd無しで指定したパスへ移動
-setopt auto_cd
-# historyを重複させない
-setopt hist_ignore_dups
-setopt share_history
-# 即座に履歴を保存
-setopt inc_append_history
 
-# zshのHistory設定
-export HISTFILE=~/.config/zsh/.zsh_history
-export HISTSIZE=100000
-export SAVEHIST=100000
 # zshの補完設定
 autoload -Uz compinit && compinit
 # 補完候補をそのまま探す -> 小文字を大文字に変えて探す -> 大文字を小文字に変えて探す
