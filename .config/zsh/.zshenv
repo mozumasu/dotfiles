@@ -16,6 +16,7 @@ export XDG_STATE_HOME=${HOME}/.local/state
 
 # zsh
 export ZDOTDIR=${XDG_CONFIG_HOME}/zsh
+export ZRCDIR=$ZDOTDIR/rc
 
 # path
 export PATH=${HOME}/.local/bin:$PATH
@@ -38,3 +39,22 @@ export GIT_EDITOR="${EDITOR}"
 # Go
 export GOPATH="$XDG_DATA_HOME/go"
 export GO111MODULE="on"
+
+# Python
+export PATH=$PATH:$HOME/.rye/shims
+export PATH=$PATH:$HOME/Library/Python/2.7/bin
+
+# Java
+export JAVA_HOME=/opt/homebrew/Cellar/openjdk@11/11.0.24/libexec/openjdk.jdk/Contents/Home
+export PATH=$JAVA_HOME/bin:$PATH
+export CPPFLAGS="-I/opt/homebrew/opt/openjdk@11/include"
+
+# TiDB
+export PATH=/Users/mozumasu/.tiup/bin:$PATH
+
+# pnpm
+export PNPM_HOME="/Users/mozumasu/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
