@@ -6,7 +6,7 @@
 # ----------------------------------------------------
 
 # Disable loading of global configuration files
-unsetopt GLOBAL_RCS
+# unsetopt GLOBAL_RCS
 
 # XDG
 export XDG_CONFIG_HOME=${HOME}/.config
