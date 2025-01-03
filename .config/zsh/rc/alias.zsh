@@ -6,6 +6,7 @@
 # common
 alias v='nvim'
 alias ls='ls -F --color=auto'
+abbr -S -qq -='cd -'
 abbr -S -qq ll='ls -l'
 abbr -S -qq la='ls -A'
 abbr -S -qq lla='ls -l -A'
