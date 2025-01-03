@@ -3,10 +3,14 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nix-darwin.url = "github:LnL7/nix-darwin";
-    home-manager.url = "github:nix-community/home-manager";
-    nix-darwin.inputs.nixpkgs.follows = "nixpkgs"; # The nixpkgs used by nix-darwin are unified to the nixpkgs specified at the top level.
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    nix-darwin = {
+      url = "github:LnL7/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs"; # The nixpkgs used by nix-darwin are unified to the nixpkgs specified at the top level.
+    };
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs@{ self, nix-darwin, nixpkgs }:
