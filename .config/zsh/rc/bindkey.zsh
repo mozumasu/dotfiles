@@ -5,3 +5,4 @@
 
 # Use emacs keybind
 bindkey -e
+bindkey '^g' ghq-fzf
