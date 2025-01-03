@@ -13,5 +13,5 @@ source "/opt/homebrew/opt/fzf/shell/completion.zsh"
 # default
 # source "/opt/homebrew/opt/fzf/shell/key-bindings.zsh"
 # ------------
-# 自分の設定
+# my settings
 source "$HOME/dotfiles/.config/zsh/fzf.key-bindings.zsh"

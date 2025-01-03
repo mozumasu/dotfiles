@@ -1,423 +1,89 @@
 #!/bin/zsh
-# oh-my-zshをインストールしたパス
-export ZSH="$HOME/.oh-my-zsh"
 
-# oh-my-zshでロードするプラグインの設定
-plugins=(git web-search rye)
+# ----------------------------------------------------
+# .zshrc
+#
+# initial setup file for only interactive zsh
+# This file is read after .zshenv file is read.
+#
+# ----------------------------------------------------
 
-source $ZSH/oh-my-zsh.sh
 
-# ryeのプラグインを読み込む
-export PATH=$PATH:$HOME/.rye/shims
-
-export PATH=$PATH:$HOME/Library/Python/2.7/bin
-# 共通設定ファイル読み込み
-RC_COMMON=$HOME/dotfiles/.bin/.rc_common
-
-if [ -e $RC_COMMON ]
-then source $RC_COMMON
-else
-    echo "$RC_COMMON not found."
-fi
-
-# 新規ファイル作成時のパーミッション
-umask 022
-
+# ----------------------------------------------------
 # homebrew
+# ----------------------------------------------------
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
+# Manage shell plugins by sheldon
+# https://sheldon.cli.rs/
+eval "$(sheldon source)"
+
+# ----------------------------------------------------
+# Function
+# ----------------------------------------------------
+source "$ZRCDIR/function.zsh"
+
+# ----------------------------------------------------
+# Alias
+# ----------------------------------------------------
+source "$ZRCDIR/alias.zsh"
+
+# ----------------------------------------------------
+# Options
+# ----------------------------------------------------
+source "$ZRCDIR/option.zsh"
+
+
+# ----------------------------------------------------
+# History
+# ----------------------------------------------------
+export HISTFILE=${HOME}/.config/zsh/.zsh_history
+# Limits memory-stored history
+export HISTSIZE=100000
+# Manage history persistence in files
+export SAVEHIST=100000
+export HISTFILESIZE=100000
+
+# ----------------------------------------------------
+# other
+# ----------------------------------------------------
+
+# Permissions when creating a new file
+umask 022
+
+# When zsh's completion candidates overflow from the screen, check whether they are still displayed.
+export LISTMAX=50
+
+# ----------------------------------------------------
+# completion
+# ----------------------------------------------------
+
+autoload -Uz compinit && compinit
+# 補完候補をそのまま探す -> 小文字を大文字に変えて探す -> 大文字を小文字に変えて探す
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' '+m:{[:upper:]}={[:lower:]}'
+# Group by completion method
+zstyle ':completion:*' format '%B%F{blue}%d%f%b'
+zstyle ':completion:*' group-name ''
+# Select a complementary candidate from the menu
+# select=2: Select a completion candidate from the list, and if there are two or more completion candidates, it will be completed immediately.
+zstyle ':completion:*:default' menu select=2
+
+# ----------------------------------------------------
+# Neovim
+# ----------------------------------------------------
+export NVM_DIR="$HOME/.config/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# ----------------------------------------------------
 # fzf
+# ----------------------------------------------------
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 zle -N fzf-history-widget
 bindkey '^R' fzf-history-widget
 
-fzf-ssh() {
-  local ssh_hosts_dir="$HOME/.ssh/conf.d/hosts"
-  local selected_host=$(grep -h -E -v '^#' "$ssh_hosts_dir"/* | grep -E '^HOST ' | awk '{print $2}' | fzf --prompt="Select SSH Host> ")
-
-  if [[ -n "$selected_host" ]]; then
-    echo "Connecting to $selected_host..."
-    ssh "$selected_host"
-  else
-    echo "No host selected."
-  fi
-}
-
-# antigen
-source $HOME/.local/bin/antigen.zsh
-
-# Load the oh-my-zsh's library
-antigen use oh-my-zsh
-
-antigen bundles <<EOBUNDLES
-    # Bundles from the default repo (robbyrussell's oh-my-zsh)
-    git
-    # Syntax highlighting bundle.
-    zsh-users/zsh-syntax-highlighting
-    # Fish-like auto suggestions
-    zsh-users/zsh-autosuggestions
-    # Extra zsh completions
-    zsh-users/zsh-completions
-    # z
-mkdir $ZSH_CUSTOM/plugins/rye
-rye self completion -s zsh > $ZSH_CUSTOM/plugins/rye/_rye
-    rupa/z z.sh
-    # abbr
-    olets/zsh-abbr@main
-EOBUNDLES
-
-# Load the theme
-antigen theme robbyrussell
-
-# Tell antigen that you're done
-antigen apply
 
 # starship
 eval "$(starship init zsh)"
-
-# alias
-alias zshconf="vim ~/.zshrc"
-alias ohmyzsh="vim ~/.oh-my-zsh"
-alias ls='ls -F --color=auto'
-alias mul='multipass'
-alias ggrks='google'
-alias sshf='fzf-ssh'
-alias awsv='aws-vault'
-alias gia='create_gitignore'
-abbr -S -qq ll='ls -l'
-abbr -S -qq la='ls -A'
-abbr -S -qq lla='ls -l -A'
-abbr -S -qq v='vim'
-abbr -S -qq g='git'
-abbr -S -qq gst='git status'
-abbr -S -qq gsw='git switch'
-abbr -S -qq gbr='git branch'
-abbr -S -qq gfe='git fetch'
-abbr -S -qq gpl='git pull'
-abbr -S -qq gad='git add'
-abbr -S -qq gcm='git commit'
-abbr -S -qq gmg='git merge'
-abbr -S -qq gpsh='git push'
-abbr -S -qq lg='lazygit'
-abbr -S -qq f='open .'
-abbr -S -qq relogin='exec $SHELL -l'
-abbr -S -qq ap='ansible-playbook'
-abbr -S -qq awsl='aws configure list'
-abbr -S -qq hosts='sudo nvim /etc/hosts'
-abbr -S -qq dhosts='nvim ~/.ssh/conf.d/hosts/'
-abbr -S -qq proot='cd $(git rev-parse --show-toplevel)'
-abbr -S -qq myip='curl ifconfig.me'
-
-# Open the selected application with new window
-function newapp() {
-  local app=$(find /Applications -name "*.app" -maxdepth 1 | sed 's|/Applications/||' | fzf \
-    --prompt="Select an application: " \
-    --height=20% \
-    --preview="echo '🍎 Application Name: {1}\n' && echo '' && mdls -name kMDItemDisplayName -name kMDItemVersion -name kMDItemKind /Applications/{1} || echo 'No metadata available'" \
-    --preview-window=right:40%)
-
-  if [[ -z "$app" ]]; then
-    echo "No application selected."
-    return 1
-  fi
-
-  echo "Opening $app..."
-  open -n "/Applications/$app"
-}
-
-# Create .gitignore file by gibo
-create_gitignore() {
-    local input_file="$1"
-
-    # If the input is empty, set .gitignore to the default value.
-    if [[ -z "$input_file" ]]; then
-        input_file=".gitignore"
-    fi
-
-    # Capture the selected templates from fzf
-    local selected=$(gibo list | fzf \
-        --multi \
-        --preview "gibo dump {} | bat --style=numbers --color=always --paging=never")
-
-    # If no selection was made, exit the function
-    if [[ -z "$selected" ]]; then
-        echo "No templates selected. Exiting."
-        return
-    fi
-
-    # Dump the selected templates into the specified file
-    echo "$selected" | xargs gibo dump >> "$input_file"
-
-    # Display the resulting file with bat
-    bat "$input_file"
-}
-
-# vpnutil ( for Mac )
-abbr -S -qq vpn='vpnutil'
-alias vpns='check_vpn_status'
-alias vpnc='vpn_connect_with_fzf'
-alias vpnd='vpn_disconnect_if_connected'
-
-# SVN
-alias svnbat='bat ~/dotfiles/docs/svn.md'
-alias svna='svn st | grep "^?" | awk "{print $2}" | xargs svn add'
-alias svnr='svn st | grep "^!" | awk "{print $2}" | xargs svn rm'
-
-# Ansible init
-ansible_init() {
-  mkdir -p group_vars/{development,production}/server_account group_vars/all/{secret,server_account} playbooks roles/{account,os_settings,pre_setup}/{defaults,tasks}
-}
-
-ansible_create_role(){
-  mkdir -p roles/$1/{tasks,handlers,templates,files,vars,defaults,meta}
-}
-
-# zsh hook
-zshaddhistory() {
-    local line="${1%%$'\n'}"
-    if [ $? -ne 0 ]; then
-        return 1
-    fi
-    [[ ! "$line" =~ "^(cd|jj?|lazygit|la|ll|ls|rm|rmdir|z)($| )" ]]
-}
-
-# Laravel sail
-alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
-
-# volta ここに記載しないと読み込めない
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
-
-# zshのみの独自設定
-# cd時に自動でスタック
-setopt auto_pushd
-# スタックを重複させない
-setopt pushd_ignore_dups
-# cd無しで指定したパスへ移動
-setopt auto_cd
-# historyを重複させない
-setopt hist_ignore_dups
-setopt share_history
-# 即座に履歴を保存
-setopt inc_append_history
-
-# zshのHistory設定
-export HISTFILE=~/.config/zsh/.zsh_history
-export HISTSIZE=100000
-export SAVEHIST=100000
-# zshの補完設定
-autoload -Uz compinit && compinit
-# 補完候補をそのまま探す -> 小文字を大文字に変えて探す -> 大文字を小文字に変えて探す
-zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' '+m:{[:upper:]}={[:lower:]}'
-# 補完方法毎にグループ化
-zstyle ':completion:*' format '%B%F{blue}%d%f%b'
-zstyle ':completion:*' group-name ''
-# 補完侯補をメニューから選択
-# select=2: 補完候補を一覧から選択,補完候補が2つ以上なければすぐに補完
-zstyle ':completion:*:default' menu select=2
-
-export NVM_DIR="$HOME/.config/nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-# java
-export JAVA_HOME=/opt/homebrew/Cellar/openjdk@11/11.0.24/libexec/openjdk.jdk/Contents/Home
-export PATH=$JAVA_HOME/bin:$PATH
-export CPPFLAGS="-I/opt/homebrew/opt/openjdk@11/include"
-
-# TiDB
-export PATH=/Users/mozumasu/.tiup/bin:$PATH
-
-# pnpm
-export PNPM_HOME="/Users/mozumasu/.local/share/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
-
-# vpnutil ( for Mac )
-# https://github.com/Timac/VPNStatus
-check_vpn_status() {
-  # Extract the output of vpnutil list as json.
-  vpn_data=$(vpnutil list)
-
-  # Extract connected vpn.
-  connected_vpns=$(echo "$vpn_data" | jq -r '.VPNs[] | select(.status == "Connected") | "\(.name) (\(.status))"')
-
-  if [[ -z "$connected_vpns" ]]; then
-    echo "No Connected"
-  else
-    echo "Connected VPN:"
-    echo "$connected_vpns"
-  fi
-}
-
-vpn_connect_with_fzf() {
-  # Extract the output of vpnutil list as json.
-  vpn_data=$(vpnutil list)
-
-  # Get the name and status of the VPN and select it with fzf.
-  selected_vpn=$(echo "$vpn_data" | jq -r '.VPNs[] | "\(.name) (\(.status))"' | fzf --prompt="choose a vpn: ")
-
-  # If there is no selected VPN, exit
-  if [[ -z "$selected_vpn" ]]; then
-    echo "VPN selection canceled."
-    return
-  fi
-
-  # Extract the vpn name
-  vpn_name=$(echo "$selected_vpn" | sed 's/ (.*)//')
-
-  # Connection place
-  echo "connection: $vpn_name"
-  vpnutil start "$vpn_name"
-}
-
-vpn_disconnect_if_connected() {
-  # Extract the output of vpnutil list as json.
-  vpn_data=$(vpnutil list)
-
-  # Extract connected VPN
-  connected_vpns=$(echo "$vpn_data" | jq -r '.VPNs[] | select(.status == "Connected") | .name')
-
-  if [[ -z "$connected_vpns" ]]; then
-    echo "No vpn connected."
-  else
-    echo "Disconnect the following VPN connections:"
-    echo "$connected_vpns"
-    
-    # Turn off each connected VPN.
-    for vpn in $connected_vpns; do
-      echo "cutting: $vpn"
-      vpnutil stop "$vpn"
-    done
-    echo "Disconnected all vpn connections."
-  fi
-}
-
-
-# volta
-autoload -Uz add-zsh-hook
-function chpwd_volta_install() {
-  # .node-versionが存在するかチェック
-  if [[ -e ".node-version" ]]; then
-    # .node-versionから内容を読み取る
-    content=$(cat .node-version)
-    volta install node@$content --quiet
-  fi
-
-  # .nvmrcが存在するかチェック
-  if [[ -e ".nvmrc" ]]; then
-    # .nvmrcから内容を読み取る
-    content=$(cat .nvmrc)
-
-    case $content in
-    # lts/argonの場合
-    "lts/argon")
-      volta install node@4 --quiet
-      ;;
-    # lts/boronの場合
-    "lts/boron")
-      volta install node@6 --quiet
-      ;;
-    # lts/carbonの場合
-    "lts/carbon")
-      volta install node@8 --quiet
-      ;;
-    # lts/dubniumの場合
-    "lts/dubnium")
-      volta install node@10 --quiet
-      ;;
-    # lts/erbiumの場合
-    "lts/erbium")
-      volta install node@12 --quiet
-      ;;
-    # lts/fermiumの場合
-    "lts/fermium")
-      volta install node@14 --quiet
-      ;;
-    # lts/galliumの場合
-    "lts/gallium")
-      volta install node@16 --quiet
-      ;;
-    # lts/hydrogenの場合
-    "lts/hydrogen")
-      volta install node@18 --quiet
-      ;;
-    # lts/*の場合
-    "lts/*")
-      volta install node@lts --quiet
-      ;;
-    # latest,current,node,*の場合
-    "latest" | "current" | "node" | "*")
-      volta install node@latest --quiet
-      ;;
-    # それ以外の場合
-    *)
-      volta install node@$content --quiet
-      ;;
-    esac
-  fi
-}
-add-zsh-hook chpwd chpwd_volta_install
-
-# ghq
-function ghq-fzf() {
-  local src=$(ghq list | fzf --preview "bat --color=always --style=header,grid --line-range :80 $(ghq root)/{}/README.*")
-  if [ -n "$src" ]; then
-    BUFFER="cd $(ghq root)/$src"
-    zle accept-line
-  fi
-  zle -R -c
-}
-zle -N ghq-fzf
-bindkey '^g' ghq-fzf
-
-export PATH=$PATH:$HOME/go/bin
-
-# Move to the open finder directory
-cdf() {
-  target=`osascript -e 'tell application "Finder" to if (count of Finder windows) > 0 then get POSIX path of (target of front Finder window as text)'`
-  if [ "$target" != "" ]; then
-    cd "$target"; pwd
-  else
-    echo 'No Finder window found' >&2
-  fi
-}
-# mise
-if type mise &>/dev/null; then
-  eval "$(mise activate zsh)"
-  eval "$(mise activate --shims)"
-fi
-
-# extend which
-function wch() {
-  result=`type $1`
-
-  if [ "`echo $result | grep 'not found'`" ]; then
-    echo 'not found'
-  elif [ "`echo $result | grep 'shell builtin'`" ]; then
-    echo 'shell built-in'
-  else
-    found=`echo $result | rev | cut -d ' ' -f 1 | rev`
-    dir=`dirname $found`
-    if [ $# = 1 ]; then
-      echo $found
-    elif [ $2 = 'ls' ]; then
-      ls $dir
-    elif [ $2 = 'dir' ]; then
-      echo $dir
-    elif [ $2 = 'cd' ]; then
-      cd $dir
-    elif [ $2 = 'vi' ]; then
-      if [ "`file $found | grep 'ASCII text'`" ]; then
-        vi $found
-      else
-        echo 'not a text'
-      fi
-    fi
-  fi
-}
-
 # Must be at the end of the file
 eval "$(zoxide init zsh)"
