@@ -4,7 +4,9 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin.url = "github:LnL7/nix-darwin";
+    home-manager.url = "github:nix-community/home-manager";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs"; # The nixpkgs used by nix-darwin are unified to the nixpkgs specified at the top level.
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs@{ self, nix-darwin, nixpkgs }:
@@ -38,7 +40,10 @@
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#Mac-2
       darwinConfigurations."Mac-2" = nix-darwin.lib.darwinSystem {
-        modules = [ configuration ];
+        modules = [
+          configuration
+          inputs.home-manager.nixosModules.home-manager
+        ];
       };
     };
 }
