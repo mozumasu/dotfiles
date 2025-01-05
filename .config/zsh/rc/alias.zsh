@@ -36,10 +36,13 @@ alias zshconf="nvim ~/.zshrc"
 alias zenn='nvim ~/src/private/zenn'
 
 # infra
-alias awsv='aws-vault'
 alias mul='multipass'
 abbr -S -qq ap='ansible-playbook'
+
+# aws
 abbr -S -qq awsl='aws configure list'
+alias awsp='set_aws_profile'
+alias awsv='aws-vault'
 
 # SVN
 alias svnbat='bat ~/dotfiles/docs/svn.md'
@@ -49,6 +52,9 @@ alias svnr='svn st | grep "^!" | awk "{print $2}" | xargs svn rm'
 # function alias
 alias sshf='fzf-ssh'
 alias gi='create_gitignore'
+
+# Laravel sail
+alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
 
 # ----------------------------------------------------
 # for Mac
