@@ -3,6 +3,34 @@
 # Function
 # ----------------------------------------------------
 
+# https://rcmdnk.com/blog/2014/07/20/computer-vim/
+function man {
+  local p
+  local m
+  if [ "$PAGER" != "" ];then
+    p="$PAGER"
+  fi
+  if [ "$MANPAGER" != "" ];then
+    m="$MNNPAGER"
+  fi
+  unset PAGER
+  unset MANPAGER
+  val=$(command man $* 2>&1)
+  ret=$?
+  if [ $ret -eq 0 ];then
+    echo "$val"|col -bx|nvim -R -c 'set ft=man' -
+  else
+    echo "$val"
+  fi
+  if [ "$p" != "" ];then
+    export PAGER="$p"
+  fi
+  if [ "$m" != "" ];then
+    export MANPAGER="$m"
+  fi
+  return $ret
+}
+
 # Create .gitignore file by gibo
 create_gitignore() {
     local input_file="$1"
@@ -30,6 +58,42 @@ create_gitignore() {
     bat "$input_file"
 }
 
+# AWS
+function set_aws_profile() {
+  local selected_profile=$(aws configure list-profiles |
+    grep -v "default" |
+    sort |
+    fzf --prompt "Select PROFILE. If press Ctrl-C, unset PROFILE. > " \
+        --height 50% --layout=reverse --border --preview-window 'right:50%' \
+        --preview "grep {} -A5 ~/.aws/config")
+
+  # Cancel settings if no profile is selected
+  if [ -z "$selected_profile" ]; then
+    echo "Unset aws profile!"
+    unset AWS_PROFILE
+    unset AWS_ACCESS_KEY_ID
+    unset AWS_SECRET_ACCESS_KEY
+    return
+  fi
+
+  # settings for the selected profile.
+  echo "Set the environment variable 'AWS_PROFILE' to '${selected_profile}'!"
+  export AWS_PROFILE="$selected_profile"
+  unset AWS_ACCESS_KEY_ID
+  unset AWS_SECRET_ACCESS_KEY
+
+  # Check your sso session and log in again if it has expired.
+  local AWS_SSO_SESSION_NAME="mozumasu"
+
+  check_sso_session=$(aws sts get-caller-identity 2>&1)
+  if [[ "$check_sso_session" == *"Token has expired"* ]]; then
+    echo -e "\n----------------------------\nYour Session has expired! Please login...\n----------------------------\n"
+    aws sso login --sso-session "${AWS_SSO_SESSION_NAME}"
+    aws sts get-caller-identity
+  else
+    echo ${check_sso_session}
+  fi
+}
 
 # Ansible init
 ansible_init() {
@@ -49,15 +113,6 @@ zshaddhistory() {
     fi
     [[ ! "$line" =~ "^(cd|jj?|lazygit|la|ll|ls|rm|rmdir|z)($| )" ]]
 }
-
-
-# Laravel sail
-alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
-
-# volta ここに記載しないと読み込めない
-export VOLTA_HOME="$HOME/.volta"
-export PATH="$VOLTA_HOME/bin:$PATH"
-
 
 
 
