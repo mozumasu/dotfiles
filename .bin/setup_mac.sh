@@ -54,8 +54,24 @@ defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 # Show Status bar and Path bar
 defaults write com.apple.finder ShowPathbar -bool true
 defaults write com.apple.finder ShowStatusBar -bool true
+
 # Trackpad
 defaults write -g com.apple.trackpad.scaling 8
 # Key repeat
 defaults write -g InitialKeyRepeat -int 12 # normal minimum is 15
 defaults write -g KeyRepeat -int 1         # normal minimum is 2
+# Click when tapped
+defaults write -g com.apple.mouse.tapBehavior -int 1
+# Drag with three fingers
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag -bool true &&
+  defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool true
+
+# Disable annimations
+# Disable animation when opening and closing windows
+defaults write -g NSAutomaticWindowAnimationsEnabled -bool false
+# Disable animation when opening information window in finder
+defaults write com.apple.finder DisableAllAnimations -bool true
+# Turn off quick look window animation
+defaults write -g QLPanelAnimationDuration -float 0
+# Disable animation when launching app from dock
+defaults write com.apple.dock launchanim -bool false
