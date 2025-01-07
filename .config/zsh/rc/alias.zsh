@@ -38,6 +38,7 @@ alias zenn='nvim ~/src/private/zenn'
 # infra
 alias mul='multipass'
 abbr -S -qq ap='ansible-playbook'
+abbr -S -qq tf='terraform'
 
 # aws
 abbr -S -qq awsl='aws configure list'
