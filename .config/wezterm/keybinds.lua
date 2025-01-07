@@ -117,6 +117,10 @@ return {
     -- QuickSelect
     { key = "Enter", mods = "SHIFT", action = "QuickSelect" }, -- { key = "f", mods = "CTRL", action = act.ScrollByPage(1) },
 
+    -- ScrollToPrompt
+    { key = "[", mods = "ALT", action = act.ScrollToPrompt(-1) },
+    { key = "]", mods = "ALT", action = act.ScrollToPrompt(1) },
+
     -- コマンドパレット
     { key = "p", mods = "SHIFT|CTRL", action = act.ActivateCommandPalette },
     -- 設定再読み込み
@@ -150,6 +154,30 @@ return {
     },
     -- copyモード leader + [
     copy_mode = {
+      -- { key = "[", mods = "ALT", action = act.ScrollToPrompt(-1) },
+      -- { key = "]", mods = "ALT", action = act.ScrollToPrompt(1) },
+      -- ALT + [ で前のプロンプトに移動してカーソルを合わせる
+      {
+        key = "[",
+        mods = "ALT",
+        action = wezterm.action_callback(function(win, pane)
+          -- 前のプロンプトにスクロール
+          win:perform_action(act.ScrollToPrompt(-1), pane)
+          -- スクロール後の位置にカーソルを移動
+          pane:send_key({ key = "UpArrow" }) -- 1行上に移動
+        end),
+      },
+      -- ALT + ] で次のプロンプトに移動してカーソルを合わせる
+      {
+        key = "]",
+        mods = "ALT",
+        action = wezterm.action_callback(function(win, pane)
+          -- 次のプロンプトにスクロール
+          win:perform_action(act.ScrollToPrompt(1), pane)
+          -- スクロール後の位置にカーソルを移動
+          pane:send_key({ key = "DownArrow" }) -- 1行下に移動
+        end),
+      },
       -- 移動
       { key = "h", mods = "NONE", action = act.CopyMode("MoveLeft") },
       { key = "j", mods = "NONE", action = act.CopyMode("MoveDown") },
