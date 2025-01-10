@@ -96,6 +96,7 @@ return {
         {
           "saghen/blink.cmp",
           optional = true,
+          version = "v0.9.3", -- 2024-01-08
           dependencies = { "giuxtaposition/blink-cmp-copilot" },
           opts = {
             keymap = { preset = "super-tab" },
