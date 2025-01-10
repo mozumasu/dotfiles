@@ -31,6 +31,7 @@ abbr -S -qq proot='cd $(git rev-parse --show-toplevel)'
 
 # configure file
 alias zshconf="nvim ~/.zshrc"
+alias szsh="source ~/dotfiles/.config/zsh/.zshrc"
 
 # zenn
 alias zenn='nvim ~/src/private/zenn'
@@ -39,6 +40,10 @@ alias zenn='nvim ~/src/private/zenn'
 alias mul='multipass'
 abbr -S -qq ap='ansible-playbook'
 abbr -S -qq tf='terraform'
+abbr -S -qq tfi='terraform init'
+abbr -S -qq tfp='terraform plan'
+abbr -S -qq tfs='terraform state'
+abbr -S -qq tfsl='terraform state list'
 
 # aws
 abbr -S -qq awsl='aws configure list'
