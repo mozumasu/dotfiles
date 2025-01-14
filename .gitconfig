@@ -32,4 +32,4 @@
 [http]
 	postBuffer = 524288000
 [ghq]
-	root = /Users/mozumasu/src
+	root = ~/src
