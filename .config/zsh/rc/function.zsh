@@ -95,6 +95,32 @@ function set_aws_profile() {
   fi
 }
 
+get_workspaces_ips() {
+    # Get private IP of WorkSpaces
+    local workspaces
+    workspaces=$(aws workspaces describe-workspaces \
+        --query "Workspaces[*].[WorkspaceId, UserName, IpAddress]" \
+        --output text)
+
+    # Output header
+    echo -e "WorkspaceId\tUserName\tPublicIpAddress" | column -t
+
+    # Find ENI for each WorkSpace
+     while read -r workspace_id username private_ip; do
+        local public_ip="None"
+        if [ "$private_ip" != "None" ]; then
+            # Get public IP by ENI
+            public_ip=$(aws ec2 describe-network-interfaces \
+                --filters "Name=private-ip-address,Values=$private_ip" \
+                --query "NetworkInterfaces[0].Association.PublicIp" \
+                --output text)
+        fi
+
+        echo -e "$workspace_id\t$username\t$public_ip" | column -t
+    done <<< "$workspaces"
+}
+alias wsip='get_workspaces_ips'
+
 # Ansible init
 ansible_init() {
   mkdir -p group_vars/{development,production}/server_account group_vars/all/{secret,server_account} playbooks roles/{account,os_settings,pre_setup}/{defaults,tasks}
