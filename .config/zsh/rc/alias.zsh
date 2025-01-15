@@ -49,6 +49,7 @@ abbr -S -qq tfsl='terraform state list'
 abbr -S -qq awsl='aws configure list'
 alias awsp='set_aws_profile'
 alias awsv='aws-vault'
+alias ec2list='(echo -e "InstanceId\tName\tPublicIpAddress" && aws ec2 describe-instances --query '\''Reservations[*].Instances[*].[InstanceId, Tags[?Key==`Name`].Value | [0], PublicIpAddress]'\'' --output text) | column -t'
 
 # SVN
 alias svnbat='bat ~/dotfiles/docs/svn.md'
