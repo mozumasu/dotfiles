@@ -67,6 +67,9 @@ alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
 # ----------------------------------------------------
 abbr -S -qq f='open .'
 
+# karabiner
+alias killkara='sudo killall karabiner_grabber'
+
 # vpnutil
 abbr -S -qq vpn='vpnutil'
 alias vpns='check_vpn_status'
