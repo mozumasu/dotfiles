@@ -99,14 +99,14 @@ get_workspaces_ips() {
     # Get private IP of WorkSpaces
     local workspaces
     workspaces=$(aws workspaces describe-workspaces \
-        --query "Workspaces[*].[WorkspaceId, UserName, IpAddress]" \
+        --query "Workspaces[*].[WorkspaceId, UserName, IpAddress, DirectoryId]" \
         --output text)
 
     # Output header
-    echo -e "WorkspaceId\tUserName\tPublicIpAddress" | column -t
+    echo -e "WorkspaceId\tUserName\tPublicIpAddress\tDirectoryId" | column -t
 
     # Find ENI for each WorkSpace
-     while read -r workspace_id username private_ip; do
+     while read -r workspace_id username private_ip directory_id; do
         local public_ip="None"
         if [ "$private_ip" != "None" ]; then
             # Get public IP by ENI
@@ -116,7 +116,7 @@ get_workspaces_ips() {
                 --output text)
         fi
 
-        echo -e "$workspace_id\t$username\t$public_ip" | column -t
+        echo -e "$workspace_id\t$username\t$public_ip\t$directory_id" | column -t
     done <<< "$workspaces"
 }
 alias wsip='get_workspaces_ips'
