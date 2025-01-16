@@ -142,6 +142,69 @@ aws_service_filter() {
     echo "$data" | jq -r ".prefixes[] | select(.region==\"ap-northeast-1\" and .service==\"$selected_service\") | .ip_prefix"
 }
 
+check_iam_policy() {
+    # Get IAM role
+    local iam_arn
+    iam_arn=$(aws sts get-caller-identity --query "Arn" --output text)
+
+    if [[ -z "$iam_arn" ]]; then
+        echo "IAM role ARN could not be obtained"
+        return 1
+    fi
+
+    # Extract role name from ARN
+    local iam_role
+    iam_role=$(echo "$iam_arn" | awk -F'/' '{print $(NF-1)}')
+
+    if [[ -z "$iam_role" ]]; then
+        echo "Failed to extract IAM role name from ARN."
+        return 1
+    fi
+
+    echo "Using IAM Role: $iam_role"
+
+    # Get the policy attached to the IAM role
+    local policies
+    policies=$(aws iam list-attached-role-policies --role-name "$iam_role" --query "AttachedPolicies[].{Name:PolicyName,Arn:PolicyArn}" --output json)
+
+    if [[ -z "$policies" ]]; then
+        echo "No policies found for role: $iam_role"
+        return 1
+    fi
+
+    # Use fzf to select a policy
+    local selected_policy
+    selected_policy=$(echo "$policies" | jq -r '.[] | "\(.Name)\t\(.Arn)"' | fzf --prompt="Select a policy: " | awk '{print $2}')
+
+    if [[ -z "$selected_policy" ]]; then
+        echo "No policy selected or invalid selection."
+        return 1
+    fi
+
+    echo "Selected Policy ARN: $selected_policy"
+
+    # Get default version of the policy
+    local default_version
+    default_version=$(aws iam get-policy --policy-arn "$selected_policy" --query "Policy.DefaultVersionId" --output text)
+
+    if [[ -z "$default_version" ]]; then
+        echo "Failed to get default version for the selected policy."
+        return 1
+    fi
+
+    # Get the policy document
+    local policy_document
+    policy_document=$(aws iam get-policy-version --policy-arn "$selected_policy" --version-id "$default_version" --query "PolicyVersion.Document" --output json)
+
+    if [[ -z "$policy_document" ]]; then
+        echo "Failed to fetch policy document."
+        return 1
+    fi
+
+    echo "Policy Document:"
+    echo "$policy_document" | jq .
+}
+
 # Ansible init
 ansible_init() {
   mkdir -p group_vars/{development,production}/server_account group_vars/all/{secret,server_account} playbooks roles/{account,os_settings,pre_setup}/{defaults,tasks}
