@@ -51,6 +51,7 @@ alias awsp='set_aws_profile'
 alias awsv='aws-vault'
 alias ec2list='(echo -e "InstanceId\tName\tPublicIpAddress" && aws ec2 describe-instances --query '\''Reservations[*].Instances[*].[InstanceId, Tags[?Key==`Name`].Value | [0], PublicIpAddress]'\'' --output text) | column -t'
 alias wsip='get_workspaces_ips'
+alias awsip='aws_service_filter'
 
 # SVN
 alias svnbat='bat ~/dotfiles/docs/svn.md'
