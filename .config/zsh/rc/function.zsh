@@ -121,6 +121,27 @@ get_workspaces_ips() {
 }
 alias wsip='get_workspaces_ips'
 
+aws_service_filter() {
+    # Get AWS IP ranges
+    local data
+    data=$(curl -s https://ip-ranges.amazonaws.com/ip-ranges.json)
+
+    # Get the service list and select with fzf.
+    local selected_service
+    selected_service=$(echo "$data" | jq -r '.prefixes[] | select(.region=="ap-northeast-1") | .service' | sort -u | fzf --prompt="Select AWS Service: ")
+
+    # Quit if no service is selected.
+    if [[ -z "$selected_service" ]]; then
+        echo "No service selected."
+        return 1
+    fi
+
+    # Displays IP ranges for selected services.
+    echo "Selected Service: $selected_service"
+    echo "IP Ranges for $selected_service in ap-northeast-1:"
+    echo "$data" | jq -r ".prefixes[] | select(.region==\"ap-northeast-1\" and .service==\"$selected_service\") | .ip_prefix"
+}
+
 # Ansible init
 ansible_init() {
   mkdir -p group_vars/{development,production}/server_account group_vars/all/{secret,server_account} playbooks roles/{account,os_settings,pre_setup}/{defaults,tasks}
