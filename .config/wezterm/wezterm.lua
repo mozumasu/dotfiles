@@ -92,4 +92,12 @@ config.leader = { key = "q", mods = "CTRL", timeout_milliseconds = 2000 }
 --   },
 -- }
 
+config.mouse_bindings = {
+  {
+    event = { Down = { streak = 3, button = "Left" } },
+    action = wezterm.action.SelectTextAtMouseCursor("SemanticZone"),
+    mods = "NONE",
+  },
+}
+
 return config
