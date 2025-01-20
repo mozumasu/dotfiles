@@ -95,7 +95,7 @@ function set_aws_profile() {
   fi
 }
 
-get_workspaces_ips() {
+get_workspaces_info() {
     # Get private IP of WorkSpaces
     local workspaces
     workspaces=$(aws workspaces describe-workspaces \
@@ -119,9 +119,8 @@ get_workspaces_ips() {
         echo -e "$workspace_id\t$username\t$public_ip\t$directory_id" | column -t
     done <<< "$workspaces"
 }
-alias wsip='get_workspaces_ips'
 
-aws_service_filter() {
+get_aws_service_ip() {
     # Get AWS IP ranges
     local data
     data=$(curl -s https://ip-ranges.amazonaws.com/ip-ranges.json)

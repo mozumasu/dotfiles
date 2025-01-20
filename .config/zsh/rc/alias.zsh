@@ -47,11 +47,12 @@ abbr -S -qq tfsl='terraform state list'
 
 # aws
 abbr -S -qq awsl='aws configure list'
+abbr -S -qq awsm='aws-mfa'
 alias awsp='set_aws_profile'
 alias awsv='aws-vault'
-alias ec2list='(echo -e "InstanceId\tName\tPublicIpAddress" && aws ec2 describe-instances --query '\''Reservations[*].Instances[*].[InstanceId, Tags[?Key==`Name`].Value | [0], PublicIpAddress]'\'' --output text) | column -t'
-alias wsip='get_workspaces_ips'
-alias awsip='aws_service_filter'
+alias ec2ls='(echo -e "InstanceId\tName\tPublicIpAddress" && aws ec2 describe-instances --query '\''Reservations[*].Instances[*].[InstanceId, Tags[?Key==`Name`].Value | [0], PublicIpAddress]'\'' --output text) | column -t'
+alias wsls='get_workspaces_info'
+alias awsip='get_aws_service_ip'
 alias iam='check_iam_policy'
 
 # SVN
@@ -79,3 +80,8 @@ abbr -S -qq vpn='vpnutil'
 alias vpns='check_vpn_status'
 alias vpnc='vpn_connect_with_fzf'
 alias vpnd='vpn_disconnect_if_connected'
+
+# ----------------------------------------------------
+# for Mac
+# ----------------------------------------------------
+abbr -S -qq p_rm='python3 ~/src/github.com/mozumasu/python/article/rename_cleanup.py'
