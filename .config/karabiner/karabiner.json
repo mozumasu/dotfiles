@@ -258,6 +258,7 @@
                     },
                     {
                         "description": "Left ctrl + jk to arrow keys Vim",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
