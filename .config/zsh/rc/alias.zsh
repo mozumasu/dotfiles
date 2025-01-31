@@ -6,6 +6,7 @@
 # common
 alias v='nvim'
 alias ls='ls -F --color=auto'
+alias -g G='| grep'
 abbr -S -qq -='cd -'
 abbr -S -qq ll='ls -l'
 abbr -S -qq la='ls -A'
@@ -42,6 +43,7 @@ abbr -S -qq ap='ansible-playbook'
 abbr -S -qq tf='terraform'
 abbr -S -qq tfi='terraform init'
 abbr -S -qq tfp='terraform plan'
+abbr -S -qq tfa='terraform apply'
 abbr -S -qq tfs='terraform state'
 abbr -S -qq tfsl='terraform state list'
 
@@ -56,6 +58,8 @@ alias awsip='get_aws_service_ip'
 alias iam='check_iam_policy'
 alias ssmdv='view_ssm_document'
 alias ssmdsync='sync_ssm_document'
+alias awsconfig='v ~/.aws/config'
+alias ascredentials='v ~/.aws/credentials'
 
 # SVN
 alias svnbat='bat ~/dotfiles/docs/svn.md'
