@@ -63,3 +63,5 @@ esac
 export VOLTA_HOME="$HOME/.volta"
 export PATH="$VOLTA_HOME/bin:$PATH"
 
+# Homemade command
+export PATH=$XDG_CONFIG_HOME/local/bin:$PATH
