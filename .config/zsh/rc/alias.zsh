@@ -54,6 +54,8 @@ alias ec2ls='(echo -e "InstanceId\tName\tPublicIpAddress" && aws ec2 describe-in
 alias wsls='get_workspaces_info'
 alias awsip='get_aws_service_ip'
 alias iam='check_iam_policy'
+alias ssmdv='view_ssm_document'
+alias ssmdsync='sync_ssm_document'
 
 # SVN
 alias svnbat='bat ~/dotfiles/docs/svn.md'
