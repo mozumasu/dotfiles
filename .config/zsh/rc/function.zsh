@@ -265,7 +265,7 @@ sync_ssm_document() {
       --name "$document_name" \
       --region "$region" \
       --query "DocumentVersions[0].DocumentVersion" \
-      --output text)
+      --output text | head -n 1)
 
     # ドキュメントを更新
     if aws ssm update-document \
