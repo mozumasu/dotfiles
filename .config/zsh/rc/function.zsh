@@ -204,6 +204,206 @@ check_iam_policy() {
     echo "$policy_document" | jq .
 }
 
+sync_ssm_document() {
+  local local_file="$1"
+  local region="${2:-ap-northeast-1}" # default region
+  local temp_aws_file="/tmp/ssm_document.yml"
+
+  if [[ -z "$local_file" ]]; then
+    echo "Usage: sync_ssm_document <local_file> [region]"
+    return 1
+  fi
+
+  if [[ ! -f "$local_file" ]]; then
+    echo "Error: Local file '$local_file' not found."
+    return 1
+  fi
+
+  # 自分が作成したSSMドキュメント一覧を取得してfzfで選択
+  local document_name
+  document_name=$(aws ssm list-documents \
+    --region "$region" \
+    --filters Key=Owner,Values=Self \
+    --query "DocumentIdentifiers[].Name" \
+    --output json | jq -r '.[]' | fzf --prompt="Select SSM Document: ")
+
+  if [[ -z "$document_name" ]]; then
+    echo "No SSM Document selected. Exiting."
+    return 1
+  fi
+
+  echo "Selected SSM Document: $document_name"
+
+  # 確認プロンプト
+  echo "Are you sure you want to update the SSM Document '$document_name' with '$local_file'? (y/n)"
+  read -r confirmation
+  if [[ "$confirmation" != "y" ]]; then
+    echo "Update canceled."
+    return 0
+  fi
+
+  # AWS上のドキュメントを取得
+  aws ssm get-document \
+    --name "$document_name" \
+    --region "$region" \
+    --query "Content" \
+    --output text > "$temp_aws_file" 2>/dev/null
+
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to retrieve content for SSM Document '$document_name'."
+    return 1
+  fi
+
+  # ローカルファイルとAWSドキュメントを比較
+  if diff "$local_file" "$temp_aws_file" > /dev/null; then
+    echo "No changes detected. SSM Document is up to date."
+  else
+    echo "Changes detected. Updating SSM Document..."
+    # 最新バージョン番号を取得
+    local latest_version
+    latest_version=$(aws ssm list-document-versions \
+      --name "$document_name" \
+      --region "$region" \
+      --query "DocumentVersions[0].DocumentVersion" \
+      --output text)
+
+    # ドキュメントを更新
+    if aws ssm update-document \
+      --name "$document_name" \
+      --content file://"$local_file" \
+      --document-version "$latest_version" \
+      --region "$region"; then
+
+      # バージョン番号を整数として扱い、1を加算
+      latest_version=$((latest_version + 1))
+
+      echo "SSM Document '$document_name' updated successfully to version $latest_version."
+    else
+      echo "SSM Document update failed."
+    fi
+    echo "Updating default version to $latest_version..."
+    # デフォルトバージョンを最新に更新
+    aws ssm update-document-default-version \
+      --name "$document_name" \
+      --document-version "$latest_version" \
+      --region "$region"
+  fi
+
+  # 一時ファイルを削除
+  rm -f "$temp_aws_file"
+}
+
+view_ssm_document() {
+  local region="${1:-ap-northeast-1}" # default region
+  local temp_aws_file="/tmp/ssm_document_content.yml"
+
+  # Get the list of ssm documents you created and select them with fzf.
+  local document_name
+  document_name=$(aws ssm list-documents \
+    --region "$region" \
+    --filters Key=Owner,Values=Self \
+    --query "DocumentIdentifiers[].Name" \
+    --output json | jq -r '.[]' | fzf --prompt="Select SSM Document to view: ")
+
+  if [[ -z "$document_name" ]]; then
+    echo "No SSM Document selected. Exiting."
+    return 1
+  fi
+
+  echo "Selected SSM Document: $document_name"
+
+  # Retrieves the contents of the selected document.
+  aws ssm get-document \
+    --name "$document_name" \
+    --region "$region" \
+    --query "Content" \
+    --output text > "$temp_aws_file" 2>/dev/null
+
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Failed to retrieve content for SSM Document '$document_name'."
+    return 1
+  fi
+
+  # Display the contents of the retrieved document.
+  echo "Content of SSM Document '$document_name':"
+  bat "$temp_aws_file"
+
+  rm -f "$temp_aws_file"
+}
+
+create_ssm_document() {
+  local content_file="$1"   # 第1引数でファイルパスを受け取る
+  local document_name="$2" # 第2引数でドキュメント名を受け取る
+  local region="${3:-ap-northeast-1}" # 第3引数でリージョンを指定（デフォルトは ap-northeast-1）
+
+  # 引数が指定されていない場合はエラーメッセージを表示して終了
+  if [[ -z "$content_file" ]]; then
+    echo "Usage: create_ssm_document <content_file> [document_name] [region]"
+    return 1
+  fi
+
+  # 引数のファイルが存在しない場合
+  if [[ ! -f "$content_file" ]]; then
+    echo "Error: File '$content_file' not found."
+    return 1
+  fi
+
+  # ドキュメント名が指定されていない場合、プロンプトで入力を求める
+  if [[ -z "$document_name" ]]; then
+    echo "Enter the name for the SSM Document:"
+    read -r document_name
+  fi
+
+  # ドキュメント名が空の場合はエラーを表示して終了
+  if [[ -z "$document_name" ]]; then
+    echo "Error: Document name cannot be empty."
+    return 1
+  fi
+
+  # fzfでドキュメントタイプを選択
+  local document_type
+  document_type=$(echo -e "Command\nAutomation\nPolicy\nSession\nPackage" | fzf --prompt="Select Document Type: ")
+
+  if [[ -z "$document_type" ]]; then
+    echo "Error: No document type selected."
+    return 1
+  fi
+
+  # fzfでファイル形式を選択
+  local file_format
+  file_format=$(echo -e "YAML\nJSON" | fzf --prompt="Select File Format: ")
+
+  if [[ -z "$file_format" ]]; then
+    echo "Error: No file format selected."
+    return 1
+  fi
+
+  # ファイル形式に応じて content の指定を変更
+  local content_option
+  if [[ "$file_format" == "YAML" ]]; then
+    content_option="file://$content_file"
+  elif [[ "$file_format" == "JSON" ]]; then
+    content_option="file://$content_file"
+  else
+    echo "Error: Invalid file format selected."
+    return 1
+  fi
+
+  # AWS CLIコマンドを実行してSSMドキュメントを作成
+  aws ssm create-document \
+    --name "$document_name" \
+    --document-type "$document_type" \
+    --content "$content_option" \
+    --region "$region"
+
+  # 結果を表示
+  if [[ $? -eq 0 ]]; then
+    echo "SSM Document '$document_name' of type '$document_type' with format '$file_format' created successfully in region '$region'."
+  else
+    echo "Failed to create SSM Document."
+  fi
+}
+
 # Ansible init
 ansible_init() {
   mkdir -p group_vars/{development,production}/server_account group_vars/all/{secret,server_account} playbooks roles/{account,os_settings,pre_setup}/{defaults,tasks}
