@@ -6,6 +6,9 @@
 # common
 alias v='nvim'
 alias ls='ls -F --color=auto'
+alias ...='../../'
+alias ....='../../../'
+alias .....='../../../../'
 alias -g G='| grep'
 abbr -S -qq -='cd -'
 abbr -S -qq ll='ls -l'
