@@ -58,6 +58,13 @@ create_gitignore() {
     bat "$input_file"
 }
 
+# Initialize git repository
+function ginit() {
+  touch README.md
+  echo "# $(basename "$PWD")" >> README.md
+  create_gitignore
+}
+
 # AWS
 function set_aws_profile() {
   local selected_profile=$(aws configure list-profiles |
