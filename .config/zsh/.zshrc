@@ -72,6 +72,15 @@ zstyle ':completion:*' group-name ''
 zstyle ':completion:*:default' menu select=2
 
 # ----------------------------------------------------
+# zsh local settings
+# ----------------------------------------------------
+if [[ -d "$LOCAL_ZSH_DIR" ]]; then
+  for file in "$LOCAL_ZSH_DIR"/*.zsh; do
+    [ -r "$file" ] && source "$file"
+  done
+fi
+
+# ----------------------------------------------------
 # Neovim
 # ----------------------------------------------------
 export NVM_DIR="$HOME/.config/nvm"
