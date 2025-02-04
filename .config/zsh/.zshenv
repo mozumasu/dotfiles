@@ -17,6 +17,7 @@ export XDG_STATE_HOME=${HOME}/.local/state
 # zsh
 export ZDOTDIR=${XDG_CONFIG_HOME}/zsh
 export ZRCDIR=$ZDOTDIR/rc
+export LOCAL_ZSH_DIR="${HOME}/.config/local/zsh"
 
 # path
 export PATH=${HOME}/.local/bin:$PATH
