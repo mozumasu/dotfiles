@@ -77,6 +77,13 @@ alias gi='create_gitignore'
 alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
 
 # ----------------------------------------------------
+# Hash
+# ----------------------------------------------------
+hash -d xdata=$XDG_DATA_HOME
+hash -d nvim=$XDG_DATA_HOME/nvim
+hash -d nvimplugins=$XDG_DATA_HOME/nvim/lua
+
+# ----------------------------------------------------
 # for Mac
 # ----------------------------------------------------
 abbr -S -qq f='open .'
