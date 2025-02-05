@@ -8,7 +8,7 @@ bindkey -e
 bindkey '^g' ghq-fzf
 
 # History search
-autoload history-search-end
+autoload -Uz history-search-end
 zle -N history-beginning-search-backward-end history-search-end
 zle -N history-beginning-search-forward-end history-search-end
 bindkey "^p" history-beginning-search-backward-end
