@@ -22,6 +22,9 @@ Session.vim
 # dpl
 .config/dpl/
 
+# czg cz-git
+.config/.czrc
+
 # zsh
 .zsh_history
 .config/zsh/.zsh_sessions/*

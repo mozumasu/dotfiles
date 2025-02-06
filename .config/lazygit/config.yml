@@ -1,10 +1,14 @@
 # https://github.com/jesseduffield/lazygit/blob/master/docs/Config.md
 
 customCommands:
-  - command: git cz
+  - command: czg
     context: files
     subprocess: true
     key: C
+  - command: czg ai
+    context: files
+    subprocess: true
+    key: w
 
 gui:
   language: "ja"
