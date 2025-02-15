@@ -2,6 +2,8 @@
 # ----------------------------------------------------
 # Function
 # ----------------------------------------------------
+# navigation
+cx() { cd "$@" && ls -aF --color=auto; }
 
 # https://rcmdnk.com/blog/2014/07/20/computer-vim/
 function man {
