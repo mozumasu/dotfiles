@@ -1,9 +1,18 @@
-
 # ----------------------------------------------------
 # Function
 # ----------------------------------------------------
 # navigation
 cx() { cd "$@" && ls -aF --color=auto; }
+
+# yazi
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		builtin cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
 
 # https://rcmdnk.com/blog/2014/07/20/computer-vim/
 function man {
