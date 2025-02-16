@@ -69,3 +69,13 @@
                                      ╚═╝  ╚═══╝╚═╝╚═╝  ╚═╝
 
 ```
+
+---
+
+## setup
+
+```sh
+npx czg --api-key="ghp_xxxxxx" --api-endpoint="https://models.inference.ai.azure.com" --api-model="gpt-4o-mini"
+```
+
+> [OpenAI | cz-git](https://cz-git.qbb.sh/recipes/openai)
