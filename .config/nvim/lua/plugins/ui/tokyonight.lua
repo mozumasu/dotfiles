@@ -2,14 +2,7 @@ return {
   {
     "folke/tokyonight.nvim",
     enable = false,
-    lazy = false, -- 起動時に読み込まないと、uiリストに追加されない
+    lazy = false, -- If it is not loaded at startup, it will not be added to the ui list.
     opts = { style = "moon" },
   },
-  -- 起動時のデフォルト設定に使用したい場合は下記を有効化する
-  -- {
-  --   "LazyVim/LazyVim",
-  --   opts = {
-  --     colorscheme = "tokyonight",
-  --   },
-  -- },
 }
