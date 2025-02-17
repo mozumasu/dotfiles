@@ -48,8 +48,11 @@ return {
         end),
       }),
     },
-    -- Convert ¥ key to \
-    { key = "¥", mods = "NONE", action = wezterm.action.SendString("\\") },
+    -- Convert ¥ key to \ (Mac kotoeri ver)
+    -- { key = "¥", mods = "NONE", action = wezterm.action.SendString("\\") },
+    -- Convert ¥ key to \ (karabiner ver)
+    { key = "¥", action = act.SendKey({ key = "¥" }) },
+    { key = "¥", mods = "ALT", action = act.SendKey({ key = "\\" }) },
     -- コマンドパレット表示
     { key = "p", mods = "SUPER", action = act.ActivateCommandPalette },
     -- Tab移動

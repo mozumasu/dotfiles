@@ -5,6 +5,34 @@
             "complex_modifications": {
                 "rules": [
                     {
+                        "description": "Change Alt+¥ to ¥",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "international3",
+                                    "modifiers": { "mandatory": ["option"] }
+                                },
+                                "to": [{ "key_code": "international3" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Change ¥ to Alt+¥",
+                        "manipulators": [
+                            {
+                                "from": { "key_code": "international3" },
+                                "to": [
+                                    {
+                                        "key_code": "international3",
+                                        "modifiers": ["option"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "^h to delete",
                         "manipulators": [
                             {
