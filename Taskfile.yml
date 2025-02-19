@@ -31,3 +31,8 @@ tasks:
     desc: Install brew packages from Brewfile
     cmds:
       - brew bundle
+
+  symlink:
+    desc: Create symlink
+    cmds:
+      - ~/dotfiles/.bin/symlink.sh
