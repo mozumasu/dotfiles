@@ -4,11 +4,11 @@ customCommands:
   - command: czg
     context: files
     subprocess: true
-    key: C
+    key: c
   - command: czg ai
     context: files
     subprocess: true
-    key: w
+    key: C
 
 gui:
   language: "ja"
