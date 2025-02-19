@@ -90,12 +90,20 @@ export NVM_DIR="$HOME/.config/nvm"
 # ----------------------------------------------------
 # fzf
 # ----------------------------------------------------
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-zle -N fzf-history-widget
-bindkey '^R' fzf-history-widget
+if [[ ! "$PATH" == */opt/homebrew/opt/fzf/bin* ]]; then
+  PATH="${PATH:+${PATH}:}/opt/homebrew/opt/fzf/bin"
+fi
+# Auto-completion
+source "/opt/homebrew/opt/fzf/shell/completion.zsh"
+# key-bindings (default: /opt/homebrew/opt/fzf/shell/key-bindings.zsh)
+source "$HOME/dotfiles/.config/zsh/rc/pluginconfig/fzf.key-bindings.zsh"
 
-
+# ----------------------------------------------------
 # starship
+# ----------------------------------------------------
 eval "$(starship init zsh)"
+
+# ----------------------------------------------------
 # Must be at the end of the file
+# ----------------------------------------------------
 eval "$(zoxide init zsh)"

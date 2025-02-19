@@ -5,6 +5,10 @@
 
 # Use emacs keybind
 bindkey -e
+
+# fzf
+zle -N fzf-history-widget
+bindkey '^R' fzf-history-widget
 bindkey '^g' ghq-fzf
 
 # History search

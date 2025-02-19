@@ -1,7 +1,0 @@
-#!/bin/zsh
-# 共通設定ファイル読み込み
-PROFILE_COMMON="$HOME/dotfiles/.bin/.profile_common"
-
-if [[ -e $PROFILE_COMMON ]]; then
-    source "$PROFILE_COMMON"
-fi
