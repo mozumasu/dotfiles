@@ -37,6 +37,9 @@ abbr -S -qq proot='cd $(git rev-parse --show-toplevel)'
 alias zshconf="nvim ~/.zshrc"
 alias szsh="source ~/dotfiles/.config/zsh/.zshrc"
 
+# rm
+[[ $(command -v gomi) ]] && alias gm='gomi'
+
 # zenn
 alias zenn='nvim ~/src/private/zenn'
 

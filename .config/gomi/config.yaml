@@ -1,0 +1,49 @@
+core:
+  trash:
+    strategy: xdg # or "xdg" or "legacy"
+    gomi_dir: $XDG_DATA_HOME/Trash/
+  restore:
+    confirm: true
+    verbose: false
+  trash_dir: ""
+ui:
+  density: spacious
+  style:
+    list_view:
+      indent_on_select: true
+      cursor: "#AD58B4"
+      selected: "#5FB458"
+    detail_view:
+      border: "#EEEEDD"
+      info_pane:
+        deleted_from:
+          fg: "#EEEEEE"
+          bg: "#1C1C1C"
+        deleted_at:
+          fg: "#EEEEEE"
+          bg: "#1C1C1C"
+      preview_pane:
+        border: "#3C3C3C"
+        size:
+          fg: "#EEEEDD"
+          bg: "#3C3C3C"
+        scroll:
+          fg: "#EEEEDD"
+          bg: "#3C3C3C"
+  exit_message: ""
+  preview:
+    syntax_highlight: true
+    colorscheme: nord
+    directory_command: ls -GF -1 -A --color=always
+  paginator_type: dots
+history:
+  include:
+    within_days: 365
+  exclude:
+    files:
+      - .DS_Store
+    patterns: []
+    globs: []
+    size:
+      min: 0KB
+      max: 10GB
