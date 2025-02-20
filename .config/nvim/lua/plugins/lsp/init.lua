@@ -4,8 +4,6 @@ return {
     opts = {
       diagnostics = {
         virtual_text = {
-          source = "always", -- Always display lsp server name
-          prefix = "●",
           format = function(diagnostic)
             -- Add lsp server name to message
             return string.format("%s (%s)", diagnostic.message, diagnostic.source or "Unknown")
@@ -14,9 +12,23 @@ return {
       },
     },
   },
-  require("lspconfig").typos_lsp.setup({
-    init_options = {
-      config = "~/.config/nvim/.typos.toml",
+  {
+    "saghen/blink.cmp",
+    opts = {
+      completion = {
+        menu = {
+          border = "rounded",
+        },
+        documentation = {
+          window = {
+            border = "rounded",
+          },
+        },
+      },
+      keymap = {
+        -- preset = "none",
+        ["<CR>"] = {}, -- Do not use enter to confirm completion
+      },
     },
-  }),
+  },
 }
