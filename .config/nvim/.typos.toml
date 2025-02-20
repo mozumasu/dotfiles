@@ -5,4 +5,5 @@ args = "args"
 cose = "cose"
 
 [default]
+detect = ["en", "ja"]
 extend-ignore-re = ["<cmd>.+<cr>", "<leader>.+\"", "<leader>.+`"]
