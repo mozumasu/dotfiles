@@ -38,7 +38,7 @@ return {
         description = "(wezterm) Create new workspace:",
         action = wezterm.action_callback(function(window, pane, line)
           if line then
-            window:perform_aciton(
+            window:perform_action(
               act.SwitchToWorkspace({
                 name = line,
               }),
