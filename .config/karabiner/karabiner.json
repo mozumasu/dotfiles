@@ -271,6 +271,7 @@
                     },
                     {
                         "description": "Control-O to move to end of line and insert newline",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "conditions": [
@@ -302,6 +303,7 @@
                     },
                     {
                         "description": "option + k to control + k",
+                        "enabled": false,
                         "manipulators": [
                             {
                                 "from": {
