@@ -76,6 +76,10 @@ alias svnr='svn st | grep "^!" | awk "{print $2}" | xargs svn rm'
 alias sshf='fzf-ssh'
 alias gi='create_gitignore'
 
+# python
+[[ $(command -v python3) ]] && abbr -S -qq py='python3'
+[[ $(command -v uv) ]] && abbr -S -qq upy='uv run python'
+
 # Laravel sail
 alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
 
