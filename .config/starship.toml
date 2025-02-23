@@ -1,78 +1,85 @@
-# promptのカラーを設定しています、$変数は後述で設定している変数が差し込まれます
-format = """
-$directory\
-[ ](fg:#88C0D0 bg:#1d2230)\
-$git_branch\
-$git_status\
-[ ](fg:#1d2230)\
-\n$character
-"""
-
-right_format = """
-$cmd_duration\
-$username\
-✨
-$time
-"""
-
-# コマンドラインに1行分のスペースを入れる
 add_newline = true
 
-[username]
-style_user = "white bold"
-style_root = "black bold"
-format = "user: [$user]($style) "
-disabled = false
+# ----------------------------------------------------
+# format
+# ----------------------------------------------------
+format = """
+$directory\
+$git_branch\
+$git_status\
+$direnv\
+$fill\
+$cmd_duration\
+$time\
+\n$character\
+"""
 
+# Enable if it appears on the same line as the command
+# right_format = """
+# $cmd_duration\
+# $time\
+# """
 
-# left_promptとright_promptの間を何で埋めるか設定
+# ----------------------------------------------------
+# left module
+# ----------------------------------------------------
 [fill]
-symbol = ' '
+symbol = '─'
 
 [directory]
-style = "fg:#2E3440 bg:#88C0D0 bold"
-# format = "[ $path ]($style)"
-truncation_length = 10
+truncation_length = 6
+truncation_symbol = ' '
 truncate_to_repo = false
-truncation_symbol = "…/"
-# truncation_symbol = ' ' # nf-fa-folder_open
-# truncate_to_repo = false
-# style = 'fg:#7aa2f7 bg:#1a1b26'
-read_only = ' 󰌾 ' # nf-md-lock
-read_only_style = 'fg:#f7768e bg:#1a1b26'
-format = '[ $path ]($style)[$read_only]($read_only_style)'
+home_symbol = '~'
+read_only = ' 󰌾 '
+format = """
+[](fg:#80EBDF)\
+[$path]($style)\
+[$read_only]($read_only_style)\
+[](fg:#80EBDF)\
+"""
+style = 'bold fg:#313244 bg:#80EBDF'
+read_only_style = 'bold fg:#313244 bg:#80EBDF'
 
-
-[directory.substitutions]
-"Documents" = "󰈙 "
-"Downloads" = " "
-"Music" = " "
-"Pictures" = " "
-
-[aws]
-disabled = true
-[gcloud]
-disabled = true
+[direnv]
+disabled = false
+format = """
+[](fg:#89dceb)\
+[$symbol$allowed]($style)\
+[](fg:#89dceb)\
+"""
+style = "bold fg:#313244 bg:#89dceb"
 
 [git_branch]
 symbol = ""
-style = "bg:#1d2230"
-format = '[[ $symbol $branch ](fg:#769ff0 bg:#1d2230)]($style)'
+style = "fg:#769ff0 bg:#1d2230"
+format = """
+[](fg:#1d2230)\
+[$symbol $branch]($style)\
+"""
 
 [git_status]
-style = "bg:#1d2230"
-format = '[[($all_status$ahead_behind )](fg:#769ff0 bg:#1d2230)]($style)'
+style = "fg:#769ff0 bg:#1d2230"
+format = """
+[$all_status$ahead_behind]($style)\
+[](fg:#1d2230)\
+"""
 
+# ----------------------------------------------------
+# right module
+# ----------------------------------------------------
 [cmd_duration]
 min_time = 1
 style = 'fg:#e0af68'
-format = "[$duration]($style)" # nf-pl-right_soft_divider, nf-mdi-clock
+format = "[ $duration]($style)" # nf-pl-right_soft_divider, nf-mdi-clock
 
 [time]
 disabled = false
 time_format = "%R" # Hour:Minute Format
-# style = "bg:#1d2230"
-format = '[[   $time ](fg:#a0a9cb)]($style)'
+format = '[[  $time](fg:#a0a9cb)]($style)'
 
+# ----------------------------------------------------
+# prompt module
+# ----------------------------------------------------
 [character]
 vimcmd_symbol = '[V](bold green) '
