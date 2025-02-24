@@ -66,8 +66,9 @@ wezterm.on("update-status", function(window, pane)
   title_cache[pane_id] = "-" -- default value
 
   local cwd_url = pane:get_current_working_dir()
+
   if cwd_url then
-    local cwd = cwd_url.path -- `path` を取得
+    local cwd = cwd_url.path
     if cwd then
       local home = os.getenv("HOME")
       if home and cwd:find("^" .. home) then
@@ -114,6 +115,9 @@ local SOLID_LEFT_CIRCLE = wezterm.nerdfonts.ple_left_half_circle_thick
 local SOLID_RIGHT_CIRCLE = wezterm.nerdfonts.ple_right_half_circle_thick
 -- local SOLID_LEFT_ARROW = wezterm.nerdfonts.ple_lower_right_triangle
 -- local SOLID_RIGHT_ARROW = wezterm.nerdfonts.ple_upper_left_triangle
+function basename(s)
+  return string.gsub(s, "(.*[/\\])(.*)", "%2")
+end
 
 wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
   local background = TAB_BACKGROUND_INACTIVE
@@ -127,10 +131,17 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
 
   local pane = tab.active_pane
   local pane_id = pane.pane_id
+  local process_name = basename(pane.foreground_process_name)
 
   local cwd = "none"
   if title_cache[pane_id] then
     cwd = title_cache[pane_id]
+    if process_name:find("ssh") or process_name:find("multipass") then
+      local host = pane.title:match("@([%w%.-]+)")
+      if host then
+        cwd = host
+      end
+    end
   else
     cwd = "-"
   end
