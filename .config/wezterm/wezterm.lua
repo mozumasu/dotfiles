@@ -110,28 +110,35 @@ local TAB_FOREGROUND_INACTIVE = "#a0a9cb"
 local TAB_BACKGROUND_INACTIVE = "#1d2230"
 local TAB_FOREGROUND_ACTIVE = "#313244"
 local TAB_BACKGROUND_ACTIVE = "#80EBDF"
+local TAB_BACKGROUND_SSH_ACTIVE = "#ff0000"
 -- Tab fitting
 local SOLID_LEFT_CIRCLE = wezterm.nerdfonts.ple_left_half_circle_thick
 local SOLID_RIGHT_CIRCLE = wezterm.nerdfonts.ple_right_half_circle_thick
 -- local SOLID_LEFT_ARROW = wezterm.nerdfonts.ple_lower_right_triangle
 -- local SOLID_RIGHT_ARROW = wezterm.nerdfonts.ple_upper_left_triangle
+
 function basename(s)
   return string.gsub(s, "(.*[/\\])(.*)", "%2")
 end
 
 wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_width)
-  local background = TAB_BACKGROUND_INACTIVE
-  local foreground = TAB_FOREGROUND_INACTIVE
-  if tab.is_active then
-    background = TAB_BACKGROUND_ACTIVE
-    foreground = TAB_FOREGROUND_ACTIVE
-  end
-  local edge_background = "none"
-  local edge_foreground = background
-
   local pane = tab.active_pane
   local pane_id = pane.pane_id
   local process_name = basename(pane.foreground_process_name)
+
+  local background = TAB_BACKGROUND_INACTIVE
+  local foreground = TAB_FOREGROUND_INACTIVE
+  if tab.is_active and (process_name:find("ssh") or process_name:find("multipass")) then
+    background = TAB_BACKGROUND_SSH_ACTIVE
+  elseif tab.is_active then
+    background = TAB_BACKGROUND_ACTIVE
+    foreground = TAB_FOREGROUND_ACTIVE
+  end
+
+  local edge_background = "none"
+  local edge_foreground = background
+
+  -- SSH接続時に赤色に変更
 
   local cwd = "none"
   if title_cache[pane_id] then
@@ -179,6 +186,7 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
     { Text = icon },
     { Background = { Color = background } },
     { Foreground = { Color = foreground } },
+    { Attribute = { Intensity = "Bold" } },
     { Text = title },
     { Background = { Color = edge_background } },
     { Foreground = { Color = edge_foreground } },
