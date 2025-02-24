@@ -39,7 +39,7 @@ config.colors = {
   },
 }
 config.show_new_tab_button_in_tab_bar = false
--- Can only be used at nightly
+-- Can only be used in nightly
 config.show_close_tab_button_in_tabs = false
 config.tab_max_width = 30
 -- Adjust the tab bar to the background color
