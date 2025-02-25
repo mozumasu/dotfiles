@@ -8,6 +8,7 @@ $directory\
 $git_branch\
 $git_status\
 $direnv\
+$python\
 $fill\
 $cmd_duration\
 $time\
@@ -23,6 +24,14 @@ $time\
 # ----------------------------------------------------
 # left module
 # ----------------------------------------------------
+[python]
+format = """
+[](fg:#ffcb6b)\
+[$virtualenv]($style)\
+[](fg:#ffcb6b)\
+"""
+style = "bold fg:#313244 bg:#ffcb6b"
+
 [fill]
 symbol = '─'
 
