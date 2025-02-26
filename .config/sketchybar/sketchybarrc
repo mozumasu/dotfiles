@@ -1,5 +1,3 @@
-# This is a demo config to showcase some of the most important commands.
-# It is meant to be changed and configured, as it is intentionally kept sparse.
 # For a (much) more advanced configuration example see my dotfiles:
 # https://github.com/FelixKratz/dotfiles
 
@@ -7,12 +5,11 @@ PLUGIN_DIR="$CONFIG_DIR/plugins"
 
 ##### Bar Appearance #####
 # Configuring the general appearance of the bar.
-# These are only some of the options available. For all options see:
 # https://felixkratz.github.io/SketchyBar/config/bar
-# If you are looking for other colors, see the color picker:
 # https://felixkratz.github.io/SketchyBar/config/tricks#color-picker
 
-sketchybar --bar position=top height=40 blur_radius=30 color=0x40000000
+# sketchybar --bar position=top height=40 blur_radius=30 color=0x40000000
+sketchybar --bar position=top height=28 blur_radius=30 color=0x40000000
 
 ##### Changing Defaults #####
 # We now change some default values, which are applied to all further items.
@@ -30,6 +27,7 @@ default=(
   icon.padding_right=4
   label.padding_left=4
   label.padding_right=4
+  update=on
 )
 sketchybar --default "${default[@]}"
 
@@ -47,7 +45,7 @@ do
     icon="${SPACE_ICONS[i]}"
     icon.padding_left=7
     icon.padding_right=7
-    background.color=0x40ffffff
+    # background.color=0x40ffffff
     background.corner_radius=5
     background.height=25
     label.drawing=off
@@ -86,6 +84,23 @@ sketchybar --add item clock right \
            --add item battery right \
            --set battery update_freq=120 script="$PLUGIN_DIR/battery.sh" \
            --subscribe battery system_woke power_source_change
+
+##### Aerospace #####
+# https://nikitabobko.github.io/AeroSpace/goodies#show-aerospace-workspaces-in-sketchybar
+sketchybar --add event aerospace_workspace_change
+
+for sid in $(aerospace list-workspaces --all); do
+    sketchybar --add item space.$sid left \
+        --subscribe space.$sid aerospace_workspace_change \
+        --set space.$sid \
+        background.color=0x44ffffff \
+        background.corner_radius=5 \
+        background.height=20 \
+        background.drawing=off \
+        label="$sid" \
+        click_script="aerospace workspace $sid" \
+        script="$CONFIG_DIR/plugins/aerospace.sh $sid"
+done
 
 ##### Force all scripts to run the first time (never do this in a script) #####
 sketchybar --update
