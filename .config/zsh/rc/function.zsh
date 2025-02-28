@@ -657,3 +657,11 @@ function newapp() {
   echo "Opening $app..."
   open -n "/Applications/$app"
 }
+
+notify() {
+    if [ -z "$1" ]; then
+        terminal-notifier -message "complete" &
+    else
+      (sleep "$1"m && terminal-notifier -message "Time's up! ($1 min)") &
+    fi
+}
