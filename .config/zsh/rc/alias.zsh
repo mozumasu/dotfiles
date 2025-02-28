@@ -110,7 +110,6 @@ alias vpnd='vpn_disconnect_if_connected'
 
 # notification
 alias beep='for i in {1..3}; do afplay /System/Library/Sounds/Submarine.aiff; done'
-alias notify='terminal-notifier -message "complete"'
 
 
 # ----------------------------------------------------
