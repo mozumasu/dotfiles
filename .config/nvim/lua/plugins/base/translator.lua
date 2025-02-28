@@ -14,6 +14,8 @@ return {
           vim.cmd('normal! "vy')
           -- Store the contents of register 'v' to a variable
           local selected_text = vim.fn.getreg("v")
+          -- If there are more than two spaces, replace it with one space
+          selected_text = string.gsub(selected_text, "%s%s+", " ")
           vim.cmd("'<,'>TranslateW")
           -- Execute the say command asynchronously to read the text stored in a variable
           vim.uv.spawn("say", { args = { "-v", "Ava", selected_text } }, function() end)
@@ -68,6 +70,31 @@ return {
     "potamides/pantran.nvim",
     keys = {
       { "<leader>tw", "<cmd>Pantran<CR>", mode = { "n", "v" }, desc = "Show Translate Window" },
+      -- Translate the current line
+      {
+        "<leader>th",
+        "<cmd>Pantran mode=hover target=ja<CR>",
+        mode = { "n" },
+        { desc = "Hover translate word under cursor" },
+      },
+      -- Translate the selected area
+      {
+        "<leader>th",
+        function()
+          -- Yanks the selected range in visual mode and stores it in a register.
+          vim.cmd('normal! "vy')
+          -- Store the contents of register 'v' to a variable
+          local selected_text = vim.fn.getreg("v")
+          -- 改行 (`\n`) をスペースに変換し、連続スペースも1つにする
+          selected_text = selected_text:gsub("\n", " "):gsub("%s%s+", " ")
+          -- If there are more than two spaces, replace it with one space
+          vim.cmd("'<,'>Pantran mode=hover target=ja")
+          -- Execute the say command asynchronously to read the text stored in a variable
+          vim.uv.spawn("say", { args = { "-v", "Ava", selected_text } }, function() end)
+        end,
+        mode = "v",
+        desc = "Read aloud the selected text using say command and register",
+      },
     },
     config = function()
       require("pantran").setup({
