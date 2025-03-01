@@ -13,7 +13,7 @@ fi
 alias ...='../../'
 alias ....='../../../'
 alias .....='../../../../'
-alias -g G='| grep'
+alias -g G='| grep --color=auto'
 abbr -S -qq -='cd -'
 abbr -S -qq ll='ls -l'
 abbr -S -qq la='ls -A'
