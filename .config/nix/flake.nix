@@ -13,7 +13,7 @@
     };
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs }:
+  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager }:
     let
       configuration = { pkgs, ... }: {
         # List packages installed in system profile. To search by name, run:
@@ -46,7 +46,7 @@
       darwinConfigurations."Mac-2" = nix-darwin.lib.darwinSystem {
         modules = [
           configuration
-          inputs.home-manager.nixosModules.home-manager
+          inputs.home-manager.darwinModules.home-manager
         ];
       };
     };
