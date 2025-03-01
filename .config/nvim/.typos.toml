@@ -3,6 +3,7 @@ mozumasu = "mozumasu"
 iterm = "iterm"
 args = "args"
 cose = "cose"
+ue = "ue"
 
 [default]
 detect = ["en", "ja"]
