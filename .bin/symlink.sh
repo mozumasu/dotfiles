@@ -5,14 +5,15 @@ set -ue
 DOTFILES_DIR="$HOME/dotfiles"
 
 SYMLINK_EXCLUDE_FILES=(
-  "README.md"
-  "Taskfile.yml"
-  "vm"
-  "images"
-  "docs"
-  "bin"
+  "^README.md"
+  "^Taskfile.yml"
+  "^vm/"
+  "^images/"
+  "^docs/"
+  "^bin/"
   ".zsh_history"
   "git-templates"
+  ".zcompdump"
 )
 
 # Create symbolic links for dotfiles
