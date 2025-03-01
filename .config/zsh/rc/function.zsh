@@ -660,8 +660,9 @@ function newapp() {
 
 notify() {
     if [ -z "$1" ]; then
-        terminal-notifier -message "complete" &
+        nohup terminal-notifier -message "complete" >/dev/null 2>&1 &
     else
-      (sleep "$1"m && terminal-notifier -message "Time's up! ($1 min)") &
+        nohup sh -c "(sleep \"$1\"m && terminal-notifier -message \"Time's up! ($1 min)\")" >/dev/null 2>&1 &
     fi
 }
+
