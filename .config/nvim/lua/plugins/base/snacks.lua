@@ -11,6 +11,25 @@ return {
         end,
         desc = "Preview math formula under cursor",
       },
+      {
+        "<leader>p",
+        function()
+          Snacks.picker.pickers()
+        end,
+      },
+      {
+        "<space>fh",
+        function()
+          Snacks.picker.help({
+            win = {
+              input = { keys = {
+                ["<CR>"] = { "edit_vsplit", mode = { "i", "n" } },
+              } },
+            },
+          })
+        end,
+        desc = "Picker: help pages",
+      },
     },
     ---@type snacks.Config
     opts = {
