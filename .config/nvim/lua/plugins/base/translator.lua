@@ -82,7 +82,6 @@ return {
 
           -- Clipboard registers also updated
           vim.fn.setreg('"', selected_text)
-          vim.fn.setreg("+", selected_text)
 
           vim.cmd("Pantran")
           vim.cmd('normal! "0p') --  Use register "0
