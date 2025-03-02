@@ -6,8 +6,22 @@
 -- vim.opt.winbar = "%=%m %f"
 -- vim標準スペルチェックから日本語を除外
 vim.opt.spelllang:append("cjk")
--- ヘルプの言語を日本語に設定
+
+--
+-- Window
+--
+-- open window at right side when vertical split
+vim.opt.splitright = true
+-- open window at bottom side when horizontal split
+vim.opt.splitbelow = true
+
+--
+-- Help
+--
 vim.opt.helplang = "ja"
+-- Create a command-line abbreviation for 'H' to open help in a vertical split on the right
+vim.cmd("cabbrev H belowright vertical help")
+
 -- ターミナルでもTrue Colorを有効にする
 vim.opt.termguicolors = true
 
