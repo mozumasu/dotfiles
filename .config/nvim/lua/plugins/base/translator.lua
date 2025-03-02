@@ -69,7 +69,27 @@ return {
   {
     "potamides/pantran.nvim",
     keys = {
-      { "<leader>tw", "<cmd>Pantran<CR>", mode = { "n", "v" }, desc = "Show Translate Window" },
+      { "<leader>tw", "<cmd>Pantran<CR>", mode = { "n" }, desc = "Show Translate Window" },
+      {
+        "<leader>tw",
+        function()
+          -- Yanks the selected range in visual mode and stores it in a register.
+          vim.cmd('normal! "vy')
+          -- Store the contents of register 'v' to a variable
+          local selected_text = vim.fn.getreg("v")
+          -- Converts line breaks (`\n`) to spaces, and also makes the continuous spaces one
+          selected_text = selected_text:gsub("\n", " "):gsub("%s%s+", " ")
+
+          -- Clipboard registers also updated
+          vim.fn.setreg('"', selected_text)
+          vim.fn.setreg("+", selected_text)
+
+          vim.cmd("Pantran")
+          vim.cmd('normal! "0p') --  Use register "0
+        end,
+        mode = "v",
+        desc = "Show Translate Window",
+      },
       -- Translate the current line
       {
         "<leader>th",
