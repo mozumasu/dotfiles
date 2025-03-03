@@ -682,7 +682,6 @@ notify() {
     # キャプチャしたグループは$match配列に入る
     local H=$match[1]
     local M=$match[2]
-    echo "Zsh: H=$H M=$M"
 
     # HH:MM format
     local now
