@@ -659,10 +659,51 @@ function newapp() {
 }
 
 notify() {
-    if [ -z "$1" ]; then
-        nohup terminal-notifier -message "complete" >/dev/null 2>&1 &
-    else
-        nohup sh -c "(sleep \"$1\"m && terminal-notifier -message \"Time's up! ($1 min)\")" >/dev/null 2>&1 &
+  # Determine two patterns
+  # 1) Numbers only: sleep as minutes
+  # 2) hh:mm format: Calculate the number of seconds up to the specified time and sleep
+
+  # No arguments → Immediately
+  if [ -z "$1" ]; then
+    nohup terminal-notifier -message "complete" >/dev/null 2>&1 &
+    return
+  fi
+
+  # Checking arguments with regular expressions
+  local re_min='^[0-9]+$' # ex: 5, 10, 120
+  local re_time='^([0-1]?[0-9]|2[0-3]):([0-5][0-9])$' # ex: 0:05, 12:01, 23:59 etc.
+
+  if [[ "$1" =~ $re_min ]]; then
+    # Only numbers → Treat as minutes
+    nohup sh -c "(sleep ${1}m && terminal-notifier -message \"Time's up! (${1} min)\")" \
+      >/dev/null 2>&1 &
+
+  elif [[ "$1" =~ $re_time ]]; then
+    # キャプチャしたグループは$match配列に入る
+    local H=$match[1]
+    local M=$match[2]
+    echo "Zsh: H=$H M=$M"
+
+    # HH:MM format
+    local now
+    now=$(date +%s) # 現在時刻(Unix time)
+
+    # Convert today's h:m to unix time (bsd-type mac example: using -v option)
+    local target
+    target=$(date -v"${H}"H -v"${M}"M +%s)
+
+    # If the current time is past, it will be the next day
+    if [ "$target" -lt "$now" ]; then
+      target=$(( target + 24*60*60 ))
     fi
+
+    # Measure the number of sleep seconds
+    local wait_sec=$(( target - now ))
+    nohup sh -c "(sleep ${wait_sec} && terminal-notifier -message \"Time's up! (${H}:${M})\")" \
+      >/dev/null 2>&1 &
+
+  else
+    echo "Usage: notify [minutes|HH:MM]"
+  fi
 }
 
