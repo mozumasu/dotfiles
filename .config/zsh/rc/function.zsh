@@ -706,3 +706,10 @@ notify() {
   fi
 }
 
+# svn
+svnb() {
+  open "$(svn info | awk '/Repository Root/ {print $3}')"
+}
+svno() {
+  open "$(svn info | grep ^URL | awk '{print $2}')"
+}
