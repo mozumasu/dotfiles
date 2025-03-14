@@ -35,12 +35,18 @@ export CVSEDITOR="${EDITOR}"
 export SVN_EDITOR="${EDITOR}"
 export GIT_EDITOR="${EDITOR}"
 
+# bin/sbin for macOS
+export PATH="/usr/local/sbin:/usr/local/bin:$PATH"
+
 # ----------------------------------------------------
 
 # Go
 export GOPATH="$XDG_DATA_HOME/go"
 export GO111MODULE="on"
 export PATH=$XDG_DATA_HOME/go/bin:$PATH
+
+# Rust
+export PATH=$HOME/.cargo/bin:$PATH
 
 # Python
 export PATH=$PATH:$HOME/.rye/shims
