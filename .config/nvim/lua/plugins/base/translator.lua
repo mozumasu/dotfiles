@@ -79,6 +79,7 @@ return {
           local selected_text = vim.fn.getreg("v")
           -- Converts line breaks (`\n`) to spaces, and also makes the continuous spaces one
           selected_text = selected_text:gsub("\n", " "):gsub("%s%s+", " ")
+          selected_text = selected_text:gsub("#", " "):gsub("%s%s+", " ")
 
           -- Clipboard registers also updated
           vim.fn.setreg('"', selected_text)
