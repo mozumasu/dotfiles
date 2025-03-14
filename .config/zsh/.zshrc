@@ -95,6 +95,11 @@ fi
 source "$HOME/.config/zsh/rc/pluginconfig/wezterm.zsh"
 
 # ----------------------------------------------------
+# aws
+# ----------------------------------------------------
+source "$HOME/.config/zsh/rc/pluginconfig/aws.zsh"
+
+# ----------------------------------------------------
 # Neovim
 # ----------------------------------------------------
 export NVM_DIR="$HOME/.config/nvm"
