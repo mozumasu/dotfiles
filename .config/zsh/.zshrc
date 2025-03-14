@@ -62,6 +62,10 @@ umask 022
 # When zsh's completion candidates overflow from the screen, check whether they are still displayed.
 export LISTMAX=50
 
+# enable zmv
+autoload -U zmv
+alias mmv='noglob zmv -W'
+
 # ----------------------------------------------------
 # completion
 # ----------------------------------------------------
