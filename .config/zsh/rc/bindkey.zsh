@@ -28,4 +28,4 @@ autoload edit-command-line
 zle -N edit-command-line
 bindkey "^[e" edit-command-line
 
-bindkey '^U' push-line
+# bindkey '^U' push-line
