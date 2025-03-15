@@ -129,31 +129,22 @@ return {
     -- 設定再読み込み
     { key = "r", mods = "SHIFT|CTRL", action = act.ReloadConfiguration },
     -- キーテーブル用
-    { key = "s", mods = "LEADER", action = act.ActivateKeyTable({ name = "resize_pane", one_shot = false }) },
-    {
-      key = "a",
-      mods = "LEADER",
-      action = act.ActivateKeyTable({ name = "activate_pane", timeout_milliseconds = 1000 }),
-    },
+    { key = "s", mods = "LEADER", action = act.ActivateKeyTable({ name = "config", one_shot = false }) },
   },
   -- キーテーブル
   -- https://wezfurlong.org/wezterm/config/key-tables.html
   key_tables = {
     -- Paneサイズ調整 leader + s
-    resize_pane = {
+    config = {
       { key = "h", action = act.AdjustPaneSize({ "Left", 1 }) },
       { key = "l", action = act.AdjustPaneSize({ "Right", 1 }) },
       { key = "k", action = act.AdjustPaneSize({ "Up", 1 }) },
       { key = "j", action = act.AdjustPaneSize({ "Down", 1 }) },
+      { key = "-", action = act({ EmitEvent = "decrease-opacity" }) },
+      { key = "+", action = act({ EmitEvent = "increase-opacity" }) },
 
       -- Cancel the mode by pressing escape
-      { key = "Enter", action = "PopKeyTable" },
-    },
-    activate_pane = {
-      { key = "h", action = act.ActivatePaneDirection("Left") },
-      { key = "l", action = act.ActivatePaneDirection("Right") },
-      { key = "k", action = act.ActivatePaneDirection("Up") },
-      { key = "j", action = act.ActivatePaneDirection("Down") },
+      { key = "Escape", action = "PopKeyTable" },
     },
     -- copyモード leader + [
     copy_mode = {

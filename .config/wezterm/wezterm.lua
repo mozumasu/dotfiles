@@ -1,5 +1,6 @@
 local wezterm = require("wezterm")
 local config = wezterm.config_builder()
+local act = wezterm.action
 
 -- config.color_scheme = "Overnight Slumber"
 -- config.color_scheme = "Solarized (dark) (terminal.sexy)"
@@ -196,6 +197,30 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
   }
 end)
 
+-- opacity
+wezterm.on("decrease-opacity", function(window)
+  local overrides = window:get_config_overrides() or {}
+  if not overrides.window_background_opacity then
+    overrides.window_background_opacity = 1.0
+  end
+  overrides.window_background_opacity = overrides.window_background_opacity - 0.1
+  if overrides.window_background_opacity < 0.1 then
+    overrides.window_background_opacity = 0.1
+  end
+  window:set_config_overrides(overrides)
+end)
+
+wezterm.on("increase-opacity", function(window)
+  local overrides = window:get_config_overrides() or {}
+  if not overrides.window_background_opacity then
+    overrides.window_background_opacity = 1.0
+  end
+  overrides.window_background_opacity = overrides.window_background_opacity + 0.1
+  if overrides.window_background_opacity > 1.0 then
+    overrides.window_background_opacity = 1.0
+  end
+  window:set_config_overrides(overrides)
+end)
 ----------------------------------------------------
 -- keybinds
 ----------------------------------------------------
