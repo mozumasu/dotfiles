@@ -205,6 +205,10 @@ if.app-id = 'com.tinyspeck.slackmacgap'
 run = 'move-node-to-workspace S'
 
 [[on-window-detected]]
+if.app-id = 'com.spotify.client'
+run = 'move-node-to-workspace M'
+
+[[on-window-detected]]
 if.app-id = 'notion.id'
 run = 'move-node-to-workspace N'
 #
