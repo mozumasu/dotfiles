@@ -56,8 +56,41 @@ config.window_background_gradient = {
 config.use_fancy_tab_bar = false
 -- Transparent tab bar
 config.window_frame = {
+
+  --
+  -- border around the window area
+  --
+  -- border_left_width = "0.5cell",
+  -- border_right_width = "0.5cell",
+  -- border_bottom_height = "0.25cell",
+  -- border_top_height = "0.25cell",
+  -- border_left_color = "purple",
+  -- border_right_color = "purple",
+  -- border_bottom_color = "purple",
+  -- border_top_color = "purple",
+
+  --
+  -- only fancy tab bar
+  --
+  font = require("wezterm").font("Roboto"),
+  font_size = 12,
   inactive_titlebar_bg = "none",
   active_titlebar_bg = "none",
+
+  -- inactive_titlebar_fg = "#cccccc",
+  -- active_titlebar_fg = "#ffffff",
+  -- inactive_titlebar_border_bottom = "#2b2042",
+  -- active_titlebar_border_bottom = "#2b2042",
+  -- button_fg = "#cccccc",
+  -- button_bg = "#2b2042",
+  -- button_hover_fg = "#ffffff",
+  -- button_hover_bg = "#3b3052",
+}
+config.window_padding = {
+  left = 15,
+  right = 15,
+  top = 15,
+  bottom = 0,
 }
 
 ----------------------------------------------------
