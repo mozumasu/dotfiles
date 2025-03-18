@@ -47,7 +47,8 @@ config.show_close_tab_button_in_tabs = false
 config.tab_max_width = 30
 -- Adjust the tab bar to the background color
 config.window_background_gradient = {
-  colors = { "#000000" },
+  -- colors = { "#000000" },
+  colors = { "#282c34" },
 }
 
 ----------------------------------------------------
