@@ -1,13 +1,10 @@
--- Pull in the wezterm API
 local wezterm = require("wezterm")
-
--- This will hold the configuration.
 local config = wezterm.config_builder()
 
--- This is where you actually apply your config choices
+local color = require("color")
+color.apply_to_config(config)
 
--- For example, changing the color scheme:
-config.color_scheme = "AdventureTime"
+config.font_size = 13.0
+config.font = wezterm.font("HackGen Console NF")
 
--- and finally, return the configuration to wezterm
 return config
