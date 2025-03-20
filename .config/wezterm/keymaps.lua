@@ -23,6 +23,9 @@ local keys = {
     action = act.CharSelect({ copy_on_select = true, copy_to = "ClipboardAndPrimarySelection" }),
   },
 
+  -- custom mode
+  { key = "s", mods = "LEADER", action = act.ActivateKeyTable({ name = "setting_mode", one_shot = false }) },
+
   -- Application
   { key = "h", mods = "SUPER", action = act.HideApplication },
 
@@ -173,6 +176,18 @@ local key_tables = {
     { key = "p", mods = "CTRL", action = act.CopyMode("PriorMatch") },
     { key = "u", mods = "CTRL", action = act.CopyMode("ClearPattern") },
     { key = "r", mods = "CTRL", action = act.CopyMode("CycleMatchType") },
+  },
+  -- custom key tables
+  setting_mode = {
+    { key = "h", action = act.AdjustPaneSize({ "Left", 1 }) },
+    { key = "l", action = act.AdjustPaneSize({ "Right", 1 }) },
+    { key = "k", action = act.AdjustPaneSize({ "Up", 1 }) },
+    { key = "j", action = act.AdjustPaneSize({ "Down", 1 }) },
+
+    -- Cancel the mode
+    { key = "Escape", action = "PopKeyTable" },
+    { key = "q", action = "PopKeyTable" },
+    { key = "c", mod = "CTRL", action = "PopKeyTable" },
   },
 }
 
