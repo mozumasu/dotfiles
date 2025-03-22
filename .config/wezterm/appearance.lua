@@ -12,9 +12,9 @@ local appearance = {
     orientation = "Horizontal", -- Horizontal , Vertical
     interpolation = "Basis", -- Linear, Basis, CatmullRom
     blend = "Oklab", -- Rgb, Hsv, Oklab
-    noise = 1000, -- default 64
+    noise = 400, -- default 64
     -- noise = 180, -- default 64
-    segment_size = 500,
+    segment_size = 11,
     segment_smoothness = 0.0,
     colors = {
       "#f8f5e4",
