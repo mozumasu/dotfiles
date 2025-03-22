@@ -1,12 +1,42 @@
 #!/bin/bash
 
+# 現在の時刻（0〜23）
+hour=$(date +%H)
+
+# デフォルトの色
+active_color="0xfffddde6"   # 朝：桜色
+inactive_color="0xfffbfaf5" # 和紙の白
+
+# 時間帯に応じて色を切り替え
+if ((hour >= 5 && hour <= 10)); then
+  # 🌅 朝
+  active_color="0xfffddde6"   # 桜色
+  inactive_color="0xfffbfaf5" # 胡粉
+elif ((hour >= 11 && hour <= 15)); then
+  # 🌞 昼
+  active_color="0xffa6c8b2" # 浅葱（青緑）
+  inactive_color="0xfffbfaf5"
+elif ((hour >= 16 && hour <= 18)); then
+  # 🌇 夕
+  active_color="0xffc77966"   # 柿渋
+  inactive_color="0xfff5e9dc" # やや暖色寄りの生成り
+else
+  # 🌙 夜
+  active_color="0xff1f1f1f"   # 墨色
+  inactive_color="0xffdcd8d0" # 渋めの和紙色
+fi
+
+# active_color=0xFFC3F8F7 # #C3F8F7
+# inactive_color=0xff3e1366
+
+# borders の設定
 options=(
   style=round
   order=above
   width=1.5
   hidpi=on
-  active_color=0xFFC3F8F7 # #C3F8F7
-  # inactive_color=0xff3e1366
+  active_color=$active_color
+  inactive_color=$inactive_color
 )
 
 borders "${options[@]}"
