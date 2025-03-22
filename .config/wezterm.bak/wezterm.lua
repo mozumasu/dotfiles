@@ -2,38 +2,9 @@ local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 local act = wezterm.action
 
--- config.color_scheme = "Overnight Slumber"
--- config.color_scheme = "Solarized (dark) (terminal.sexy)"
-config.color_scheme = "Solarized Dark (Gogh)"
-config.automatically_reload_config = true
-config.font_size = 13.0
-config.use_ime = true
-config.window_background_opacity = 0.7
-config.macos_window_background_blur = 13
-config.audible_bell = "Disabled"
-config.font = wezterm.font("HackGen Console NF")
-
-----------------------------------------------------
--- Pane
-----------------------------------------------------
-config.inactive_pane_hsb = {
-  saturation = 1.0,
-  brightness = 0.5,
-}
-
-----------------------------------------------------
--- Title Bar
-----------------------------------------------------
--- Title bar not listed
-config.window_decorations = "RESIZE"
-
 ----------------------------------------------------
 -- Tab
 ----------------------------------------------------
--- Display tabs
-config.show_tabs_in_tab_bar = true
--- If there is one tab, it is not displayed
-config.hide_tab_bar_if_only_one_tab = true
 -- Hide borders between tabs
 config.colors = {
   tab_bar = {
@@ -231,30 +202,6 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
   }
 end)
 
--- opacity
-wezterm.on("decrease-opacity", function(window)
-  local overrides = window:get_config_overrides() or {}
-  if not overrides.window_background_opacity then
-    overrides.window_background_opacity = 1.0
-  end
-  overrides.window_background_opacity = overrides.window_background_opacity - 0.1
-  if overrides.window_background_opacity < 0.1 then
-    overrides.window_background_opacity = 0.1
-  end
-  window:set_config_overrides(overrides)
-end)
-
-wezterm.on("increase-opacity", function(window)
-  local overrides = window:get_config_overrides() or {}
-  if not overrides.window_background_opacity then
-    overrides.window_background_opacity = 1.0
-  end
-  overrides.window_background_opacity = overrides.window_background_opacity + 0.1
-  if overrides.window_background_opacity > 1.0 then
-    overrides.window_background_opacity = 1.0
-  end
-  window:set_config_overrides(overrides)
-end)
 ----------------------------------------------------
 -- keybinds
 ----------------------------------------------------
