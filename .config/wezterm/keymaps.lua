@@ -103,6 +103,21 @@ local keys = {
   -- Convert ¥ key to \ (karabiner ver)
   { key = "¥", action = act.SendKey({ key = "¥" }) },
   { key = "¥", mods = "ALT", action = act.SendKey({ key = "\\" }) },
+  {
+    key = ",",
+    mods = "CMD",
+    action = wezterm.action.SplitPane({
+      direction = "Right",
+      size = { Percent = 50 },
+      command = {
+        args = {
+          os.getenv("SHELL"),
+          "-c",
+          "nvim " .. wezterm.shell_quote_arg(wezterm.config_dir),
+        },
+      },
+    }),
+  },
 }
 
 local key_tables = {
