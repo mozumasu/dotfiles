@@ -430,6 +430,7 @@ create_ssm_document() {
     --name "$document_name" \
     --document-type "$document_type" \
     --content "$content_option" \
+    --document-format "$file_format" \
     --region "$region"
 
   # 結果を表示
