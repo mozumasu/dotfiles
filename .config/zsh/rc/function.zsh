@@ -85,7 +85,6 @@ function set_aws_profile() {
         --height 50% --layout=reverse --border --preview-window 'right:50%' \
         --preview "grep {} -A5 ~/.aws/config")
 
-  # Cancel settings if no profile is selected
   if [ -z "$selected_profile" ]; then
     echo "Unset aws profile!"
     unset AWS_PROFILE
@@ -94,22 +93,19 @@ function set_aws_profile() {
     return
   fi
 
-  # settings for the selected profile.
   echo "Set the environment variable 'AWS_PROFILE' to '${selected_profile}'!"
   export AWS_PROFILE="$selected_profile"
   unset AWS_ACCESS_KEY_ID
   unset AWS_SECRET_ACCESS_KEY
 
-  # Check your sso session and log in again if it has expired.
-  local AWS_SSO_SESSION_NAME="mozumasu"
-
   check_sso_session=$(aws sts get-caller-identity 2>&1)
-  if [[ "$check_sso_session" == *"Token has expired"* ]]; then
-    echo -e "\n----------------------------\nYour Session has expired! Please login...\n----------------------------\n"
-    aws sso login --sso-session "${AWS_SSO_SESSION_NAME}"
+
+  if [[ "$check_sso_session" == *"Token has expired"* || "$check_sso_session" == *"Token for ${selected_profile} does not exist"* ]]; then
+    echo -e "\n----------------------------\nSSO session is missing or expired! Logging in...\n----------------------------\n"
+    aws sso login --profile "${selected_profile}"
     aws sts get-caller-identity
   else
-    echo ${check_sso_session}
+    echo "${check_sso_session}"
   fi
 }
 
