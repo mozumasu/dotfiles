@@ -161,6 +161,11 @@ local keys = {
       },
     }),
   },
+  {
+    key = "]",
+    mods = "CMD|SHIFT",
+    action = wezterm.action.ToggleAlwaysOnTop,
+  },
 }
 
 local key_tables = {
