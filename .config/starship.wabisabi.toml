@@ -42,13 +42,13 @@ truncate_to_repo = false
 home_symbol = '~'
 read_only = ' 󰌾 '
 format = """
-[](fg:#80EBDF)\
+[](fg:#e4d2d8)\
 [$path]($style)\
 [$read_only]($read_only_style)\
-[](fg:#80EBDF)\
+[](fg:#e4d2d8)\
 """
-style = 'bold fg:#313244 bg:#80EBDF'
-read_only_style = 'bold fg:#313244 bg:#80EBDF'
+style = 'bold fg:#313244 bg:#e4d2d8'
+read_only_style = 'bold fg:#e4d2d8 bg:#313244'
 
 [direnv]
 disabled = false
@@ -61,17 +61,17 @@ style = "bold fg:#313244 bg:#89dceb"
 
 [git_branch]
 symbol = ""
-style = "fg:#769ff0 bg:#1d2230"
+style = "fg:#313244 bg:#a6c8b2"
 format = """
-[](fg:#1d2230)\
+[](fg:#a6c8b2)\
 [$symbol $branch]($style)\
 """
 
 [git_status]
-style = "fg:#769ff0 bg:#1d2230"
+style = "fg:#313244 bg:#a6c8b2"
 format = """
 [$all_status$ahead_behind]($style)\
-[](fg:#1d2230)\
+[](fg:#a6c8b2)\
 """
 
 # ----------------------------------------------------
@@ -85,10 +85,13 @@ format = "[ $duration]($style)" # nf-pl-right_soft_divider, nf-mdi-clock
 [time]
 disabled = false
 time_format = "%R" # Hour:Minute Format
-format = '[[  $time](fg:#a0a9cb)]($style)'
-
+# format = '[[  $time](fg:#313244)]($style)'
+format = '[  $time](fg:#8fae92)'
 # ----------------------------------------------------
 # prompt module
 # ----------------------------------------------------
 [character]
-vimcmd_symbol = '[V](bold green) '
+# vimcmd_symbol = '[V](bold green) '
+success_symbol = '[❯](bold fg:#a6c8b2)'
+error_symbol = '[❯](bold fg:#f5b1aa)'
+vimcmd_symbol = '[V](bold fg:#3a3f5a)'
