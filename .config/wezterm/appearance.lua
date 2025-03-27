@@ -4,26 +4,8 @@ local module = {}
 local appearance = {
   -- background
   window_background_opacity = 0.7,
-  -- window_background_opacity = 0.85,
   macos_window_background_blur = 13,
   text_background_opacity = 0.8,
-
-  -- window_background_gradient = {
-  --   orientation = "Horizontal", -- Horizontal , Vertical
-  --   interpolation = "Basis", -- Linear, Basis, CatmullRom
-  --   blend = "Oklab", -- Rgb, Hsv, Oklab
-  --   noise = 400, -- default 64
-  --   -- noise = 180, -- default 64
-  --   segment_size = 11,
-  --   segment_smoothness = 0.0,
-  --   colors = {
-  --     "#f8f5e4",
-  --     "#ede6d5",
-  --     "#faf7ea",
-  --     "#eae1ce",
-  --     "#fdf9f0",
-  --   },
-  -- },
 
   -- font
   font_size = 13.0,
