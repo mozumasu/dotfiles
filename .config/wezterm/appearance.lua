@@ -14,16 +14,16 @@ local appearance = {
   -- window title
   window_decorations = "RESIZE",
 
-  -- tab
-  show_tabs_in_tab_bar = true,
-  hide_tab_bar_if_only_one_tab = true,
-  tab_bar_at_bottom = true,
-
   --pane
   inactive_pane_hsb = {
     saturation = 1.0,
     brightness = 0.5,
   },
+
+  -- tab
+  show_tabs_in_tab_bar = true,
+  hide_tab_bar_if_only_one_tab = true,
+  tab_bar_at_bottom = true,
 }
 
 function module.apply_to_config(config)
