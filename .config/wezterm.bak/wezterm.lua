@@ -2,70 +2,6 @@ local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 local act = wezterm.action
 
-----------------------------------------------------
--- Tab
-----------------------------------------------------
--- Hide borders between tabs
-config.colors = {
-  tab_bar = {
-    background = "none",
-    inactive_tab_edge = "none",
-  },
-}
-config.show_new_tab_button_in_tab_bar = false
--- Can only be used in nightly
-config.show_close_tab_button_in_tabs = false
-config.tab_max_width = 30
--- Adjust the tab bar to the background color
-config.window_background_gradient = {
-  -- colors = { "#000000" },
-  colors = { "#282c34" },
-}
-
-----------------------------------------------------
--- Fansy Tab Bar (now, not use)
-----------------------------------------------------
-config.use_fancy_tab_bar = false
--- Transparent tab bar
-config.window_frame = {
-
-  --
-  -- border around the window area
-  --
-  -- border_left_width = "0.5cell",
-  -- border_right_width = "0.5cell",
-  -- border_bottom_height = "0.25cell",
-  -- border_top_height = "0.25cell",
-  -- border_left_color = "purple",
-  -- border_right_color = "purple",
-  -- border_bottom_color = "purple",
-  -- border_top_color = "purple",
-
-  --
-  -- only fancy tab bar
-  --
-  font = require("wezterm").font("Roboto"),
-  font_size = 12,
-  inactive_titlebar_bg = "none",
-  active_titlebar_bg = "none",
-
-  -- inactive_titlebar_fg = "#cccccc",
-  -- active_titlebar_fg = "#ffffff",
-  -- inactive_titlebar_border_bottom = "#2b2042",
-  -- active_titlebar_border_bottom = "#2b2042",
-  -- button_fg = "#cccccc",
-  -- button_bg = "#2b2042",
-  -- button_hover_fg = "#ffffff",
-  -- button_hover_bg = "#3b3052",
-}
-config.window_padding = {
-  left = 15,
-  right = 15,
-  top = 15,
-  bottom = 0,
-}
-
-----------------------------------------------------
 -- 各タブの「ディレクトリ名」を記憶しておくテーブル
 local title_cache = {}
 
@@ -201,31 +137,5 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
     { Text = SOLID_RIGHT_CIRCLE },
   }
 end)
-
-----------------------------------------------------
--- keybinds
-----------------------------------------------------
--- local act = require("wezterm").action
-
-config.disable_default_key_bindings = true
-config.keys = require("keybinds").keys
-config.key_tables = require("keybinds").key_tables
-config.leader = { key = "q", mods = "CTRL", timeout_milliseconds = 2000 }
-
--- config.keys = {
---   {
---     mods = "LEADER",
---     key = "s",
---     action = act.ShowLauncherArgs({ flags = "WORKSPACES", title = "Select workspace" }),
---   },
--- }
-
-config.mouse_bindings = {
-  {
-    event = { Down = { streak = 3, button = "Left" } },
-    action = wezterm.action.SelectTextAtMouseCursor("SemanticZone"),
-    mods = "NONE",
-  },
-}
 
 return config
