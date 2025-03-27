@@ -254,11 +254,20 @@ local key_tables = {
   },
 }
 
+local mouse_bindings = {
+  {
+    event = { Down = { streak = 3, button = "Left" } },
+    action = wezterm.action.SelectTextAtMouseCursor("SemanticZone"),
+    mods = "NONE",
+  },
+}
+
 function module.apply_to_config(config)
   config.disable_default_key_bindings = true
   config.leader = leader
   config.keys = keys
   config.key_tables = key_tables
+  config.mouse_bindings = mouse_bindings
 end
 
 return module
