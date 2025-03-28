@@ -5,6 +5,15 @@ config.set_environment_variables = {
   PATH = os.getenv("PATH"),
 }
 
+config.skip_close_confirmation_for_processes_named = {
+  "man",
+  "nvim",
+  "bash",
+  "zsh",
+  "sh",
+  "fzf",
+}
+
 config.automatically_reload_config = true
 config.audible_bell = "Disabled"
 -- 日本語を入力するのに必要
