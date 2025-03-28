@@ -4,7 +4,6 @@ local config = wezterm.config_builder()
 config.set_environment_variables = {
   PATH = os.getenv("PATH"),
 }
-
 config.skip_close_confirmation_for_processes_named = {
   "man",
   "nvim",
