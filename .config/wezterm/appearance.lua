@@ -12,7 +12,13 @@ local appearance = {
   unicode_version = 14,
 
   -- window title
-  window_decorations = "RESIZE",
+  window_decorations = "RESIZE", -- NONE, TITLE, TITLE | RESIZE, RESIZE, INTEGRATED_BUTTONS
+  -- only for INTEGRATED_BUTTONS
+  -- integrated_title_button_alignment = "Right",
+  -- integrated_title_button_color = "Auto",
+  -- integrated_title_button_style = "MacOsNative", -- Windows, Gnome, MacOsNative
+  -- integrated_title_buttons = { "Hide", "Maximize", "Close" },
+
   window_padding = {
     left = 15,
     right = 15,
@@ -30,6 +36,20 @@ local appearance = {
     saturation = 1.0,
     brightness = 0.5,
   },
+  default_cursor_style = "SteadyBlock", -- BlinkingBlock, SteadyUnderline, BlinkingUnderline, SteadyBar, BlinkingBar
+  hide_mouse_cursor_when_typing = true,
+
+  -- command palette
+  command_palette_font = wezterm.font("Roboto"),
+  command_palette_bg_color = "#1d2230",
+  command_palette_fg_color = "#769ff0",
+  command_palette_rows = 18,
+  command_palette_font_size = 14.0,
+
+  -- char select
+  char_select_font = wezterm.font("Roboto"),
+  char_select_bg_color = "#1d2230",
+  char_select_fg_color = "#769ff0",
 
   ----------------------------------------------------
   -- Tab
