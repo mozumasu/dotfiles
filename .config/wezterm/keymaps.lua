@@ -52,7 +52,7 @@ local keys = {
   { key = "7", mods = "SUPER", action = act.ActivateTab(6) },
   { key = "8", mods = "SUPER", action = act.ActivateTab(7) },
   { key = "9", mods = "SUPER", action = act.ActivateTab(-1) },
-  { key = "w", mods = "SUPER", action = act.CloseCurrentTab({ confirm = true }) },
+  { key = "w", mods = "SUPER", action = act.CloseCurrentTab({ confirm = false }) },
   { key = "t", mods = "SUPER", action = act.SpawnTab("CurrentPaneDomain") },
 
   -- Font
