@@ -118,6 +118,28 @@ local keys = {
       },
     }),
   },
+  {
+    key = ".",
+    mods = "CMD",
+    action = wezterm.action.SplitPane({
+      direction = "Right",
+      size = { Percent = 50 },
+      command = {
+        args = {
+          os.getenv("SHELL"),
+          "-l",
+          "-c",
+          [[
+          export FZF_DEFAULT_COMMAND="man -k . | awk -F ' - ' '{print \$1}' | sed 's/(.*)//' | sort -u"
+          cmd=$(fzf --height=40% --reverse --prompt='man> ')
+          if [ -n "$cmd" ]; then
+            command man "$cmd" 2>&1 | col -bx | nvim -R -c 'set ft=man' -
+          fi
+          ]],
+        },
+      },
+    }),
+  },
   -- InputSelector
   {
     key = "E",
