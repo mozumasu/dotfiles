@@ -5,11 +5,11 @@ local appearance = {
   -- background
   window_background_opacity = 0.7,
   macos_window_background_blur = 13,
-  text_background_opacity = 0.8,
 
   -- font
   font_size = 13.0,
   font = wezterm.font("HackGen Console NF"),
+  unicode_version = 14,
 
   -- window title
   window_decorations = "RESIZE",
@@ -19,6 +19,11 @@ local appearance = {
     top = 15,
     bottom = 0,
   },
+  window_content_alignment = {
+    horizontal = "Center",
+    vertical = "Center",
+  },
+  window_close_confirmation = "NeverPrompt", -- AlwaysPrompt or NeverPrompt
 
   --pane
   inactive_pane_hsb = {
