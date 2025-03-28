@@ -118,6 +118,10 @@ local keys = {
       },
     }),
   },
+  -- ScrollToPrompt
+  { key = "[", mods = "ALT", action = act.ScrollToPrompt(-1) },
+  { key = "]", mods = "ALT", action = act.ScrollToPrompt(1) },
+
   {
     key = ".",
     mods = "CMD",
@@ -253,6 +257,9 @@ local key_tables = {
     { key = "b", mods = "ALT", action = act.CopyMode("MoveBackwardWord") },
     -- { key = "b", mods = "CTRL", action = act.CopyMode("PageUp") },
     -- { key = "f", mods = "CTRL", action = act.CopyMode("PageDown") },
+    -- ScrollToPrompt
+    { key = "[", mods = "ALT", action = act.ScrollToPrompt(-1) },
+    { key = "]", mods = "ALT", action = act.ScrollToPrompt(1) },
   },
   search_mode = {
     -- close
