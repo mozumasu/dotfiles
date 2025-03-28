@@ -13,6 +13,12 @@ config.skip_close_confirmation_for_processes_named = {
   "sh",
   "fzf",
 }
+config.launch_menu = {
+  {
+    label = "🗓 作業日報を書く",
+    args = { os.getenv("SHELL"), "-l", "-c", "bash ~/dotfiles/.bin/gen_daily_report.sh" },
+  },
+}
 
 config.automatically_reload_config = true
 config.audible_bell = "Disabled"
