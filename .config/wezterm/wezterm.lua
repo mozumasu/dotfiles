@@ -1,6 +1,10 @@
 local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 
+config.set_environment_variables = {
+  PATH = os.getenv("PATH"),
+}
+
 config.automatically_reload_config = true
 config.audible_bell = "Disabled"
 -- 日本語を入力するのに必要
