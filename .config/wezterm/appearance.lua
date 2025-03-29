@@ -25,10 +25,11 @@ local appearance = {
     top = 15,
     bottom = 0,
   },
-  window_content_alignment = {
-    horizontal = "Center",
-    vertical = "Center",
-  },
+  -- Disabled due to unstable font rendering
+  -- window_content_alignment = {
+  --   horizontal = "Center",
+  --   vertical = "Center",
+  -- },
   window_close_confirmation = "NeverPrompt", -- AlwaysPrompt or NeverPrompt
 
   --pane
