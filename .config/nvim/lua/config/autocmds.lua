@@ -20,3 +20,22 @@
 --     ]])
 --   end,
 -- })
+
+vim.api.nvim_create_user_command("CountCleanTextLength", function()
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  local text = table.concat(lines, "\n")
+
+  text = text:gsub("```.-```", "")
+  text = text:gsub("`.-`", "")
+  text = text:gsub("%[%^%d+%]", "")
+  text = text:gsub("\n%[%^%d+%]:[^\n]*", "")
+  text = text:gsub("<https?://[^>]+>", "")
+  text = text:gsub("%[([^%]]-)%]%([^%)]+%)", "%1")
+  text = text:gsub("#+", ""):gsub("%*%*", ""):gsub("%*", ""):gsub("_", ""):gsub("[%[%]%(%)]", ""):gsub("-", "")
+
+  local clean = text:gsub("%s+", "")
+  print("文字数（記法除去後）: " .. #clean)
+end, {})
+
+-- 任意：キーマップも Markdown のときだけ登録
+vim.keymap.set("n", "<leader>mc", "<cmd>CountCleanTextLength<CR>", { desc = "🧮 Markdown文字数カウント" })
