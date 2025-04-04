@@ -68,3 +68,20 @@ vim.api.nvim_create_autocmd("FileType", {
     })
   end,
 })
+
+vim.api.nvim_create_user_command("InsertDatetime", function()
+  local handle = io.popen('date "+%Y-%m-%d %H:%M:%S"')
+  if not handle then
+    print("日付取得に失敗")
+    return
+  end
+
+  local result = handle:read("*a")
+  handle:close()
+  result = result:gsub("%s+$", "") -- 改行除去
+
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+  row = row - 1 -- Lua は 0-indexed
+
+  vim.api.nvim_buf_set_text(0, row, col, row, col, { result })
+end, {})

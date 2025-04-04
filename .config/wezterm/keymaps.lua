@@ -144,6 +144,21 @@ local keys = {
       },
     }),
   },
+  -- ShowLauncher
+  { key = "l", mods = "SUPER", action = wezterm.action.ShowLauncher }, -- default: Alt + l
+  {
+    key = ";",
+    mods = "ALT",
+    action = wezterm.action.ShowLauncherArgs({ flags = "FUZZY|TABS" }),
+  },
+  {
+    key = "p",
+    mods = "LEADER",
+    action = wezterm.action.ShowLauncherArgs({
+      title = "🎛 カスタムメニュー",
+      flags = "LAUNCH_MENU_ITEMS|WORKSPACES",
+    }),
+  },
   -- InputSelector
   {
     key = "E",

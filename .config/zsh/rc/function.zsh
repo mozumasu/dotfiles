@@ -26,7 +26,7 @@ function man {
   fi
   unset PAGER
   unset MANPAGER
-  val=$(command man $* 2>&1)
+  val=$(command man $@ 2>&1)
   ret=$?
   if [ $ret -eq 0 ];then
     echo "$val"|col -bx|nvim -R -c 'set ft=man' -
