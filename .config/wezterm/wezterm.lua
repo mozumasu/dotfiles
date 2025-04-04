@@ -1,6 +1,8 @@
 local wezterm = require("wezterm")
 local config = wezterm.config_builder()
 
+local shell = os.getenv("SHELL")
+
 config.set_environment_variables = {
   PATH = os.getenv("PATH"),
 }
@@ -15,7 +17,12 @@ config.skip_close_confirmation_for_processes_named = {
 config.launch_menu = {
   {
     label = "🗓 作業日報を書く",
-    args = { os.getenv("SHELL"), "-l", "-c", "bash ~/dotfiles/.bin/gen_daily_report.sh" },
+    cwd = os.getenv("HOME") .. "/dotfiles",
+    args = { shell, "-l", "-c", "bash .bin/gen_daily_report.sh" },
+  },
+  {
+    label = "Show WezTerm Path",
+    args = { shell, "-c", "echo $PATH && read" },
   },
 }
 
