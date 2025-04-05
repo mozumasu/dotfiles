@@ -6,13 +6,36 @@ local module = {}
 local leader = { key = "q", mods = "CTRL", timeout_milliseconds = 2000 }
 local keys = {
   -- Copy mode
-  { key = "X", mods = "CTRL", action = act.ActivateCopyMode },
+  -- { key = "X", mods = "CTRL", action = act.ActivateCopyMode },
+  -- 検索ワードをクリアにして Copy mode
+  {
+    key = "X",
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, pane)
+      window:perform_action(act.CopyMode("ClearPattern"), pane)
+      window:perform_action(act.ActivateCopyMode, pane)
+    end),
+  },
   -- Command Palette
   { key = "p", mods = "SHIFT|CTRL", action = act.ActivateCommandPalette },
   --  Quick Select: control + shift + space
   { key = "phys:Space", mods = "SHIFT|CTRL", action = act.QuickSelect },
   -- Search mode
-  { key = "f", mods = "SUPER", action = act.Search("CurrentSelectionOrEmptyString") },
+  -- { key = "f", mods = "SUPER", action = act.Search("CurrentSelectionOrEmptyString") },
+  {
+    key = "f",
+    mods = "SUPER",
+    action = wezterm.action_callback(function(window, pane)
+      window:perform_action(act.Search("CurrentSelectionOrEmptyString"), pane)
+      window:perform_action(
+        act.Multiple({
+          act.CopyMode("ClearPattern"),
+          act.CopyMode("ClearSelectionMode"),
+        }),
+        pane
+      )
+    end),
+  },
   -- Zoom mode
   --     { key = "Z", mods = "CTRL", action = act.TogglePaneZoomState },
   { key = "z", mods = "LEADER", action = act.TogglePaneZoomState },
@@ -31,7 +54,7 @@ local keys = {
 
   -- Window
   { key = "Enter", mods = "ALT", action = act.ToggleFullScreen },
-  { key = "q", mods = "SUPER", action = act.QuitApplication },
+  -- { key = "q", mods = "SUPER", action = act.QuitApplication },
   { key = "n", mods = "SUPER", action = act.SpawnWindow },
   { key = "m", mods = "SUPER", action = act.Hide },
 
@@ -100,8 +123,7 @@ local keys = {
   -- { key = "UpArrow", mods = "SHIFT|ALT|CTRL", action = act.AdjustPaneSize({ "Up", 1 }) },
   -- { key = "DownArrow", mods = "SHIFT|ALT|CTRL", action = act.AdjustPaneSize({ "Down", 1 }) },
 
-  -- Convert ¥ key to \ (karabiner ver)
-  { key = "¥", action = act.SendKey({ key = "¥" }) },
+  -- Convert ¥ key to \
   { key = "¥", mods = "ALT", action = act.SendKey({ key = "\\" }) },
   {
     key = ",",
@@ -164,7 +186,7 @@ local keys = {
     key = "E",
     mods = "CTRL",
     action = act.InputSelector({
-      action = wezterm.action_callback(function(window, pane, id, label)
+      action = wezterm.action_callback(function(_, pane, id, label)
         if not id and not label then
           wezterm.log_info("cancelled")
         else
@@ -275,14 +297,39 @@ local key_tables = {
     -- ScrollToPrompt
     { key = "[", mods = "ALT", action = act.ScrollToPrompt(-1) },
     { key = "]", mods = "ALT", action = act.ScrollToPrompt(1) },
+
+    -- コマンドの入力領域（Inputゾーン）単位でカーソル移動
+    { key = "]", mods = "NONE", action = act.CopyMode({ MoveForwardZoneOfType = "Input" }) }, -- Input, Output, Prompt
+    { key = "[", mods = "NONE", action = act.CopyMode({ MoveBackwardZoneOfType = "Input" }) }, -- Input, Output, Prompt
+
+    -- 検索ワードを編集
+    { key = "e", mods = "CTRL", action = act.CopyMode("EditPattern") },
+    { key = "q", mods = "CTRL", action = act.CopyMode("AcceptPattern") }, -- 明示的に設定してもOK
+    { key = "c", mods = "CTRL", action = act.CopyMode("ClearPattern") }, -- キャンセル用カーソル移動
+
+    -- セマンティックゾーン選択モード開始（現在位置のゾーン全体を選択）
+    { key = "z", mods = "NONE", action = act.CopyMode({ SetSelectionMode = "SemanticZone" }) },
+    -- Copy Mode → Search mode
+    { key = "/", mods = "NONE", action = act.Search("CurrentSelectionOrEmptyString") },
+    { key = "n", mods = "CTRL", action = act.CopyMode("NextMatch") },
+    { key = "p", mods = "CTRL", action = act.CopyMode("PriorMatch") },
   },
   search_mode = {
     -- close
-    { key = "Escape", mods = "NONE", action = act.CopyMode("Close") },
+    -- { key = "Escape", mods = "NONE", action = act.CopyMode("Close") },
     { key = "n", mods = "CTRL", action = act.CopyMode("NextMatch") },
     { key = "p", mods = "CTRL", action = act.CopyMode("PriorMatch") },
     { key = "u", mods = "CTRL", action = act.CopyMode("ClearPattern") },
     { key = "r", mods = "CTRL", action = act.CopyMode("CycleMatchType") },
+
+    -- -- Escape キーで検索だけキャンセル（Copy Mode 継続）
+    -- { key = "Escape", mods = "NONE", action = act.CopyMode("ClearPattern") },
+    { key = "c", mods = "CTRL", action = act.Multiple({ "ScrollToBottom", { CopyMode = "Close" } }) },
+    -- -- Cancel the mode
+    -- { key = "Escape", action = "PopKeyTable" },
+    -- { key = "q", action = "PopKeyTable" },
+    -- { key = "c", mod = "CTRL", action = "PopKeyTable" },
+    { key = "X", mods = "CTRL", action = act.ActivateCopyMode },
   },
   -- custom key tables
   config_mode = {
