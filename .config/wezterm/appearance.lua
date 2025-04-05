@@ -68,6 +68,9 @@ local appearance = {
       background = "none",
       inactive_tab_edge = "none",
     },
+    cursor_bg = "#ffcc00", -- カーソルの背景色（ブロックカーソルの本体色）
+    cursor_fg = "#000000", -- カーソル内の文字の色
+    cursor_border = "#ffaa00", -- カーソルの枠線の色（主にブロックカーソルで使われる）
   },
 }
 
