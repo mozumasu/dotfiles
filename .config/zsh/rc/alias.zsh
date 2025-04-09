@@ -88,7 +88,7 @@ alias gi='create_gitignore'
 alias sail='[ -f sail ] && bash sail || bash vendor/bin/sail'
 
 # Claude
-alias claudeconfig='v Library/Application\ Support/Claude/claude_desktop_config.json'
+alias claudeconfig='v ~/Library/Application\ Support/Claude/claude_desktop_config.json'
 
 # ----------------------------------------------------
 # Hash
