@@ -56,7 +56,7 @@ inner.horizontal = 3
 inner.vertical =   3
 outer.left =       3
 outer.bottom =     3
-outer.top =        2
+outer.top =        [{monitor.VY249 = 35}, 2]
 outer.right =      3
 
 # 'main' binding mode declaration
