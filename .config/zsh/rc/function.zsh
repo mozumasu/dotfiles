@@ -26,7 +26,7 @@ function man {
   fi
   unset PAGER
   unset MANPAGER
-  val=$(command man $* 2>&1)
+  val=$(command man $@ 2>&1)
   ret=$?
   if [ $ret -eq 0 ];then
     echo "$val"|col -bx|nvim -R -c 'set ft=man' -
@@ -85,7 +85,6 @@ function set_aws_profile() {
         --height 50% --layout=reverse --border --preview-window 'right:50%' \
         --preview "grep {} -A5 ~/.aws/config")
 
-  # Cancel settings if no profile is selected
   if [ -z "$selected_profile" ]; then
     echo "Unset aws profile!"
     unset AWS_PROFILE
@@ -94,47 +93,62 @@ function set_aws_profile() {
     return
   fi
 
-  # settings for the selected profile.
   echo "Set the environment variable 'AWS_PROFILE' to '${selected_profile}'!"
   export AWS_PROFILE="$selected_profile"
   unset AWS_ACCESS_KEY_ID
   unset AWS_SECRET_ACCESS_KEY
 
-  # Check your sso session and log in again if it has expired.
-  local AWS_SSO_SESSION_NAME="mozumasu"
-
   check_sso_session=$(aws sts get-caller-identity 2>&1)
-  if [[ "$check_sso_session" == *"Token has expired"* ]]; then
-    echo -e "\n----------------------------\nYour Session has expired! Please login...\n----------------------------\n"
-    aws sso login --sso-session "${AWS_SSO_SESSION_NAME}"
+
+  if [[ "$check_sso_session" == *"Token has expired"* || "$check_sso_session" == *"Token for ${selected_profile} does not exist"* ]]; then
+    echo -e "\n----------------------------\nSSO session is missing or expired! Logging in...\n----------------------------\n"
+    aws sso login --profile "${selected_profile}"
     aws sts get-caller-identity
   else
-    echo ${check_sso_session}
+    echo "${check_sso_session}"
   fi
 }
 
 get_workspaces_info() {
-    # Get private IP of WorkSpaces
+    # WorkSpaces 情報取得
     local workspaces
     workspaces=$(aws workspaces describe-workspaces \
         --query "Workspaces[*].[WorkspaceId, UserName, IpAddress, DirectoryId]" \
         --output text)
 
-    # Output header
-    echo -e "WorkspaceId\tUserName\tPublicIpAddress\tDirectoryId" | column -t
+    # SSM インスタンス情報取得
+    local ssm_info
+    ssm_info=$(aws ssm describe-instance-information \
+        --query "InstanceInformationList[*].[InstanceId, IPAddress]" \
+        --output text)
 
-    # Find ENI for each WorkSpace
-     while read -r workspace_id username private_ip directory_id; do
-        local public_ip="None"
+    # ヘッダー出力
+    echo -e "WorkspaceId\tUserName\tPrivateIP\tPublicIP\tDirectoryId\tInstanceId" | column -t
+
+    # 各 WorkSpace を処理
+    while read -r workspace_id username private_ip directory_id; do
+        public_ip="None"
+        instance_id="not found"
+
+        # ENI から Public IP を取得（存在する場合）
         if [ "$private_ip" != "None" ]; then
-            # Get public IP by ENI
             public_ip=$(aws ec2 describe-network-interfaces \
                 --filters "Name=private-ip-address,Values=$private_ip" \
                 --query "NetworkInterfaces[0].Association.PublicIp" \
-                --output text)
+                --output text 2>/dev/null)
+
+            [ "$public_ip" = "None" ] && public_ip="None"
+
+            # IP で SSM インスタンスを突き合わせて InstanceId を取得
+            while read -r ssm_instance_id ssm_ip; do
+                if [ "$private_ip" = "$ssm_ip" ]; then
+                    instance_id="$ssm_instance_id"
+                    break
+                fi
+            done <<< "$ssm_info"
         fi
 
-        echo -e "$workspace_id\t$username\t$public_ip\t$directory_id" | column -t
+        echo -e "$workspace_id\t$username\t$private_ip\t$public_ip\t$directory_id\t$instance_id" | column -t
     done <<< "$workspaces"
 }
 
@@ -412,6 +426,7 @@ create_ssm_document() {
     --name "$document_name" \
     --document-type "$document_type" \
     --content "$content_option" \
+    --document-format "$file_format" \
     --region "$region"
 
   # 結果を表示
