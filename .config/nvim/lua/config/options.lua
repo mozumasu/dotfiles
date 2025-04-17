@@ -7,6 +7,9 @@
 -- vim標準スペルチェックから日本語を除外
 vim.opt.spelllang:append("cjk")
 
+-- Enable this option to avoid conflicts with Prettier.
+vim.g.lazyvim_prettier_needs_config = true
+
 --
 -- Window
 --
