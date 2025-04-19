@@ -69,7 +69,7 @@ alias iam='check_iam_policy'
 alias ssmdv='view_ssm_document'
 alias ssmdsync='sync_ssm_document'
 alias awsconfig='v ~/.aws/config'
-alias ascredentials='v ~/.aws/credentials'
+alias awscredentials='v ~/.aws/credentials'
 
 # SVN
 alias svnbat='bat ~/dotfiles/docs/svn.md'
