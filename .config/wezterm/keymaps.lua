@@ -127,7 +127,7 @@ local keys = {
   { key = "¥", mods = "ALT", action = act.SendKey({ key = "\\" }) },
   {
     key = ",",
-    mods = "CMD",
+    mods = "SUPER",
     action = wezterm.action.SplitPane({
       direction = "Right",
       size = { Percent = 50 },
@@ -146,7 +146,7 @@ local keys = {
 
   {
     key = ".",
-    mods = "CMD",
+    mods = "SUPER",
     action = wezterm.action.SplitPane({
       direction = "Right",
       size = { Percent = 50 },
@@ -226,7 +226,7 @@ local keys = {
   },
   {
     key = "]",
-    mods = "CMD|SHIFT",
+    mods = "SUPER|SHIFT",
     action = wezterm.action.ToggleAlwaysOnTop,
   },
 }
