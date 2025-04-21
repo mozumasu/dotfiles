@@ -5,12 +5,7 @@ start-at-login = true
 after-login-command = []
 
 # 'after-startup-command' is run after 'after-login-command'
-after-startup-command = ['exec-and-forget borders', 'exec-and-forget sketchybar']
-
-# Notify Sketchybar about workspace change
-exec-on-workspace-change = ['/bin/bash', '-c',
-    'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
-]
+after-startup-command = ['exec-and-forget borders']
 
 # Normalizations. See: https://nikitabobko.github.io/AeroSpace/guide#normalization
 enable-normalization-flatten-containers = true
