@@ -53,7 +53,8 @@ export PATH=$PATH:$HOME/.rye/shims
 export PATH=$PATH:$HOME/Library/Python/2.7/bin
 
 # Java
-export JAVA_HOME=/opt/homebrew/Cellar/openjdk@11/11.0.24/libexec/openjdk.jdk/Contents/Home
+export JAVA_HOME=/opt/homebrew/Cellar/openjdk@11/11.0.26/libexec/openjdk.jdk/Contents/Home
+# export JAVA_HOME=/opt/homebrew/Cellar/openjdk@11/11.0.24/libexec/openjdk.jdk/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH
 export CPPFLAGS="-I/opt/homebrew/opt/openjdk@11/include"
 
