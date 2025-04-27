@@ -31,6 +31,7 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.util.mini-hipatterns" },
     { import = "lazyvim.plugins.extras.util.octo" },
     -- LazyExtra editor
+    { import = "lazyvim.plugins.extras.editor.Inc-rename" },
     -- LazyExtra lang
     { import = "lazyvim.plugins.extras.lang.markdown" },
     { import = "lazyvim.plugins.extras.lang.ansible" },
