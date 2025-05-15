@@ -74,3 +74,6 @@ export PATH="$VOLTA_HOME/bin:$PATH"
 
 # Homemade command
 export PATH=$XDG_CONFIG_HOME/local/bin:$PATH
+
+# mysql
+export PATH=/opt/homebrew/Cellar/mysql@8.0/8.0.42/bin:$PATH
