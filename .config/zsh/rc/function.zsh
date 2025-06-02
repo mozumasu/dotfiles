@@ -109,6 +109,11 @@ function set_aws_profile() {
   fi
 }
 
+function aws_vault_login () {
+  local selected_profile=$(aws-vault list | fzf --prompt "Select AWS Profile: " | awk '{print $1}')
+  aws-vault login "$selected_profile"
+}
+
 get_workspaces_info() {
     # WorkSpaces 情報取得
     local workspaces
