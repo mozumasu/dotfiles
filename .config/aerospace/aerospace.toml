@@ -210,3 +210,10 @@ run = 'move-node-to-workspace N'
 # sticky is not yet supported https://github.com/nikitabobko/AeroSpace/issues/2
 #s = ['layout sticky tiling', 'mode main']
 
+# setting up Zoom to always open on the display
+[workspace-to-monitor-force-assignment]
+Z = ['Display']
+
+[[on-window-detected]]
+if.app-id = 'us.zoom.xos'
+run = 'move-node-to-workspace Z'
