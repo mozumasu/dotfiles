@@ -21,3 +21,5 @@ github = "zsh-users/zsh-completions"
 [plugins.zsh-abbr]
 github = "olets/zsh-abbr"
 rev = "fe8b03f3e7979ad810756a56dc768f712dd53de1"
+[plugins.zeno]
+github = "yuki-yano/zeno.zsh"
