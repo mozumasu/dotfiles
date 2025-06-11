@@ -101,6 +101,11 @@ source "$HOME/.config/zsh/rc/pluginconfig/wezterm.zsh"
 source "$HOME/.config/zsh/rc/pluginconfig/aws.zsh"
 
 # ----------------------------------------------------
+# zeno.zsh
+# ----------------------------------------------------
+source "$HOME/.config/zsh/rc/pluginconfig/zeno.zsh"
+
+# ----------------------------------------------------
 # Neovim
 # ----------------------------------------------------
 export NVM_DIR="$HOME/.config/nvm"
