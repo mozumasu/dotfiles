@@ -127,6 +127,7 @@ local key_tables = {
       mods = "SHIFT",
       action = wezterm.action_callback(kill_workspace()),
     },
+    { key = "Escape", action = "PopKeyTable" },
   },
 }
 
