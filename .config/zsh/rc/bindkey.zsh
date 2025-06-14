@@ -29,3 +29,7 @@ zle -N edit-command-line
 bindkey "^[e" edit-command-line
 
 # bindkey '^U' push-line
+
+# redo
+bindkey '^X^R' redo
+bindkey '^Xr' redo
