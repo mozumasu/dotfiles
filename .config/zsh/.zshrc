@@ -118,8 +118,8 @@ export NVM_DIR="$HOME/.config/nvm"
 if [[ ! "$PATH" == */opt/homebrew/opt/fzf/bin* ]]; then
   PATH="${PATH:+${PATH}:}/opt/homebrew/opt/fzf/bin"
 fi
-# Auto-completion
-source "/opt/homebrew/opt/fzf/shell/completion.zsh"
+# Disable fzf completion to use zeno completion
+# source "/opt/homebrew/opt/fzf/shell/completion.zsh"
 # key-bindings (default: /opt/homebrew/opt/fzf/shell/key-bindings.zsh)
 source "$HOME/dotfiles/.config/zsh/rc/pluginconfig/fzf.key-bindings.zsh"
 
