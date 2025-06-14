@@ -26,6 +26,10 @@ snippets:
       lbuffer: '^git\s+checkout\s+'
     evaluate: true # eval snippet
 
+  - name: today
+    keyword: td
+    snippet: date +%Y-%m-%d
+    evaluate: true
 
 completions:
   # simple sourceCommand, no callback
