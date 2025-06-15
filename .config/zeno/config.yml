@@ -31,6 +31,11 @@ snippets:
     snippet: date +%Y-%m-%d
     evaluate: true
 
+  - keyword: G
+    snippet: '| grep'
+    context:
+      lbuffer: '.+\s'
+ 
   - keyword: '-'
     snippet: cd -
 
