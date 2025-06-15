@@ -19,14 +19,17 @@ source "$ZRCDIR/bindkey.zsh"
 # ----------------------------------------------------
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# Manage shell plugins by sheldon
-# https://sheldon.cli.rs/
-eval "$(sheldon source)"
-
 # ----------------------------------------------------
 # Function
 # ----------------------------------------------------
 source "$ZRCDIR/function.zsh"
+
+# ----------------------------------------------------
+# sheldon
+# ----------------------------------------------------
+# Manage shell plugins by sheldon
+# https://sheldon.cli.rs/
+eval "$(sheldon source)"
 
 # ----------------------------------------------------
 # Alias
