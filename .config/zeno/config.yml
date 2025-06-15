@@ -31,6 +31,109 @@ snippets:
     snippet: date +%Y-%m-%d
     evaluate: true
 
+  - keyword: '-'
+    snippet: cd -
+
+  - keyword: proot
+    snipepet: 'cd $(git rev-parse --show-toplevel)'
+
+  - keyword: ll
+    snippet: ls -l
+
+  - keyword: la
+    snippet: ls -a
+
+  - keyword: lla
+    snippet: ls -la
+
+  - keyword: r
+    snippet: exec $SHELL -l
+
+  - keyword: myip
+    snippet: curl ifconfig.me
+
+  - keyword: dhosts
+    snippet: nvim ~/.ssh/conf.d/hosts/
+
+  - keyword: hosts
+    snippet: sudo nvim /etc/hosts
+
+  - keyword: zenn
+    snippet: nvim ~/src/private/zenn
+
+  - keyword: g
+    snippet: git
+
+  - keyword: gs
+    snippet: git status
+
+  - keyword: gsw
+    snippet: git switch
+
+  - keyword: gpl
+    snippet: git pull
+
+  - keyword: gfe
+    snippet: git fetch
+
+  - keyword: lg
+    snippet: lazygit
+
+  - keyword: mul
+    snippet: multipass
+
+  - keyword: ap
+    snippet: ansible-playbook
+
+  - keyword: anv
+    snippet: ansible-valut
+
+  - keyword: tf
+    snippet: terraform
+
+  - keyword: ap
+    snippet: apply
+    context:
+      lbuffer: '^terraform\s+'
+
+  - keyword: pl
+    snippet: plan
+    context:
+      lbuffer: '^terraform\s+'
+
+  - keyword: in
+    snippet: init
+    context:
+      lbuffer: '^terraform\s+'
+
+  - keyword: st
+    snippet: state
+    context:
+      lbuffer: '^terraform\s+'
+
+  - keyword: stl
+    snippet: state list
+    context:
+      lbuffer: '^terraform\s+'
+
+  - keyword: awsl
+    snippet: aws configure list
+
+  - keyword: py
+    snippet: python3
+
+  - keyword: upy
+    snippet: uv run python
+
+  - keyword: f
+    snippet: open .
+
+  - keyword: vpn
+    snippet: vpnutil
+
+  - keyword: ld
+    snippet: lazydocker
+
 completions:
   # simple sourceCommand, no callback
   - name: kill signal

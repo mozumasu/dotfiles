@@ -14,12 +14,9 @@ shell = "zsh"
 
 [plugins.zsh-autosuggestions]
 github = "zsh-users/zsh-autosuggestions"
-[plugins.zsh-syntax-highlighting]
-github = "zsh-users/zsh-syntax-highlighting"
 [plugins.zsh-completions]
 github = "zsh-users/zsh-completions"
-[plugins.zsh-abbr]
-github = "olets/zsh-abbr"
-rev = "fe8b03f3e7979ad810756a56dc768f712dd53de1"
 [plugins.zeno]
 github = "yuki-yano/zeno.zsh"
+[plugins.fast-syntax-highlighting ]
+github = "zdharma-continuum/fast-syntax-highlighting"
