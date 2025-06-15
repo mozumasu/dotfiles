@@ -173,3 +173,22 @@ completions:
       --preview: "cd {} && ls -a | sed '/^[.]*$/d'"
     callback: "cut -z -c 3-"
     callbackZero: true  # null termination is used in `callback` I/O
+
+  - name: ssh login
+    patterns:
+      - "^ssh(?: .*)? $"
+    sourceCommand: |
+      cat "$HOME/.ssh/conf.d/hosts/"**/*(.) | grep -E '^HOST\s' | grep -v '\*' | awk '{print $2}' | sort -u
+    options:
+      --prompt: "'ssh > '"
+
+  - name: npm scripts
+    patterns:
+      - "npm run(?: .*)? $"
+      - "yarn run(?: .*)? $"
+      - "pnpm run(?: .*)? $"
+      - "bun run(?: .*)? $"
+    sourceCommand: 'jq -r ''.scripts | to_entries | .[] | .key + " = " + .value'' package.json'
+    options:
+      --prompt: "'npm run > '"
+    callback: "awk -F ' = ' '{ print $1 }'"
