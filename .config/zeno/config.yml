@@ -192,3 +192,14 @@ completions:
     options:
       --prompt: "'npm run > '"
     callback: "awk -F ' = ' '{ print $1 }'"
+
+  - name: nb edit
+    patterns:
+      - "^nb e( .*)? $"
+      - "^nb edit( .*)? $"
+    sourceCommand: "nb ls --no-color | grep -E '^\\[[0-9]+\\]'"
+    options:
+      --ansi: true  # ← ANSIカラー有効
+      --prompt: "'nb edit >'"
+      --preview: "echo {} | sed -E 's/^\\[([0-9]+)\\].*/\\1/' | xargs nb show"
+    callback: "sed -E 's/^\\[([0-9]+)\\].*/\\1/'"
