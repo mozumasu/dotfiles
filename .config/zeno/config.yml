@@ -203,3 +203,11 @@ completions:
       --prompt: "'nb edit >'"
       --preview: "echo {} | sed -E 's/^\\[([0-9]+)\\].*/\\1/' | xargs nb show"
     callback: "sed -E 's/^\\[([0-9]+)\\].*/\\1/'"
+
+  - name: gh browse
+    patterns:
+      - "^gh browse( .*)? $"
+    sourceCommand: "gh repo list | awk '{print $1}'"
+    options:
+      --prompt: "'browse repo >'"
+    callback: "gh browse -R {}"
