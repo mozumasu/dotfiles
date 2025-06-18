@@ -139,6 +139,9 @@ snippets:
   - keyword: ld
     snippet: lazydocker
 
+  - keyword: ghc
+    snippet: gh repo create '{{repo_name}}' --private
+
 completions:
   # simple sourceCommand, no callback
   - name: kill signal
@@ -211,3 +214,12 @@ completions:
     options:
       --prompt: "'browse repo >'"
     callback: "gh browse -R {}"
+
+  - name: ghq get
+    patterns:
+      - "^ghqg"
+      - "^ghq get( .*)? $"
+    sourceCommand: "gh repo list | awk '{print $1}'"
+    options:
+      --prompt: "'browse repo >'"
+    callback: "ghq get ${1}"
