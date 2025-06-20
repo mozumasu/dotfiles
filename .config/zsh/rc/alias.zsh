@@ -19,6 +19,7 @@ alias .....='../../../../'
 
 
 # aws
+alias qc="q chat --model claude-4-sonnet --trust-tools=mcp,fs_read,fs_write"
 alias awsp='set_aws_profile'
 alias awsvl='aws_vault_login'
 alias awsv='aws-vault'
