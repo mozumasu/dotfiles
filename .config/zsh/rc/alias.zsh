@@ -17,6 +17,9 @@ alias .....='../../../../'
 # rm
 [[ $(command -v gomi) ]] && alias gm='gomi'
 
+# ESC H
+alias run-help >/dev/null 2>&1 && unalias run-help
+autoload -Uz run-help run-help-git run-help-openssl run-help-sudo
 
 # aws
 alias qc="q chat --model claude-4-sonnet --trust-tools=mcp,fs_read,fs_write"
