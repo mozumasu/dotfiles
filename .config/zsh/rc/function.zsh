@@ -725,6 +725,17 @@ notify() {
     echo "Usage: notify [minutes|HH:MM]"
   fi
 }
+# github cli
+gh_pr_comment_id_fzf() {
+  local pr="$1"  # PR番号だけ渡す
+  local repo
+  repo=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+
+  gh api --paginate repos/"$repo"/issues/"$pr"/comments \
+    --jq '.[] | "\(.id)\t\(.user.login)\t\(.body | gsub("\n"; " ")[0:80])"' \
+    | fzf --with-nth=2.. \
+    | cut -f1
+}
 
 # svn
 svnb() {
