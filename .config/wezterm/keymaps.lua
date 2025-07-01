@@ -97,6 +97,9 @@ local keys = {
   { key = "k", mods = "SUPER", action = act.ClearScrollback("ScrollbackOnly") },
   { key = "L", mods = "CTRL", action = act.ShowDebugOverlay },
 
+  -- Claude Code
+  { key = "Enter", mods = "SHIFT", action = wezterm.action.SendString("\n") },
+
   -- control + f/b を使用する場合は非有効にする必要がある
   -- { key = "LeftArrow", mods = "NONE", action = act.CopyMode("MoveLeft") },
   -- { key = "RightArrow", mods = "NONE", action = act.CopyMode("MoveRight") },
