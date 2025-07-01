@@ -9,6 +9,9 @@ snippets:
     keyword: gcim
     snippet: git commit -m '{{commit_message}}'
 
+  - keyword: proot
+    snippet: cd $(git rev-parse --show-toplevel)
+
   - name: "null"
     keyword: "null"
     snippet: ">/dev/null 2>&1"
