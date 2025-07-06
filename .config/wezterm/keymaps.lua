@@ -105,9 +105,9 @@ local keys = {
   -- { key = "RightArrow", mods = "NONE", action = act.CopyMode("MoveRight") },
 
   -- Scroll
-  { key = "PageUp", mods = "SHIFT", action = act.ScrollByPage(-1) },
+  { key = "PageUp", mods = "SHIFT", action = act.ScrollByPage(-0.01) },
   { key = "PageUp", mods = "SHIFT|CTRL", action = act.MoveTabRelative(-1) },
-  { key = "PageDown", mods = "SHIFT", action = act.ScrollByPage(1) },
+  { key = "PageDown", mods = "SHIFT", action = act.ScrollByPage(0.02) },
   { key = "PageDown", mods = "SHIFT|CTRL", action = act.MoveTabRelative(1) },
 
   -- Pane
@@ -285,6 +285,8 @@ local key_tables = {
     -- scroll
     { key = "PageUp", mods = "NONE", action = act.CopyMode("PageUp") },
     { key = "PageDown", mods = "NONE", action = act.CopyMode("PageDown") },
+    { key = "e", mods = "CTRL", action = act.ScrollByPage(-0.01) },
+    { key = "y", mods = "CTRL", action = act.ScrollByPage(0.02) },
     { key = "u", mods = "CTRL", action = act.CopyMode({ MoveByPage = -0.5 }) },
     { key = "d", mods = "CTRL", action = act.CopyMode({ MoveByPage = 0.5 }) },
     { key = "g", mods = "NONE", action = act.CopyMode("MoveToScrollbackTop") },
@@ -306,7 +308,7 @@ local key_tables = {
     { key = "[", mods = "NONE", action = act.CopyMode({ MoveBackwardZoneOfType = "Input" }) }, -- Input, Output, Prompt
 
     -- 検索ワードを編集
-    { key = "e", mods = "CTRL", action = act.CopyMode("EditPattern") },
+    -- { key = "e", mods = "CTRL", action = act.CopyMode("EditPattern") },
     { key = "q", mods = "CTRL", action = act.CopyMode("AcceptPattern") }, -- 明示的に設定してもOK
     { key = "c", mods = "CTRL", action = act.CopyMode("ClearPattern") }, -- キャンセル用カーソル移動
 
