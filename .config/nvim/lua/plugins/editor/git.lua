@@ -520,4 +520,66 @@ return {
       vim.keymap.set("n", "<leader>gd", toggle_diffview, key_opts)
     end,
   },
+  {
+    "choplin/code-review.nvim",
+    config = function()
+      require("code-review").setup({
+        -- UI settings
+        ui = {
+          -- Comment input window
+          input_window = {
+            width = 60,
+            height = 2,
+            max_height = 20, -- Auto-expand up to this height
+            border = "rounded",
+            title = " Add Comment (C-CR to submit) ",
+            title_pos = "center",
+          },
+          -- Preview window
+          preview = {
+            format = "markdown", -- 'markdown', 'json', or 'auto' (same as output.format)
+            split = "vertical", -- 'vertical', 'horizontal', or 'float'
+            vertical_width = 80,
+            horizontal_height = 20,
+            float = {
+              width = 0.8,
+              height = 0.8,
+              border = "rounded",
+              title = " Review Preview ",
+              title_pos = "center",
+            },
+          },
+          -- Sign column indicators
+          signs = {
+            enabled = true,
+            text = "┃",
+            texthl = "CodeReviewSign",
+          },
+          -- Virtual text indicators
+          virtual_text = {
+            enabled = true,
+            prefix = " 󰆉 ",
+            hl = "CodeReviewVirtualText",
+          },
+        },
+        -- Output settings
+        output = {
+          format = "markdown", -- 'markdown' or 'json'
+          date_format = "%Y-%m-%d %H:%M:%S",
+          save_dir = nil, -- nil = current directory
+        },
+        -- Keymaps (set to false to disable all keymaps)
+        keymaps = {
+          clear = "<leader>rx",
+          add_comment = "<leader>rc",
+          preview = "<leader>rp",
+          save = "<leader>rw",
+          copy = "<leader>ry",
+          show_comment = "<leader>rs",
+          list_comments = "<leader>rl",
+          delete_comment = "<leader>rd",
+        },
+      })
+    end,
+  },
 }
