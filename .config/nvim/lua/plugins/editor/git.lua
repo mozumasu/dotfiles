@@ -524,15 +524,26 @@ return {
     "choplin/code-review.nvim",
     config = function()
       require("code-review").setup({
+        comment = {
+          storage = {
+            -- Each comment is saved as a separate file: YYYY-MM-DD-HHMMSS-NNN.md
+            backend = "file", --default: "memory"
+            file = {
+              -- dir = ".code-review", -- Default: project root/.code-review/
+              dir = ".reviews", -- Alternative: project root/.reviews/
+              -- dir = "~/src/reviews", -- Absolute path: ~/reviews/
+            },
+          },
+        },
         -- UI settings
         ui = {
           -- Comment input window
           input_window = {
             width = 60,
             height = 2,
-            max_height = 20, -- Auto-expand up to this height
+            max_height = 40, -- Auto-expand up to this height
             border = "rounded",
-            title = " Add Comment (C-CR to submit) ",
+            title = " Add Comment (C-s to submit) ",
             title_pos = "center",
           },
           -- Preview window
@@ -579,6 +590,46 @@ return {
           list_comments = "<leader>rl",
           delete_comment = "<leader>rd",
         },
+      })
+
+      -- Comment input buffer keymaps
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "CodeReviewInputEnter",
+        callback = function(ev)
+          local buf = ev.data.buf
+          local cr = require("code-review")
+          local funcs = cr.get_input_buffer_functions(buf)
+
+          -- Submit with C-s in both insert and normal mode
+          vim.keymap.set({ "i", "n" }, "<C-s>", funcs.submit, { buffer = buf })
+          -- Cancel with Esc or q in normal mode
+          vim.keymap.set("n", "<Esc>", funcs.cancel, { buffer = buf })
+          vim.keymap.set("n", "q", funcs.cancel, { buffer = buf })
+        end,
+      })
+
+      -- Preview buffer keymaps
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "CodeReviewPreviewEnter",
+        callback = function(ev)
+          local buf = ev.data.buf
+          -- Custom keymaps for preview buffer
+          vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = buf })
+          vim.keymap.set("n", "<C-s>", function()
+            vim.cmd("write") -- Save edits
+            require("code-review").save() -- Save to file
+          end, { buffer = buf })
+        end,
+      })
+
+      -- Comment view buffer keymaps
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "CodeReviewCommentsEnter",
+        callback = function(ev)
+          local buf = ev.data.buf
+          vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = buf })
+          vim.keymap.set("n", "<Esc>", "<cmd>close<CR>", { buffer = buf })
+        end,
       })
     end,
   },
