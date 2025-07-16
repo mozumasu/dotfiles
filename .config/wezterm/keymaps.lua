@@ -5,6 +5,16 @@ local module = {}
 
 local leader = { key = "q", mods = "CTRL", timeout_milliseconds = 2000 }
 local keys = {
+
+  {
+    key = "i",
+    mods = "CTRL",
+    action = wezterm.action.SplitPane({
+      direction = "Down",
+      size = { Percent = 20 },
+      command = { args = { "/Users/mozumasu/.volta/bin/editprompt" } },
+    }),
+  },
   -- Copy mode
   -- { key = "X", mods = "CTRL", action = act.ActivateCopyMode },
   -- 検索ワードをクリアにして Copy mode
