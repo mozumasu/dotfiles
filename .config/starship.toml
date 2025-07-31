@@ -9,6 +9,7 @@ $git_branch\
 $git_status\
 $direnv\
 $python\
+$aws\
 $fill\
 $cmd_duration\
 $time\
@@ -92,3 +93,11 @@ format = '[[  $time](fg:#a0a9cb)]($style)'
 # ----------------------------------------------------
 [character]
 vimcmd_symbol = '[V](bold green) '
+
+# ----------------------------------------------------
+# AWS module
+# ----------------------------------------------------
+[aws]
+format = '[$symbol $profile ]($style)'
+symbol = "💭"
+style = "bold fg:#ffcb6b"
