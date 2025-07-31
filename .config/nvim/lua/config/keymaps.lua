@@ -20,9 +20,6 @@ vim.api.nvim_set_keymap("i", "<C-i>", "<C-i>", { noremap = true })
 keymap("n", "+", "<C-a>", opts)
 keymap("n", "-", "<C-x>", opts)
 
--- Select all
-keymap("n", "<C-a>", "ggVG")
-
 -- Tab
 keymap("n", "<tab>", ":tabnext<Return>", opts)
 keymap("n", "<s-tab>", ":tabprev<Return>", opts)
