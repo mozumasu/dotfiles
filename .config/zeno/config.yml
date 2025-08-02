@@ -42,7 +42,7 @@ snippets:
 
   - name: cd there
     keyword: CD
-    snippet: && cd $_
+    snippet: "&& cd $_"
     context:
       lbuffer: '.+\s'
 

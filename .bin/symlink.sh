@@ -71,8 +71,8 @@ main() {
     if is_excluded "$file"; then
       continue
     fi
-    create_symlink "$file"
-  done < <(find . -type f ! -path '*.git/*' ! -name '.DS_Store' | cut -c 3-)
+    create_symlink "$file" || true  # エラーが発生しても続行
+  done < <(find . -type f ! -path '*.git/*' ! -name '.DS_Store' | sed 's|^\./||')
 
   echo "Complete! 🚀"
 }
