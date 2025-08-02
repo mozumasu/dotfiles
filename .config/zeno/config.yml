@@ -166,6 +166,11 @@ snippets:
   - keyword: serena-init
     sunippet: mcp__serena__initial_instructions
 
+  - name: npm
+    keyword: npm
+    snippet: zsh -c "$HOME/.config/zeno/scripts/package-manager.ts"
+    evaluate: true
+
 completions:
   # simple sourceCommand, no callback
   - name: kill signal
