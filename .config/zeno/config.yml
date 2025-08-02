@@ -145,6 +145,9 @@ snippets:
   - keyword: ghc
     snippet: gh repo create '{{repo_name}}' --private
 
+  - keyword: instance-connect
+    snippet: aws ec2-instance-connect ssh --instance-id {{instance-id}} --os-user ec2-user
+
 completions:
   # simple sourceCommand, no callback
   - name: kill signal
@@ -226,3 +229,9 @@ completions:
     options:
       --prompt: "'browse repo >'"
     callback: "ghq get ${1}"
+
+  - name: instance-id
+    patterns:
+      - "aws ec2-instance-connect ssh --instance-id( .*)?"
+    sourceCommand: "aws ec2 describe-instances --query 'Reservations[*].Instances[*].[InstanceId, Tags[?Key==`Name`].Value | [0]]' --output text"
+    callback: "awk -F ' ' '{ print $1 }'"
