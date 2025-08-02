@@ -148,6 +148,12 @@ snippets:
   - keyword: instance-connect
     snippet: aws ec2-instance-connect ssh --instance-id {{instance-id}} --os-user ec2-user
 
+  - keyword: serena
+    sunippet: claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena-mcp-server --context ide-assistant --project $(pwd)
+
+  - keyword: serena-init
+    sunippet: mcp__serena__initial_instructions
+
 completions:
   # simple sourceCommand, no callback
   - name: kill signal
