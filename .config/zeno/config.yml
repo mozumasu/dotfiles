@@ -34,6 +34,18 @@ snippets:
     snippet: date +%Y-%m-%d
     evaluate: true
 
+  - name: copy
+    keyword: CC
+    snippet: "| pbcopy"
+    context:
+      lbuffer: '.+\s'
+
+  - name: cd there
+    keyword: CD
+    snippet: && cd $_
+    context:
+      lbuffer: '.+\s'
+
   - keyword: G
     snippet: '| grep'
     context:
