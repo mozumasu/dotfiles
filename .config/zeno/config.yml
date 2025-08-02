@@ -197,7 +197,7 @@ completions:
     options:
       --prompt: "'ssh > '"
 
-  - name: npm scripts
+  - name: package scripts
     patterns:
       - "npm run(?: .*)? $"
       - "yarn run(?: .*)? $"
@@ -214,18 +214,16 @@ completions:
       - "^nb edit( .*)? $"
     sourceCommand: "nb ls --no-color | grep -E '^\\[[0-9]+\\]'"
     options:
-      --ansi: true  # ← ANSIカラー有効
       --prompt: "'nb edit >'"
       --preview: "echo {} | sed -E 's/^\\[([0-9]+)\\].*/\\1/' | xargs nb show"
     callback: "sed -E 's/^\\[([0-9]+)\\].*/\\1/'"
 
   - name: gh browse
     patterns:
-      - "^gh browse( .*)? $"
+      - "^gh browse -R( .*)? $"
     sourceCommand: "gh repo list | awk '{print $1}'"
     options:
       --prompt: "'browse repo >'"
-    callback: "gh browse -R {}"
 
   - name: ghq get
     patterns:
