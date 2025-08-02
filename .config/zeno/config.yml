@@ -55,7 +55,7 @@ snippets:
     snippet: cd -
 
   - keyword: proot
-    snipepet: 'cd $(git rev-parse --show-toplevel)'
+    snippet: 'cd $(git rev-parse --show-toplevel)'
 
   - keyword: ll
     snippet: ls -l
@@ -161,10 +161,10 @@ snippets:
     snippet: aws ec2-instance-connect ssh --instance-id {{instance-id}} --os-user ec2-user
 
   - keyword: serena
-    sunippet: claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena-mcp-server --context ide-assistant --project $(pwd)
+    snippet: claude mcp add serena -- uvx --from git+https://github.com/oraios/serena serena-mcp-server --context ide-assistant --project $(pwd)
 
   - keyword: serena-init
-    sunippet: mcp__serena__initial_instructions
+    snippet: mcp__serena__initial_instructions
 
   - name: npm
     keyword: npm
