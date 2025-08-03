@@ -166,6 +166,9 @@ snippets:
   - keyword: serena-init
     snippet: mcp__serena__initial_instructions
 
+  - keyword: claudes
+    snippet: claude --append-system-prompt $(uvx --from git+https://github.com/oraios/serena serena print-system-prompt)
+
   - name: npm
     keyword: npm
     snippet: zsh -c "$HOME/.config/zeno/scripts/package-manager.ts"
