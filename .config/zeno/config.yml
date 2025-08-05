@@ -199,7 +199,7 @@ completions:
   # Use null (\0) termination Input / Output
   - name: chdir
     patterns:
-      - "^cd $"
+      - "^;cd $"
     sourceCommand: "find . -path '*/.git' -prune -o -maxdepth 5 -type d -print0"
     options:
       # Added --read0 if null termination is used in `sourceCommand` output.
@@ -241,7 +241,7 @@ completions:
   - name: gh browse
     patterns:
       - "^gh browse -R( .*)? $"
-    sourceCommand: "gh repo list | awk '{print $1}'"
+    sourceCommand: "gh repo list --visibility=public | awk '{print $1}'"
     options:
       --prompt: "'browse repo >'"
 
