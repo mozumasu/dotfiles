@@ -267,3 +267,9 @@ completions:
     callback: "awk '{printf $2}'"
     options:
       --prompt: "'make> '"
+
+  - name: suspend
+    patterns:
+      - "^fg $"
+    sourceCommand: "jobs"
+    callback: "cut -d'[' -f2 | cut -d']' -f1 | sed 's/^/%/'"
