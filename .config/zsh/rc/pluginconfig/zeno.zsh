@@ -53,3 +53,10 @@ if [[ -n $ZENO_LOADED ]]; then
   bindkey '^x^f' zeno-ghq-cd
 
 fi
+
+if [[ -n $ZENO_LOADED ]]; then
+  bindkey '^r'   zeno-history-selection
+  bindkey '^x^s' zeno-insert-snippet
+  bindkey '^x^f' zeno-ghq-cd
+  bindkey '^x^n'   zeno-snippet-next-placeholder
+fi
