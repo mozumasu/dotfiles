@@ -122,11 +122,11 @@ local key_tables = {
         end),
       }),
     },
-    {
-      key = "d",
-      mods = "SHIFT",
-      action = wezterm.action_callback(kill_workspace()),
-    },
+    -- {
+    --   key = "d",
+    --   mods = "SHIFT",
+    --   action = wezterm.action_callback(kill_workspace()),
+    -- },
     { key = "Escape", action = "PopKeyTable" },
   },
 }
