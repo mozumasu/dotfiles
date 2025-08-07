@@ -91,8 +91,6 @@ local keys = {
 
 local key_tables = {
   workspace_mode = {
-    { key = "n", mods = "CTRL|ALT", action = act.SwitchWorkspaceRelative(1) },
-    { key = "p", mods = "CTRL|ALT", action = act.SwitchWorkspaceRelative(-1) },
     {
       -- Create new workspace
       mods = "SHIFT",
