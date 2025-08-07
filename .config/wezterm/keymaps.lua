@@ -242,6 +242,8 @@ local keys = {
     mods = "SUPER|SHIFT",
     action = wezterm.action.ToggleAlwaysOnTop,
   },
+  { key = "n", mods = "CTRL|ALT", action = act.SwitchWorkspaceRelative(1) },
+  { key = "p", mods = "CTRL|ALT", action = act.SwitchWorkspaceRelative(-1) },
 }
 
 local key_tables = {
