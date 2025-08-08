@@ -21,7 +21,9 @@
       "Bash(docker compose exec:*)",
       "Bash(docker compose logs:*)",
       "Bash(git commit:*)",
-      "Edit"
+      "Edit*",
+      "serena*",
+      "gemini-cli*"
     ],
     "deny": [
       "Bash(curl:*)",
