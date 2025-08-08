@@ -71,6 +71,26 @@ function module.apply_to_config(config)
       { Foreground = { Color = "#80EBDF" } },
       { Text = " " .. table.concat(left_status, " | ") .. " " },
     }))
+
+    local right_status = {}
+
+    local date = wezterm.strftime("%Y-%m-%d %H:%M:%S")
+    table.insert(right_status, "🕐 " .. date)
+
+    -- Battery information (for laptops)
+    for _, b in ipairs(wezterm.battery_info()) do
+      local battery_icon = "🔋"
+      if b.state == "Charging" then
+        battery_icon = "🔌"
+      end
+      table.insert(right_status, string.format("%s %.0f%%", battery_icon, b.state_of_charge * 100))
+    end
+
+    -- Shown on the right
+    window:set_right_status(wezterm.format({
+      { Foreground = { Color = "#a0a9cb" } },
+      { Text = table.concat(right_status, " | ") .. " " },
+    }))
   end)
 
   wezterm.on("format-tab-title", function(tab, _, _, _, _, max_width)
