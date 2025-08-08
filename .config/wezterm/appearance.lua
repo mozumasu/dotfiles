@@ -56,7 +56,7 @@ local appearance = {
   -- Tab
   ----------------------------------------------------
   show_tabs_in_tab_bar = true,
-  hide_tab_bar_if_only_one_tab = true,
+  hide_tab_bar_if_only_one_tab = false,
   tab_bar_at_bottom = true,
   show_new_tab_button_in_tab_bar = false,
   show_close_tab_button_in_tabs = false, -- Can only be used in nightly

@@ -35,7 +35,7 @@ function module.apply_to_config(config)
     return string.gsub(s, "(.*[/\\])(.*)", "%2")
   end
 
-  wezterm.on("update-status", function(_, pane)
+  wezterm.on("update-status", function(window, pane)
     local pane_id = pane:pane_id()
     title_cache[pane_id] = "-"
     local cwd_url = pane:get_current_working_dir()
@@ -57,6 +57,20 @@ function module.apply_to_config(config)
         end
       end
     end
+
+    -- Update the status bar at the same time
+    local left_status = {}
+
+    -- Get workspace name
+    local workspace = window:active_workspace()
+    wezterm.log_info("Current workspace: " .. tostring(workspace))
+    table.insert(left_status, " " .. workspace .. " ")
+
+    -- Shown on the left
+    window:set_left_status(wezterm.format({
+      { Foreground = { Color = "#80EBDF" } },
+      { Text = " " .. table.concat(left_status, " | ") .. " " },
+    }))
   end)
 
   wezterm.on("format-tab-title", function(tab, _, _, _, _, max_width)
