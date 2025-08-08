@@ -40,7 +40,7 @@ function module.apply_to_config(config)
     title_cache[pane_id] = "-"
     local cwd_url = pane:get_current_working_dir()
     if cwd_url then
-      local cwd = cwd_url.path
+      local cwd = cwd_url.file_path
       if cwd then
         local home = os.getenv("HOME")
         if home and cwd:find("^" .. home) then
