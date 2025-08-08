@@ -74,8 +74,6 @@ local appearance = {
   },
 }
 
-require("tab")
-
 function module.apply_to_config(config)
   for k, v in pairs(appearance) do
     config[k] = v
