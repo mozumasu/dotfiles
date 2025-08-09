@@ -23,7 +23,8 @@
       "Bash(git commit:*)",
       "Edit*",
       "serena*",
-      "gemini-cli*"
+      "gemini-cli*",
+      "Fetch*"
     ],
     "deny": [
       "Bash(curl:*)",
