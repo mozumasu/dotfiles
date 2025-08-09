@@ -9,6 +9,9 @@ local leader = { key = "q", mods = "CTRL", timeout_milliseconds = 2000 }
 local keys = {
   -- Terminal pane toggle
   toggle_term.toggle_term(),
+  
+  -- Zoom current pane
+  { key = "z", mods = "SHIFT|CTRL", action = act.TogglePaneZoomState },
 
   -- {
   --   key = "i",
