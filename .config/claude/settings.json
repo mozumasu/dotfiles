@@ -88,5 +88,9 @@
       "todoWrite",
       "todoRead"
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "npx ccusage@latest statusline"
   }
 }
