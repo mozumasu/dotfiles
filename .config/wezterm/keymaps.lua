@@ -1,10 +1,14 @@
 local wezterm = require("wezterm")
 local act = wezterm.action
+local toggle_term = require("toggle_term")
 
 local module = {}
 
 local leader = { key = "q", mods = "CTRL", timeout_milliseconds = 2000 }
+
 local keys = {
+  -- Terminal pane toggle
+  toggle_term.toggle_term(),
 
   -- {
   --   key = "i",
