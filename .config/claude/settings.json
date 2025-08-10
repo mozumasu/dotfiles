@@ -23,6 +23,7 @@
       "Bash(docker compose logs:*)",
       "Bash(git commit:*)",
       "Edit",
+      "Read",
       "Create",
       "serena*",
       "gemini-cli*",
@@ -88,7 +89,8 @@
       "glob",
       "grep",
       "todoWrite",
-      "todoRead"
+      "todoRead",
+      "serena"
     ]
   },
   "statusLine": {
