@@ -3,31 +3,38 @@ local module = {}
 
 function module.apply_to_config(config)
   local title_cache = {}
+  local ssh_host_cache = {}
+  local ssh_original_cmd_cache = {} -- Cache original command when connecting to ssh
 
-  -- アイコン
+  -- Icon
   local TAB_ICON_DOCKER = wezterm.nerdfonts.md_docker
   local TAB_ICON_PYTHON = wezterm.nerdfonts.dev_python
   local TAB_ICON_NEOVIM = wezterm.nerdfonts.linux_neovim
   local TAB_ICON_ZSH = wezterm.nerdfonts.dev_terminal
   local TAB_ICON_TASK = wezterm.nerdfonts.cod_server_process
   local TAB_ICON_NODE = wezterm.nerdfonts.md_language_typescript
+  local TAB_ICON_NB = wezterm.nerdfonts.md_notebook
+  local TAB_ICON_SSH = wezterm.nerdfonts.md_lan
   local TAB_ICON_FALLBACK = wezterm.nerdfonts.md_console_network
 
-  -- 色
+  -- Color
   local TAB_ICON_COLOR_DOCKER = "#4169e1"
   local TAB_ICON_COLOR_PYTHON = "#ffd700"
   local TAB_ICON_COLOR_NEOVIM = "#57A143"
   local TAB_ICON_COLOR_ZSH = "#769ff0"
   local TAB_ICON_COLOR_TASK = "#ff7f50"
   local TAB_ICON_COLOR_NODE = "#1e90ff"
+  local TAB_ICON_COLOR_NB = "#9370DB"
+  local TAB_ICON_COLOR_SSH = "#ff6b6b"
   local TAB_ICON_COLOR_FALLBACK = "#ae8b2d"
   local TAB_FOREGROUND_INACTIVE = "#a0a9cb"
   local TAB_BACKGROUND_INACTIVE = "#1d2230"
   local TAB_FOREGROUND_ACTIVE = "#313244"
   local TAB_BACKGROUND_ACTIVE = "#80EBDF"
-  local TAB_BACKGROUND_SSH_ACTIVE = "#ff0000"
+  local TAB_BACKGROUND_SSH_ACTIVE = "#ff6b6b"
+  local TAB_FOREGROUND_SSH_ACTIVE = "#ffffff"
 
-  -- デコレーション
+  -- Decoration
   local SOLID_LEFT_CIRCLE = wezterm.nerdfonts.ple_left_half_circle_thick
   local SOLID_RIGHT_CIRCLE = wezterm.nerdfonts.ple_right_half_circle_thick
 
@@ -35,25 +42,53 @@ function module.apply_to_config(config)
     return string.gsub(s, "(.*[/\\])(.*)", "%2")
   end
 
+  wezterm.on("pane-focus-changed", function(_, pane)
+    local pane_id = pane:pane_id()
+    local cmd = pane:get_foreground_process_name() or ""
+
+    if cmd:find("ssh%s+") and not ssh_original_cmd_cache[pane_id] then
+      ssh_original_cmd_cache[pane_id] = cmd
+      local host = cmd:match("ssh%s+(__[%w_%-%.]+)")
+      if not host then
+        host = cmd:match("ssh%s+([%w_%-%.]+)")
+      end
+      if host then
+        host = host:gsub("^__", "")
+        ssh_host_cache[pane_id] = host
+      end
+    end
+  end)
+
   wezterm.on("update-status", function(window, pane)
     local pane_id = pane:pane_id()
-    title_cache[pane_id] = "-"
-    local cwd_url = pane:get_current_working_dir()
-    if cwd_url then
-      local cwd = cwd_url.file_path
-      if cwd then
-        local home = os.getenv("HOME")
-        if home and cwd:find("^" .. home) then
-          cwd = cwd:gsub("^" .. home, "~")
-        end
-        local github_prefix_pattern = ".*/src/github.com/([^/]+)/([^/]+)"
-        local user, project = cwd:match(github_prefix_pattern)
-        if user and project then
-          title_cache[pane_id] = project
-        else
-          cwd = cwd:gsub("/$", "")
-          local last_dir = cwd:match("([^/]+)$")
-          title_cache[pane_id] = last_dir or cwd
+
+    local user_vars = pane.user_vars or {}
+    if user_vars.ssh_host and user_vars.ssh_host ~= "" then
+      -- Skip while ssh connecting
+    else
+      title_cache[pane_id] = "-"
+      local cwd_url = pane:get_current_working_dir()
+      if cwd_url then
+        local cwd = cwd_url.file_path
+        if cwd then
+          local home = os.getenv("HOME")
+          if home and cwd:find("^" .. home) then
+            cwd = cwd:gsub("^" .. home, "~")
+          end
+          -- nbディレクトリの検出
+          if cwd:find("%.nb") then
+            title_cache[pane_id] = "nb"
+          else
+            local github_prefix_pattern = ".*/src/github.com/([^/]+)/([^/]+)"
+            local user, project = cwd:match(github_prefix_pattern)
+            if user and project then
+              title_cache[pane_id] = project
+            else
+              cwd = cwd:gsub("/$", "")
+              local last_dir = cwd:match("([^/]+)$")
+              title_cache[pane_id] = last_dir or cwd
+            end
+          end
         end
       end
     end
@@ -77,33 +112,117 @@ function module.apply_to_config(config)
     local pane = tab.active_pane
     local pane_id = pane.pane_id
     local process_name = basename(pane.foreground_process_name)
+
+    local full_cmdline = pane.foreground_process_name or ""
+    local title = pane.title or ""
+    local user_vars = pane.user_vars or {}
+
+    local is_ssh = false
+    local ssh_host_from_uservar = user_vars.ssh_host
+    if ssh_host_from_uservar and ssh_host_from_uservar ~= "" then
+      is_ssh = true
+      if not ssh_host_cache[pane_id] or ssh_host_cache[pane_id] ~= ssh_host_from_uservar then
+        ssh_host_cache[pane_id] = ssh_host_from_uservar
+      end
+    elseif ssh_host_cache[pane_id] and (not ssh_host_from_uservar or ssh_host_from_uservar == "") then
+      ssh_host_cache[pane_id] = nil
+      ssh_original_cmd_cache[pane_id] = nil
+
+      -- Retrieve directory information when ssh is finished
+      local cwd_url = pane:get_current_working_dir()
+      if cwd_url and cwd_url.file_path then
+        local cwd = cwd_url.file_path
+        local home = os.getenv("HOME")
+        if home and cwd:find("^" .. home) then
+          cwd = cwd:gsub("^" .. home, "~")
+        end
+        cwd = cwd:gsub("/$", "")
+        local last_dir = cwd:match("([^/]+)$")
+        title_cache[pane_id] = last_dir or cwd
+      else
+        title_cache[pane_id] = "-"
+      end
+
+      is_ssh = false
+    elseif process_name:find("ssh") or full_cmdline:find("ssh") or process_name:find("multipass") then
+      is_ssh = true
+
+      if not ssh_host_cache[pane_id] then
+        local host = full_cmdline:match("ssh%s+(__[%w_%-%.]+)")
+        if not host then
+          host = full_cmdline:match("ssh%s+([%w_%-%.]+)")
+        end
+        if host then
+          host = host:gsub("^__", "")
+          ssh_host_cache[pane_id] = host
+        end
+      end
+    else
+      if ssh_host_cache[pane_id] then
+        ssh_host_cache[pane_id] = nil
+        ssh_original_cmd_cache[pane_id] = nil
+        title_cache[pane_id] = nil
+      end
+    end
     local background = TAB_BACKGROUND_INACTIVE
     local foreground = TAB_FOREGROUND_INACTIVE
-    if tab.is_active and (process_name:find("ssh") or process_name:find("multipass")) then
+    if tab.is_active and is_ssh then
       background = TAB_BACKGROUND_SSH_ACTIVE
+      foreground = TAB_FOREGROUND_SSH_ACTIVE
     elseif tab.is_active then
       background = TAB_BACKGROUND_ACTIVE
       foreground = TAB_FOREGROUND_ACTIVE
     end
-    local edge_background = "none"
+    local edge_background = TAB_BACKGROUND_INACTIVE -- Make it the same background color for the tab bar
     local edge_foreground = background
 
     local cwd = "-"
-    if title_cache[pane_id] then
+    if is_ssh then
+      local cached_host = ssh_host_cache[pane_id]
+      if cached_host then
+        cwd = cached_host
+      else
+        cwd = "ssh"
+      end
+    elseif title_cache[pane_id] then
       cwd = title_cache[pane_id]
-      if process_name:find("ssh") or process_name:find("multipass") then
-        local host = pane.title:match("@([%w%.-]+)")
-        if host then
-          cwd = host
-        end
+      local cmdline = pane.foreground_process_name or ""
+      local current_cwd = title_cache[pane_id] or ""
+      if
+        cmdline:find("/nb")
+        or cmdline:find("nb ")
+        or process_name == "nb"
+        or current_cwd:find("%.nb")
+        or cwd == "nb"
+      then
+        cwd = "nb"
       end
     end
 
     local icon = TAB_ICON_FALLBACK
     local icon_foreground = TAB_ICON_COLOR_FALLBACK
-    if pane.title == "nvim" then
+    local cmdline = pane.foreground_process_name or ""
+    local current_cwd = title_cache[pane_id] or ""
+    if is_ssh then
+      icon = TAB_ICON_SSH
+      -- If the ssh tab is active, the icon is white, if inactive, the icon is red
+      if tab.is_active then
+        icon_foreground = "#ffffff"
+      else
+        icon_foreground = TAB_ICON_COLOR_SSH
+      end
+    elseif pane.title == "nvim" then
       icon = TAB_ICON_NEOVIM
       icon_foreground = TAB_ICON_COLOR_NEOVIM
+    elseif
+      cmdline:find("/nb")
+      or cmdline:find("nb ")
+      or process_name == "nb"
+      or current_cwd:find("%.nb")
+      or cwd == "nb"
+    then
+      icon = TAB_ICON_NB
+      icon_foreground = TAB_ICON_COLOR_NB
     elseif pane.title == "zsh" then
       icon = TAB_ICON_ZSH
       icon_foreground = TAB_ICON_COLOR_ZSH
@@ -127,7 +246,7 @@ function module.apply_to_config(config)
       { Text = " " },
       { Foreground = { Color = edge_foreground } },
       { Text = SOLID_LEFT_CIRCLE },
-      { Background = { Color = edge_foreground } },
+      { Background = { Color = background } },
       { Foreground = { Color = icon_foreground } },
       { Text = icon },
       { Background = { Color = background } },
