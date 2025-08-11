@@ -9,7 +9,9 @@ function module.edit_prompt()
     mods = "CTRL",
     action = wezterm.action_callback(function(window, pane)
       -- Create temporary file
-      local temp_file = os.tmpname() .. ".md"
+      local temp_base = os.tmpname()
+      os.remove(temp_base) -- Remove the file created by os.tmpname()
+      local temp_file = temp_base .. ".md"
 
       -- Get current input text
       local current_text = ""
