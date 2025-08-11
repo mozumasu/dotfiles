@@ -5,16 +5,18 @@ local module = {}
 function module.apply_to_config(config)
   -- Use the defaults as a base
   config.hyperlink_rules = wezterm.default_hyperlink_rules()
-  -- make task numbers clickable
-  -- the first matched regex group is captured in $1.
+  
+  -- GitHub repository format (owner/repo) - only in specific contexts
+  -- Match GitHub URLs that are already partial (missing https://)
   table.insert(config.hyperlink_rules, {
-    regex = [[\b[tt](\d+)\b]],
-    format = "https://example.com/tasks/?t=$1",
+    regex = [[github\.com/([\w\d-]+)/([\w\d.-]+)]],
+    format = "https://github.com/$1/$2",
   })
-
+  
+  -- Match owner/repo when clearly mentioned (e.g., in quotes or after "clone")
   table.insert(config.hyperlink_rules, {
-    regex = [[["]?([\w\d]{1}[-\w\d]+)(/){1}([-\w\d\.]+)["]?]],
-    format = "https://www.github.com/$1/$3",
+    regex = [["([\w\d-]+)/([\w\d.-]+)"]],
+    format = "https://github.com/$1/$2",
   })
 end
 
