@@ -1,6 +1,7 @@
 local wezterm = require("wezterm")
 local act = wezterm.action
 local toggle_term = require("toggle_term")
+local edit_prompt = require("edit_prompt")
 
 local module = {}
 
@@ -9,19 +10,13 @@ local leader = { key = "q", mods = "CTRL", timeout_milliseconds = 2000 }
 local keys = {
   -- Terminal pane toggle
   toggle_term.toggle_term(),
-  
+
   -- Zoom current pane
   { key = "z", mods = "SHIFT|CTRL", action = act.TogglePaneZoomState },
 
-  -- {
-  --   key = "i",
-  --   mods = "CTRL",
-  --   action = wezterm.action.SplitPane({
-  --     direction = "Down",
-  --     size = { Percent = 20 },
-  --     command = { args = { "/Users/mozumasu/.volta/bin/editprompt" } },
-  --   }),
-  -- },
+  -- EditPrompt for Claude Code
+  edit_prompt.edit_prompt(), -- Ctrl+A: Open nvim in split pane
+
   -- Copy mode
   -- { key = "X", mods = "CTRL", action = act.ActivateCopyMode },
   -- 検索ワードをクリアにして Copy mode
