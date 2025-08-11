@@ -14,6 +14,8 @@
       "Bash(grep:*)",
       "Bash(diff:*)",
       "Bash(mkdir:*)",
+      "Bash(touch:*)",
+      "Bash(lua:*)",
       "Bash(cat:*)",
       "Bash(gh pr view:*)",
       "Bash(gh pr diff:*)",
