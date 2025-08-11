@@ -26,14 +26,25 @@ function module.apply_to_config(config)
     -- AWS Account ID (12 digits only)
     '\\b[0-9]{12}\\b',
     
-    -- RDS Endpoint (complete hostname ending with .amazonaws.com)
-    '[\\w\\-]+\\.(?:cluster-)?[\\w\\-]+\\.[\\w\\-]+\\.rds\\.amazonaws\\.com',
     
     -- UUID (hyphen-separated required)
     '\\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\b',
     
     -- S3 URL (starting with s3:// only)
     's3://[a-z0-9][a-z0-9\\-\\.]{1,61}[a-z0-9]',
+    
+    -- AWS Secrets Manager JSON values
+    -- Password-like strings (X characters repeated, common for masked passwords)
+    '\\bX{10,}\\b',
+    
+    -- Alphanumeric strings with special chars (potential passwords, 10+ chars)
+    '[A-Za-z0-9!@#$%^&*()_+=\\-]{10,}',
+    
+    -- RDS hostnames with amazonaws.com
+    '[\\w\\-]+\\.(?:cluster-)?[\\w\\-]+\\.[\\w\\-]+\\.rds\\.amazonaws\\.com',
+    
+    -- Database identifiers (prod-dbcluster, etc.)
+    '\\b(?:prod|dev|staging|test)-[\\w\\-]+\\b',
   }
   
   -- Additional QuickSelect settings
