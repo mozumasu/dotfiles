@@ -163,6 +163,9 @@ snippets:
   - keyword: ic;
     snippet: aws ec2-instance-connect ssh --instance-id {{instance-id}} --os-user {{ec2-user}}
 
+  - keyword: smg;
+    snippet: aws secretsmanager get-secret-value --secret-id {{env-HogePassword}} --query SecretString --output text
+
     # Claude Code
   - keyword: cc
     snippet: claude -c
