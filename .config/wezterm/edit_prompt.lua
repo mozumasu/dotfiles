@@ -176,7 +176,7 @@ function module.edit_prompt()
         file:close()
       end
 
-      -- Open nvim in new pane
+      -- Open nvim in new pane and handle the result
       pane:split({
         direction = "Bottom",
         size = 0.4,
@@ -185,23 +185,46 @@ function module.edit_prompt()
           "-c",
           string.format(
             [[
-            /opt/homebrew/bin/nvim '%s' && \
+            # Edit the file
+            /opt/homebrew/bin/nvim '%s'
+            
+            # Check if file has content
             if [ -s '%s' ]; then
               content=$(cat '%s')
               if [ -n "$content" ]; then
+                # Copy to clipboard
                 echo "$content" | pbcopy
-                echo "✓ Prompt copied to clipboard. Press Cmd+V in Claude Code to paste."
+                
+                # Clean up temp file
+                rm -f '%s'
+                
+                echo "✓ Sending prompt to Claude Code..."
+                
+                # Use wezterm cli to send keystrokes to the original pane
+                /Applications/WezTerm.app/Contents/MacOS/wezterm cli send-text --pane-id=%s --no-paste $'\x15' # Ctrl+U to clear line
+                sleep 0.1
+                # Paste the clipboard content
+                pbpaste | /Applications/WezTerm.app/Contents/MacOS/wezterm cli send-text --pane-id=%s --no-paste
+                
+                echo "✓ Done!"
+                sleep 0.5
               else
                 echo "× No content to send."
+                rm -f '%s'
+                sleep 2
               fi
             else
               echo "× File is empty."
+              rm -f '%s'
+              sleep 2
             fi
-            rm -f '%s'
-            read -p "Press Enter to close this pane..."
             ]],
             temp_file,
             temp_file,
+            temp_file,
+            temp_file,
+            pane:pane_id(),
+            pane:pane_id(),
             temp_file,
             temp_file
           ),
