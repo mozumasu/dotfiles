@@ -30,7 +30,8 @@
       "NotebookEdit",
       "serena*",
       "gemini-cli*",
-      "Fetch"
+      "Fetch",
+      "mcp__*"
     ],
     "deny": [
       "Bash(curl:*)",
