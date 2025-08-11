@@ -14,6 +14,8 @@ SYMLINK_EXCLUDE_FILES=(
   "git-templates"
   "\.zcompdump.*"
   "^\.config/jgit/config$"
+  "^\.config/raycast/extensions/"
+  "^\.config/karabiner/karabiner\.json$"
 )
 
 is_excluded() {
