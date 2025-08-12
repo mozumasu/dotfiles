@@ -185,48 +185,57 @@ function module.edit_prompt()
           "-c",
           string.format(
             [[
+            # Set variables
+            temp_file='%s'
+            pane_id='%s'
+            wezterm_cli="/Applications/WezTerm.app/Contents/MacOS/wezterm cli"
+            
             # Edit the file
-            /opt/homebrew/bin/nvim '%s'
+            /opt/homebrew/bin/nvim "$temp_file"
             
             # Check if file has content
-            if [ -s '%s' ]; then
-              content=$(cat '%s')
+            if [ -s "$temp_file" ]; then
+              content=$(cat "$temp_file")
               if [ -n "$content" ]; then
                 # Copy to clipboard
                 echo "$content" | pbcopy
                 
                 # Clean up temp file
-                rm -f '%s'
+                rm -f "$temp_file"
                 
                 echo "✓ Sending prompt to Claude Code..."
                 
-                # Use wezterm cli to send keystrokes to the original pane
-                /Applications/WezTerm.app/Contents/MacOS/wezterm cli send-text --pane-id=%s --no-paste $'\x15' # Ctrl+U to clear line
-                sleep 0.1
-                # Paste the clipboard content
-                pbpaste | /Applications/WezTerm.app/Contents/MacOS/wezterm cli send-text --pane-id=%s --no-paste
+                # Clear existing text in Claude Code prompt
+                # Go to beginning and clear line multiple times
+                $wezterm_cli send-text --pane-id="$pane_id" --no-paste $'\x01' # Ctrl+A (beginning)
+                sleep 0.05
+                $wezterm_cli send-text --pane-id="$pane_id" --no-paste $'\x0b' # Ctrl+K (kill to end)
+                sleep 0.05
+                
+                # Clear any remaining lines (for multiline prompts)
+                for i in {1..5}; do
+                  $wezterm_cli send-text --pane-id="$pane_id" --no-paste $'\x15' # Ctrl+U (clear line)
+                  sleep 0.02
+                done
+                
+                # Now paste the new content from clipboard
+                pbpaste | $wezterm_cli send-text --pane-id="$pane_id" --no-paste
                 
                 echo "✓ Done!"
                 sleep 0.5
               else
                 echo "× No content to send."
-                rm -f '%s'
+                rm -f "$temp_file"
                 sleep 2
               fi
             else
               echo "× File is empty."
-              rm -f '%s'
+              rm -f "$temp_file"
               sleep 2
             fi
             ]],
             temp_file,
-            temp_file,
-            temp_file,
-            temp_file,
-            pane:pane_id(),
-            pane:pane_id(),
-            temp_file,
-            temp_file
+            pane:pane_id()
           ),
         },
       })
