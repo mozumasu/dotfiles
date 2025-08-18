@@ -157,6 +157,13 @@ snippets:
   - keyword: ghc
     snippet: gh repo create '{{repo_name}}' --private
 
+  - name: gh pr create
+    keyword: ghpr
+    snippet:
+      gh pr create --title "{{title}}" --body "$(cat <<'EOF'
+      {{content}}
+      EOF)"
+
   - keyword: ic;
     snippet: aws ec2-instance-connect ssh --instance-id {{instance-id}} --os-user ec2-user
 
