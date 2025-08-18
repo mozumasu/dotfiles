@@ -157,10 +157,10 @@ snippets:
   - keyword: ghc
     snippet: gh repo create '{{repo_name}}' --private
 
-  - keyword: instance-connect
+  - keyword: ic;
     snippet: aws ec2-instance-connect ssh --instance-id {{instance-id}} --os-user ec2-user
 
-  - keyword: ic;
+  - keyword: icu;
     snippet: aws ec2-instance-connect ssh --instance-id {{instance-id}} --os-user {{ec2-user}}
 
   - keyword: smg;
