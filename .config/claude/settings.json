@@ -54,6 +54,17 @@
   },
   "model": "opus",
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "printf '\\033]133;B\\033\\\\'"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "matcher": "",
