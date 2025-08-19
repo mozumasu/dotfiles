@@ -248,7 +248,7 @@ completions:
     patterns:
       - "^nb e( .*)? $"
       - "^nb edit( .*)? $"
-    sourceCommand: "nb ls --no-color | grep -E '^\\[[0-9]+\\]'"
+    sourceCommand: "nb ls --all --no-color | grep -E '^\\[[0-9]+\\]'"
     options:
       --prompt: "'nb edit >'"
       --preview: "echo {} | sed -E 's/^\\[([0-9]+)\\].*/\\1/' | xargs nb show"
