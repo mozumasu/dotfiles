@@ -42,6 +42,11 @@ source "$ZRCDIR/alias.zsh"
 source "$ZRCDIR/ssh-wezterm.zsh"
 
 # ----------------------------------------------------
+# nb query function
+# ----------------------------------------------------
+source "$HOME/dotfiles/.config/zsh/rc/nb-query.zsh"
+
+# ----------------------------------------------------
 # Options
 # ----------------------------------------------------
 source "$ZRCDIR/option.zsh"
