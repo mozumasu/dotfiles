@@ -52,6 +52,34 @@ return {
           max_height = 40,
         },
       },
+      picker = {
+        sources = {
+          buffers = {
+            format = function(item, picker)
+              -- nb note files
+              if item.file and item.file:match("/nb/home/.*.md") then
+                local file = io.open(item.file, "r")
+                if file then
+                  local first_line = file:read("*l")
+                  file:close()
+                  
+                  -- Extract heading from the first line
+                  local heading = first_line and first_line:match("^#%s+(.+)")
+                  if heading then
+                    -- Return formatted text with note title only
+                    return {
+                      { heading, "TelescopeResultsIdentifier" }
+                    }
+                  end
+                end
+              end
+              
+              -- Use default format for other files
+              return picker.format.format(item, picker, "buffer")
+            end
+          }
+        }
+      },
     },
   },
 }
