@@ -61,3 +61,6 @@ zenn-cli.json
 
 # Vagrant
 .vagrant
+
+# serena
+.serena
