@@ -679,13 +679,24 @@ function newapp() {
 }
 
 notify() {
+  # Capture the exit status of the previous command
+  local prev_exit_status=$?
+  local message
+  
+  # Determine message based on exit status
+  if [ "$prev_exit_status" -eq 0 ]; then
+    message="complete"
+  else
+    message="failed"
+  fi
+  
   # Determine two patterns
   # 1) Numbers only: sleep as minutes
   # 2) hh:mm format: Calculate the number of seconds up to the specified time and sleep
 
   # No arguments → Immediately
   if [ -z "$1" ]; then
-    nohup terminal-notifier -message "complete" >/dev/null 2>&1 &
+    nohup terminal-notifier -message "$message" >/dev/null 2>&1 &
     return
   fi
 
@@ -695,7 +706,7 @@ notify() {
 
   if [[ "$1" =~ $re_min ]]; then
     # Only numbers → Treat as minutes
-    nohup sh -c "(sleep ${1}m && terminal-notifier -message \"Time's up! (${1} min)\")" \
+    nohup sh -c "(sleep ${1}m && terminal-notifier -message \"$message: Time's up! (${1} min)\")" \
       >/dev/null 2>&1 &
 
   elif [[ "$1" =~ $re_time ]]; then
@@ -718,7 +729,7 @@ notify() {
 
     # Measure the number of sleep seconds
     local wait_sec=$(( target - now ))
-    nohup sh -c "(sleep ${wait_sec} && terminal-notifier -message \"Time's up! (${H}:${M})\")" \
+    nohup sh -c "(sleep ${wait_sec} && terminal-notifier -message \"$message: Time's up! (${H}:${M})\")" \
       >/dev/null 2>&1 &
 
   else
