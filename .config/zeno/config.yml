@@ -196,6 +196,9 @@ snippets:
     context:
       lbuffer: '.+;'
 
+  - keyword: cdkls
+    snippet: cdk list -c env=
+
 completions:
   # simple sourceCommand, no callback
   - name: kill signal
