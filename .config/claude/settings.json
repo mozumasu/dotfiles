@@ -52,7 +52,8 @@
       "Bash(npm remove:*)"
     ],
     "additionalDirectories": [
-      "~/src/github.com/mozumasu/nb"
+      "~/src/github.com/mozumasu/nb",
+      "~/src/github.com/mozumasu/zenn/articles"
     ]
   },
   "model": "opus",
