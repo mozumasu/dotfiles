@@ -19,6 +19,9 @@ source "$ZRCDIR/bindkey.zsh"
 # ----------------------------------------------------
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
+# Prioritize Japanese man pages
+export MANPATH="/usr/local/share/man/ja_JP.UTF-8:$(manpath)"
+
 # ----------------------------------------------------
 # Function
 # ----------------------------------------------------
