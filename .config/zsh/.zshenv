@@ -14,9 +14,6 @@ export XDG_CACHE_HOME=${HOME}/.cache
 export XDG_DATA_HOME=${HOME}/.local/share
 export XDG_STATE_HOME=${HOME}/.local/state
 
-# Prioritize Japanese man pages
-export MANPATH="/usr/local/share/man/ja_jp.utf-8:$(manpath)"
-
 # claude
 export CLAUDE_CONFIG_DIR=${XDG_CONFIG_HOME}/claude
 
