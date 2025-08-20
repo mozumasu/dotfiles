@@ -733,7 +733,8 @@ notify() {
       >/dev/null 2>&1 &
 
   else
-    echo "Usage: notify [minutes|HH:MM]"
+    # Silent error - don't output usage to console
+    return 1
   fi
 }
 # github cli
