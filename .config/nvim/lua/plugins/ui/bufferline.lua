@@ -4,7 +4,7 @@ return {
     options = {
       name_formatter = function(buf)
         -- Detect nb repository note files
-        if buf.path:match("/nb/home/.*.md") then
+        if buf.path:match("/nb/.*%.md$") then
           local file = io.open(buf.path, "r")
           if not file then
             return
