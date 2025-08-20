@@ -190,6 +190,12 @@ snippets:
     snippet: zsh -c "$HOME/.config/zeno/scripts/package-manager.ts"
     evaluate: true
 
+  - name: notify function
+    keyword: n
+    snippet: notify
+    context:
+      lbuffer: '.+;'
+
 completions:
   # simple sourceCommand, no callback
   - name: kill signal
