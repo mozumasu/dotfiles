@@ -50,6 +50,9 @@
       "Write(**/secrets/**)",
       "Bash(npm uninstall:*)",
       "Bash(npm remove:*)"
+    ],
+    "additionalDirectories": [
+      "~/src/github.com/mozumasu/nb"
     ]
   },
   "model": "opus",
