@@ -49,5 +49,6 @@ if [[ -n $ZENO_LOADED ]]; then
   bindkey '^r'   zeno-history-selection
   bindkey '^x^s' zeno-insert-snippet
   bindkey '^x^f' zeno-snippet-next-placeholder
+  bindkey "^X^[[C" zeno-snippet-next-placeholder
   # bindkey '^x^f' zeno-ghq-cd
 fi

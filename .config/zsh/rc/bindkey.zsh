@@ -5,6 +5,8 @@
 
 # Use emacs keybind
 bindkey -e
+# remove default keybind
+bindkey -r "^X^F"
 
 # fzf
 zle -N fzf-history-widget
