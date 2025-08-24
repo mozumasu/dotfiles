@@ -49,3 +49,11 @@ setopt no_beep
 # Do not display file type launch at the end of completion candidates.
 unsetopt list_types
 
+
+# ----------------------------------------------------
+# tty
+# ----------------------------------------------------
+# only run if stdin is a tty
+if [[ -t 0 ]]; then
+  stty -ixon
+fi
