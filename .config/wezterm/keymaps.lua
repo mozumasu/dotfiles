@@ -138,8 +138,6 @@ local keys = {
   -- { key = "UpArrow", mods = "SHIFT|ALT|CTRL", action = act.AdjustPaneSize({ "Up", 1 }) },
   -- { key = "DownArrow", mods = "SHIFT|ALT|CTRL", action = act.AdjustPaneSize({ "Down", 1 }) },
 
-  -- Convert ¥ key to \
-  { key = "¥", mods = "ALT", action = act.SendKey({ key = "\\" }) },
   {
     key = ",",
     mods = "SUPER",
