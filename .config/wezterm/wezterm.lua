@@ -30,6 +30,8 @@ config.automatically_reload_config = true
 config.audible_bell = "Disabled"
 -- 日本語を入力するのに必要
 config.use_ime = true
+-- Enable entering backslashes
+config.send_composed_key_when_left_alt_is_pressed = true
 -- https://github.com/mtgto/macSKK?tab=readme-ov-file#q-wezterm-%E3%81%A7-c-j-%E3%82%92%E6%8A%BC%E3%81%99%E3%81%A8%E6%94%B9%E8%A1%8C%E3%81%95%E3%82%8C%E3%81%A6%E3%81%97%E3%81%BE%E3%81%84%E3%81%BE%E3%81%99
 config.macos_forward_to_ime_modifier_mask = "SHIFT|CTRL"
 
