@@ -278,6 +278,15 @@ completions:
     options:
       --prompt: "'browse repo >'"
     callback: "ghq get ${1}"
+  
+  - name: gh run ID
+    patterns:
+      - "^gh run (watch|view|cancel|download|rerun)( .*)? $"
+    sourceCommand: gh run list --limit 20 --json databaseId,status,conclusion,displayTitle,workflowName | jq -r '.[] | "\(.databaseId)\t[\(if .status != "completed" then "⚡" elif .conclusion == "success" then "✓" elif .conclusion == "failure" then "✗" else "⚠" end)] \(.displayTitle) (\(.workflowName))"'
+    options:
+      --prompt: "'Run ID> '"
+      --preview: "echo {} | cut -f2-"
+    callback: "awk '{print $1}'"
 
   - name: instance-id
     patterns:
