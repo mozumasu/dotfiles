@@ -30,10 +30,12 @@
       "Write",
       "MultiEdit",
       "NotebookEdit",
-      "mcp__serena*",
-      "gemini-cli*",
       "Fetch",
-      "mcp__*"
+      "mcp__context7",
+      "mcp__serena",
+      "mcp__gemini-cli",
+      "mcp__aws-cdk-mcp-server",
+      "mcp__aws-documentation-mcp-server"
     ],
     "deny": [
       "Bash(curl:*)",
