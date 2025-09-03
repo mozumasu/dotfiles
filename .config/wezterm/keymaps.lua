@@ -55,17 +55,18 @@ local keys = {
   {
     key = "a",
     mods = "LEADER",
-    action = wezterm.action_callback(function(_, pane)
-      pane:split({
+    action = wezterm.action_callback(function(window, pane)
+      local new_pane = pane:split({
         direction = "Right",
-        size = 0.5,
+        size = 1.0,
         args = {
           os.getenv("SHELL"),
-          "-c",
-          "-l",
-          "wezterm cli get-text --pane-id=" .. pane:pane_id() .. " --start-line -999999 | /opt/homebrew/bin/nvim -R -",
+          "-lc",
+          "wezterm cli get-text --pane-id=" .. pane:pane_id() .. " --start-line -999999 | nvim -R -",
         },
       })
+      new_pane:activate()
+      window:perform_action(act.TogglePaneZoomState, new_pane)
     end),
   },
   -- Char select
