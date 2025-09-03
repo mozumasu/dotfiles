@@ -397,3 +397,4 @@ auto-update = download
 # stable / tip
 # This only works on macOS since only macOS has an auto-update feature.
 auto-update-channel = tip
+keybind = shift+enter=text:\n
