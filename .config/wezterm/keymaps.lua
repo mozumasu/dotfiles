@@ -51,6 +51,23 @@ local keys = {
   -- Zoom mode
   --     { key = "Z", mods = "CTRL", action = act.TogglePaneZoomState },
   { key = "z", mods = "LEADER", action = act.TogglePaneZoomState },
+  -- View terminal history in nvim
+  {
+    key = "a",
+    mods = "LEADER",
+    action = wezterm.action_callback(function(_, pane)
+      pane:split({
+        direction = "Right",
+        size = 0.5,
+        args = {
+          os.getenv("SHELL"),
+          "-c",
+          "-l",
+          "wezterm cli get-text --pane-id=" .. pane:pane_id() .. " --start-line -999999 | /opt/homebrew/bin/nvim -R -",
+        },
+      })
+    end),
+  },
   -- Char select
   {
     key = "U",
