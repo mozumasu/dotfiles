@@ -66,8 +66,6 @@ local keys = {
           "wezterm cli get-text --pane-id="
             .. pane:pane_id()
             .. " --start-line -999999 --escapes | nvim -R "
-            .. "-c 'setlocal conceallevel=2' "
-            .. "-c 'silent! WezEscFix' "
             .. "-c 'silent! BaleiaColorize' "
             .. "-c 'normal! G' -",
         },
