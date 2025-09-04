@@ -56,13 +56,16 @@ local keys = {
     key = "a",
     mods = "LEADER",
     action = wezterm.action_callback(function(window, pane)
+      local dims = pane:get_dimensions()
       local new_pane = pane:split({
         direction = "Right",
         size = 1.0,
         args = {
           os.getenv("SHELL"),
           "-lc",
-          "wezterm cli get-text --pane-id=" .. pane:pane_id() .. " --start-line -999999 | nvim -R -",
+          "wezterm cli get-text --pane-id="
+            .. pane:pane_id()
+            .. " --start-line -999999 --escapes | nvim -R -c 'normal! G' -",
         },
       })
       new_pane:activate()
