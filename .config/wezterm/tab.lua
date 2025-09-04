@@ -241,6 +241,16 @@ function module.apply_to_config(config)
     end
 
     local title = " " .. wezterm.truncate_right(cwd, max_width) .. " "
+    
+    -- Add zoom indicator if the pane is zoomed
+    local zoom_indicator = ""
+    for _, pane_info in ipairs(tab.panes) do
+      if pane_info.is_zoomed then
+        zoom_indicator = wezterm.nerdfonts.md_magnify .. " "
+        break
+      end
+    end
+    
     return {
       { Background = { Color = edge_background } },
       { Text = " " },
@@ -249,6 +259,9 @@ function module.apply_to_config(config)
       { Background = { Color = background } },
       { Foreground = { Color = icon_foreground } },
       { Text = icon },
+      { Background = { Color = background } },
+      { Foreground = { Color = foreground } },
+      { Text = zoom_indicator },
       { Background = { Color = background } },
       { Foreground = { Color = foreground } },
       { Attribute = { Intensity = "Bold" } },
