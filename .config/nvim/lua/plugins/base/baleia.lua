@@ -1,15 +1,27 @@
 return {
   "m00qek/baleia.nvim",
   version = "*",
-  config = function()
+  -- Keep plugin lazy, but expose commands/autocmds early.
+  -- We lazy-require baleia in callbacks as needed.
+  init = function()
     ---@class BaleiaObj
     ---@field once fun(buffer: integer)
     ---@field automatically fun(buffer: integer)
     ---@field logger { show: fun() }
 
-    ---@type BaleiaObj
-    local baleia = require("baleia").setup({})
-    vim.g.baleia = baleia -- 必要ならグローバルにも残す
+    -- Lazy loader for baleia
+    local function ensure_baleia()
+      if vim.g.baleia then
+        return vim.g.baleia
+      end
+      local ok, mod = pcall(require, "baleia")
+      if not ok then
+        return nil
+      end
+      local b = mod.setup({})
+      vim.g.baleia = b
+      return b
+    end
 
     -- 最小VTレンダラ（前回のまま）...
     local function render_ansi_current_buf()
@@ -216,12 +228,18 @@ return {
 
     vim.api.nvim_create_user_command("BaleiaColorize", function()
       local bufnr = vim.api.nvim_get_current_buf()
-      ---@diagnostic disable-next-line:param-type-mismatch
-      baleia.once(bufnr)
+      local b = ensure_baleia()
+      if b then
+        ---@diagnostic disable-next-line:param-type-mismatch
+        b.once(bufnr)
+      end
     end, { bang = true })
 
     vim.api.nvim_create_user_command("BaleiaLogs", function()
-      baleia.logger.show()
+      local b = ensure_baleia()
+      if b then
+        b.logger.show()
+      end
     end, { bang = true })
 
     -- stdin から読むとき
@@ -229,8 +247,11 @@ return {
       callback = function()
         render_ansi_current_buf()
         local bufnr = vim.api.nvim_get_current_buf()
-        ---@diagnostic disable-next-line:param-type-mismatch
-        baleia.automatically(bufnr)
+        local b = ensure_baleia()
+        if b then
+          ---@diagnostic disable-next-line:param-type-mismatch
+          b.automatically(bufnr)
+        end
       end,
     })
 
@@ -239,8 +260,11 @@ return {
       pattern = { "*.wezesc", "*.esc", "*.ansilog" },
       callback = function(ctx)
         render_ansi_current_buf()
-        ---@diagnostic disable-next-line:param-type-mismatch
-        baleia.automatically(ctx.buf) -- ctx.buf は bufnr
+        local b = ensure_baleia()
+        if b then
+          ---@diagnostic disable-next-line:param-type-mismatch
+          b.automatically(ctx.buf) -- ctx.buf は bufnr
+        end
       end,
     })
   end,
