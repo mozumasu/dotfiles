@@ -15,6 +15,7 @@ local keys = {
 
   -- Zoom current pane
   { key = "z", mods = "SHIFT|CTRL", action = act.TogglePaneZoomState },
+  { key = "s", mods = "SHIFT|CTRL", action = act.PaneSelect },
 
   -- EditPrompt for Claude Code
   edit_prompt.edit_prompt(), -- Ctrl+A: Open nvim in split pane
