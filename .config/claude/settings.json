@@ -36,7 +36,7 @@
       "mcp__gemini-cli",
       "mcp__aws-cdk-mcp-server",
       "mcp__aws-documentation-mcp-server",
-      "mcp__playwrighte"
+      "mcp__playwright"
     ],
     "deny": [
       "Bash(curl:*)",
