@@ -67,33 +67,11 @@ function module.edit_prompt()
         end
       end
 
-      -- ボックスから取れたら結合 取れなければ最後に見つかったまともな1行を採用
+      -- ボックスから取れたら結合 取れなければ空のまま
       if #prompt_lines > 0 then
         current_text = table.concat(prompt_lines, "\n")
       else
-        for i = #all_lines, 1, -1 do
-          local line = all_lines[i]
-          if line and line ~= "" then
-            local clean = line
-            clean = clean:gsub(string.char(194, 160), " ")
-            clean = clean:gsub("^│%s*", ""):gsub("^┃%s*", ""):gsub("^|%s*", "")
-            clean = clean:gsub("%s*│$", ""):gsub("%s*┃$", ""):gsub("%s*|$", "")
-            clean = clean:gsub("^>%s*", "")
-            clean = clean:gsub("^%s+", ""):gsub("%s+$", "")
-            if
-              clean ~= ""
-              and not clean:match("^Press ")
-              and not clean:match("^✓")
-              and not clean:match("^×")
-              and not clean:match("^🤖")
-              and not clean:match("^⏺")
-              and not clean:match("^✻")
-            then
-              current_text = clean
-              break
-            end
-          end
-        end
+        current_text = ""
       end
 
       -- 整形せずにそのまま一時ファイルへ書き出し
