@@ -102,19 +102,17 @@ function module.edit_prompt()
             if [ -s "$temp_file" ]; then
               content=$(cat "$temp_file")
               if [ -n "$content" ]; then
-                # クリップボードへ投入
-                echo "$content" | pbcopy
-                # 一時ファイルを削除
-                rm -f "$temp_file"
-
                 echo "✓ Sending prompt to Claude Code..."
 
                 # 既存入力を Ctrl+L の生キー送信でクリア
                 $wezterm_cli send-text --pane-id="$pane_id" --no-paste $'\x0c'
                 sleep 0.05
 
-                # bracketed paste で複数行を安定送信
-                pbpaste | $wezterm_cli send-text --pane-id="$pane_id"
+                # tmpfileから直接 bracketed paste で複数行を送信
+                cat "$temp_file" | $wezterm_cli send-text --pane-id="$pane_id"
+                
+                # 一時ファイルを削除
+                rm -f "$temp_file"
 
                 echo "✓ Done!"
                 sleep 0.5
