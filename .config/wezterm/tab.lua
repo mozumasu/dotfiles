@@ -101,9 +101,16 @@ function module.apply_to_config(config)
     wezterm.log_info("Current workspace: " .. tostring(workspace))
     table.insert(left_status, " " .. workspace .. " ")
 
+    -- Check if in copy mode
+    local key_table = window:active_key_table()
+    local workspace_color = "#80EBDF"  -- Default color (cyan)
+    if key_table == "copy_mode" then
+      workspace_color = "#ffd700"  -- Yellow for copy mode
+    end
+
     -- Shown on the left
     window:set_left_status(wezterm.format({
-      { Foreground = { Color = "#80EBDF" } },
+      { Foreground = { Color = workspace_color } },
       { Text = " " .. table.concat(left_status, " | ") .. " " },
     }))
   end)
