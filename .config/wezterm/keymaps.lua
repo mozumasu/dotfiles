@@ -147,6 +147,8 @@ local keys = {
   { key = "PageUp", mods = "SHIFT|CTRL", action = act.MoveTabRelative(-1) },
   { key = "PageDown", mods = "SHIFT", action = act.ScrollByPage(0.02) },
   { key = "PageDown", mods = "SHIFT|CTRL", action = act.MoveTabRelative(1) },
+  { key = "p", mods = "ALT|CTRL", action = act.ScrollByPage(-0.5) },
+  { key = "n", mods = "ALT|CTRL", action = act.ScrollByPage(0.5) },
 
   -- Pane
   { key = "h", mods = "LEADER", action = act.ActivatePaneDirection("Left") },
@@ -268,8 +270,8 @@ local keys = {
     mods = "SUPER|SHIFT",
     action = wezterm.action.ToggleAlwaysOnTop,
   },
-  { key = "n", mods = "CTRL|ALT", action = act.SwitchWorkspaceRelative(1) },
-  { key = "p", mods = "CTRL|ALT", action = act.SwitchWorkspaceRelative(-1) },
+  { key = "n", mods = "CTRL|CMD", action = act.SwitchWorkspaceRelative(1) },
+  { key = "p", mods = "CTRL|CMD", action = act.SwitchWorkspaceRelative(-1) },
 }
 
 local key_tables = {
@@ -323,6 +325,8 @@ local key_tables = {
     -- scroll
     { key = "PageUp", mods = "NONE", action = act.CopyMode("PageUp") },
     { key = "PageDown", mods = "NONE", action = act.CopyMode("PageDown") },
+    { key = "p", mods = "ALT|CTRL", action = act.CopyMode("PageUp") },
+    { key = "n", mods = "ALT|CTRL", action = act.CopyMode("PageDown") },
     { key = "e", mods = "CTRL", action = act.ScrollByPage(-0.01) },
     { key = "y", mods = "CTRL", action = act.ScrollByPage(0.02) },
     { key = "u", mods = "CTRL", action = act.CopyMode({ MoveByPage = -0.5 }) },
