@@ -68,3 +68,4 @@ vim.api.nvim_create_autocmd("WinLeave", {
     end
   end,
 })
+vim.opt.whichwrap = "b,s,h,l,<,>,[,],~"
