@@ -17,10 +17,24 @@ source "$ZRCDIR/bindkey.zsh"
 # ----------------------------------------------------
 # homebrew
 # ----------------------------------------------------
-eval "$(/opt/homebrew/bin/brew shellenv)"
+# eval "$(/opt/homebrew/bin/brew shellenv)"
+export HOMEBREW_PREFIX="/opt/homebrew";
+export HOMEBREW_CELLAR="/opt/homebrew/Cellar";
+export HOMEBREW_REPOSITORY="/opt/homebrew";
+fpath[1,0]="/opt/homebrew/share/zsh/site-functions";
+[ -z "${MANPATH-}" ] || export MANPATH=":${MANPATH#:}";
+export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
 
 # Prioritize Japanese man pages
 export MANPATH="/usr/local/share/man/ja_JP.UTF-8:$(manpath)"
+
+# ----------------------------------------------------
+# mise
+# ----------------------------------------------------
+if type mise &>/dev/null; then
+  eval "$(mise activate zsh)"
+  eval "$(mise activate --shims)"
+fi
 
 # ----------------------------------------------------
 # Function
