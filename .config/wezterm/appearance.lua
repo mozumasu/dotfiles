@@ -34,8 +34,8 @@ local appearance = {
 
   --pane
   inactive_pane_hsb = {
-    saturation = 1.0,
-    brightness = 0.5,
+    saturation = 0.5,
+    brightness = 1.0,
   },
   default_cursor_style = "SteadyBlock", -- BlinkingBlock, SteadyUnderline, BlinkingUnderline, SteadyBar, BlinkingBar
   hide_mouse_cursor_when_typing = true,
