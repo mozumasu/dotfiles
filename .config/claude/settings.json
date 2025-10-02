@@ -59,7 +59,6 @@
       "~/src/github.com/mozumasu/zenn/articles"
     ]
   },
-  "model": "opus",
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -95,6 +94,11 @@
       }
     ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "npx ccusage@latest statusline"
+  },
+  "alwaysThinkingEnabled": false,
   "maxTokens": 8192,
   "temperature": 0,
   "preferences": {
@@ -103,9 +107,5 @@
       "concise": false,
       "includeExplanations": false
     }
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "npx ccusage@latest statusline"
   }
 }
