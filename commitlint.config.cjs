@@ -1,6 +1,4 @@
-const { defineConfig } = require("cz-git");
-
-module.exports = defineConfig({
+module.exports = {
   rules: {
     // @see: https://commitlint.js.org/#/reference-rules
   },
@@ -107,4 +105,4 @@ module.exports = defineConfig({
     defaultScope: "",
     defaultSubject: "",
   },
-});
+};
