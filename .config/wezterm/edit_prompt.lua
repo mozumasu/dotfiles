@@ -33,13 +33,15 @@ function module.edit_prompt()
       end
 
       -- 直近のボックスを検出（下から上へ探索）
+      -- 新しいレイアウト: ── の罫線で囲まれたボックス
       local prompt_lines = {}
       local box_end, box_start = 0, 0
       for i = #all_lines, 1, -1 do
         local l = all_lines[i]
-        if l:match("^╰─") and box_end == 0 then
+        -- 罫線パターン（─ が10個以上連続）を検出
+        if l:match("^─────────") and box_end == 0 then
           box_end = i
-        elseif l:match("^╭─") and box_end > 0 then
+        elseif l:match("^─────────") and box_end > 0 then
           box_start = i
           break
         end
