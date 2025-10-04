@@ -13,6 +13,8 @@ local keys = {
   -- Terminal pane toggle (right)
   toggle_term.toggle_term_right(),
 
+  -- Treat Alt as Meta while keeping backslash functionality (Alt+¥)
+  { key = "¥", mods = "ALT", action = wezterm.action.SendString("\\") },
   -- Zoom current pane
   { key = "z", mods = "SHIFT|CTRL", action = act.TogglePaneZoomState },
   { key = "s", mods = "SHIFT|CTRL", action = act.PaneSelect },
