@@ -157,10 +157,11 @@ local keys = {
   { key = "l", mods = "LEADER", action = act.ActivatePaneDirection("Right") },
   { key = "k", mods = "LEADER", action = act.ActivatePaneDirection("Up") },
   { key = "j", mods = "LEADER", action = act.ActivatePaneDirection("Down") },
-  -- { key = "h", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Left") },
-  -- { key = "l", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Right") },
-  -- { key = "k", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Up") },
-  -- { key = "j", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Down") },
+  -- <C-h> has been remapped to Backspace, so Backspace must be specified here
+  { key = "Backspace", mods = "SHIFT", action = act.ActivatePaneDirection("Left") },
+  { key = "l", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Right") },
+  { key = "k", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Up") },
+  { key = "j", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Down") },
 
   -- key_tables で設定するため非有効
   -- { key = "LeftArrow", mods = "SHIFT|ALT|CTRL", action = act.AdjustPaneSize({ "Left", 1 }) },

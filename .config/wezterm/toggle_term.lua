@@ -6,7 +6,7 @@ local module = {}
 function module.toggle_term()
   return {
     key = "j",
-    mods = "SHIFT|CTRL",
+    mods = "SUPER|CTRL",
     action = wezterm.action_callback(function(window, pane)
       local tab = pane:tab()
       local panes = tab:panes()
