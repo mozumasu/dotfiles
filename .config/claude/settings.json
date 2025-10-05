@@ -77,6 +77,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "echo '{\"systemMessage\": \"───────────────────────────────────────────────────────────────────────────────\"}'"
+          },
+          {
+            "type": "command",
             "command": "terminal-notifier -title \"Claude\" -message \"$(basename \"$PWD\")\" & \nafplay /System/Library/Sounds/Glass.aiff"
           }
         ]
