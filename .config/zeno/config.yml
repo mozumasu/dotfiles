@@ -385,3 +385,8 @@ completions:
     patterns:
     - '^.*\bmise plugins uninstall\s*$'
     sourceCommand: mise plugins ls
+
+  - name: cloudformation stack name
+    patterns:
+    - 'aws cloudformation.*--stack-name'
+    sourceCommand: aws cloudformation describe-stacks --query 'Stacks[].StackName' --output text | tr '\t' '\n'
