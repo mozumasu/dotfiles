@@ -390,3 +390,10 @@ completions:
     patterns:
     - 'aws cloudformation.*--stack-name'
     sourceCommand: aws cloudformation describe-stacks --query 'Stacks[].StackName' --output text | tr '\t' '\n'
+
+  - name: aws cli completer
+    patterns:
+      - '^\s*aws(?:$|\s.*)$'
+    sourceCommand: 'COMP_LINE="${LBUFFER}${RBUFFER}" COMP_POINT=${#LBUFFER} aws_completer 2>/dev/null'
+    options:
+      --prompt: "'aws > '"
