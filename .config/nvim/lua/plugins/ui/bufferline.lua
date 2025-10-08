@@ -11,7 +11,12 @@ return {
           end
           local first_line = file:read("*l")
           file:close()
-          
+
+          -- Check if file is empty or first line is nil
+          if not first_line then
+            return
+          end
+
           -- Extract heading from the first line
           local heading = first_line:match("^#%s+(.+)")
           if heading then
@@ -23,3 +28,4 @@ return {
     },
   },
 }
+
