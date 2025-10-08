@@ -3,6 +3,96 @@ local act = wezterm.action
 
 local module = {}
 
+-- Store the workspace we came from before switching to scratch
+local previous_workspace = nil
+
+-- Toggle scratch workspace
+local function toggle_scratch_workspace()
+  return wezterm.action_callback(function(window, pane)
+    local current = wezterm.mux.get_active_workspace()
+
+    if current == "scratch" then
+      -- If in scratch, go back to previous workspace or default
+      local target = previous_workspace or "default"
+      window:perform_action(act.SwitchToWorkspace({ name = target }), pane)
+    else
+      -- Store current workspace and switch to scratch
+      previous_workspace = current
+      window:perform_action(act.SwitchToWorkspace({ name = "scratch" }), pane)
+    end
+  end)
+end
+
+-- Switch to next workspace, skipping scratch
+local function switch_to_next_workspace_skip_scratch()
+  return wezterm.action_callback(function(window, pane)
+    local workspaces = wezterm.mux.get_workspace_names()
+    local current = wezterm.mux.get_active_workspace()
+
+    -- Filter out scratch workspace
+    local filtered = {}
+    for _, ws in ipairs(workspaces) do
+      if ws ~= "scratch" then
+        table.insert(filtered, ws)
+      end
+    end
+
+    -- Find current index
+    local current_index = 1
+    for i, ws in ipairs(filtered) do
+      if ws == current then
+        current_index = i
+        break
+      end
+    end
+
+    -- Get next workspace
+    local next_index = current_index + 1
+    if next_index > #filtered then
+      next_index = 1
+    end
+
+    if #filtered > 0 then
+      window:perform_action(act.SwitchToWorkspace({ name = filtered[next_index] }), pane)
+    end
+  end)
+end
+
+-- Switch to previous workspace, skipping scratch
+local function switch_to_prev_workspace_skip_scratch()
+  return wezterm.action_callback(function(window, pane)
+    local workspaces = wezterm.mux.get_workspace_names()
+    local current = wezterm.mux.get_active_workspace()
+
+    -- Filter out scratch workspace
+    local filtered = {}
+    for _, ws in ipairs(workspaces) do
+      if ws ~= "scratch" then
+        table.insert(filtered, ws)
+      end
+    end
+
+    -- Find current index
+    local current_index = 1
+    for i, ws in ipairs(filtered) do
+      if ws == current then
+        current_index = i
+        break
+      end
+    end
+
+    -- Get previous workspace
+    local prev_index = current_index - 1
+    if prev_index < 1 then
+      prev_index = #filtered
+    end
+
+    if #filtered > 0 then
+      window:perform_action(act.SwitchToWorkspace({ name = filtered[prev_index] }), pane)
+    end
+  end)
+end
+
 local function kill_workspace(workspace)
   return function(_, _, _)
     workspace = workspace or wezterm.mux.get_active_workspace()
@@ -51,19 +141,26 @@ local function kill_workspace(workspace)
 end
 
 local keys = {
+  -- Toggle scratch workspace with CTRL+CMD+s
+  { key = "s", mods = "CTRL|CMD", action = toggle_scratch_workspace() },
+
   {
     mods = "LEADER",
     key = "w",
     action = wezterm.action_callback(function(win, pane)
       -- 現在のPaneでworkspace_modeを有効化
       win:perform_action(act.ActivateKeyTable({ name = "workspace_mode", one_shot = false }), pane)
-      -- workspace のリストを作成
+      -- workspace のリストを作成 (scratchを除外)
       local workspaces = {}
-      for i, name in ipairs(wezterm.mux.get_workspace_names()) do
-        table.insert(workspaces, {
-          id = name,
-          label = string.format("%d. %s", i, name),
-        })
+      local index = 1
+      for _, name in ipairs(wezterm.mux.get_workspace_names()) do
+        if name ~= "scratch" then
+          table.insert(workspaces, {
+            id = name,
+            label = string.format("%d. %s", index, name),
+          })
+          index = index + 1
+        end
       end
       local current = wezterm.mux.get_active_workspace()
       -- 選択メニューを起動
@@ -136,5 +233,9 @@ function module.apply_to_config(config)
     config.key_tables[name] = table_def
   end
 end
+
+-- Export functions for use in keymaps.lua
+module.switch_to_next_workspace_skip_scratch = switch_to_next_workspace_skip_scratch
+module.switch_to_prev_workspace_skip_scratch = switch_to_prev_workspace_skip_scratch
 
 return module

@@ -2,6 +2,7 @@ local wezterm = require("wezterm")
 local act = wezterm.action
 local toggle_term = require("toggle_term")
 local edit_prompt = require("edit_prompt")
+local workspace = require("workspace")
 
 local module = {}
 
@@ -273,8 +274,9 @@ local keys = {
     mods = "SUPER|SHIFT",
     action = wezterm.action.ToggleAlwaysOnTop,
   },
-  { key = "n", mods = "CTRL|CMD", action = act.SwitchWorkspaceRelative(1) },
-  { key = "p", mods = "CTRL|CMD", action = act.SwitchWorkspaceRelative(-1) },
+  -- Skip scratch workspace when switching workspaces
+  { key = "n", mods = "CTRL|CMD", action = workspace.switch_to_next_workspace_skip_scratch() },
+  { key = "p", mods = "CTRL|CMD", action = workspace.switch_to_prev_workspace_skip_scratch() },
 }
 
 local key_tables = {
