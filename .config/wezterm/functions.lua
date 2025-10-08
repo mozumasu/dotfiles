@@ -4,14 +4,14 @@ local module = {}
 
 function module.apply_to_config(config)
   -- 透明度調整のキーを追加
-  table.insert(config.key_tables.config_mode, { key = ";", action = act({ EmitEvent = "increase-opacity" }) })
-  table.insert(config.key_tables.config_mode, { key = "-", action = act({ EmitEvent = "decrease-opacity" }) })
-  table.insert(config.key_tables.config_mode, { key = "0", action = act({ EmitEvent = "reset-opacity" }) })
+  table.insert(config.key_tables.setting_mode, { key = ";", action = act({ EmitEvent = "increase-opacity" }) })
+  table.insert(config.key_tables.setting_mode, { key = "-", action = act({ EmitEvent = "decrease-opacity" }) })
+  table.insert(config.key_tables.setting_mode, { key = "0", action = act({ EmitEvent = "reset-opacity" }) })
 end
 
-local function reactivate_config_mode(window)
+local function reactivate_setting_mode(window)
   window:perform_action(
-    wezterm.action.ActivateKeyTable({ name = "config_mode", one_shot = false }),
+    wezterm.action.ActivateKeyTable({ name = "setting_mode", one_shot = false }),
     window:active_pane()
   )
 end
@@ -26,7 +26,7 @@ local function adjust_opacity(window, delta, config)
   overrides.window_background_opacity = new_opacity
   window:set_config_overrides(overrides)
 
-  reactivate_config_mode(window)
+  reactivate_setting_mode(window)
 end
 
 wezterm.on("decrease-opacity", function(window, config)
@@ -42,7 +42,7 @@ wezterm.on("reset-opacity", function(window, config)
   overrides.window_background_opacity = config.window_background_opacity
   window:set_config_overrides(overrides)
 
-  reactivate_config_mode(window)
+  reactivate_setting_mode(window)
 end)
 
 return module

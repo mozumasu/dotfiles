@@ -51,11 +51,9 @@ local function kill_workspace(workspace)
 end
 
 local keys = {
-  -- custom mode
-  -- { key = "s", mods = "LEADER", action = act.ActivateKeyTable({ name = "config_mode", one_shot = false }) },
   {
     mods = "LEADER",
-    key = "s",
+    key = "w",
     action = wezterm.action_callback(function(win, pane)
       -- 現在のPaneでworkspace_modeを有効化
       win:perform_action(act.ActivateKeyTable({ name = "workspace_mode", one_shot = false }), pane)
