@@ -87,7 +87,7 @@ local keys = {
   },
 
   -- custom mode
-  { key = "c", mods = "LEADER", action = act.ActivateKeyTable({ name = "config_mode", one_shot = false }) },
+  { key = "s", mods = "LEADER", action = act.ActivateKeyTable({ name = "setting_mode", one_shot = false }) },
 
   -- Application
   { key = "h", mods = "SUPER", action = act.HideApplication },
@@ -382,7 +382,7 @@ local key_tables = {
     { key = "X", mods = "CTRL", action = act.ActivateCopyMode },
   },
   -- custom key tables
-  config_mode = {
+  setting_mode = {
     { key = "h", action = act.AdjustPaneSize({ "Left", 1 }) },
     { key = "l", action = act.AdjustPaneSize({ "Right", 1 }) },
     { key = "k", action = act.AdjustPaneSize({ "Up", 1 }) },
