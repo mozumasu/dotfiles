@@ -52,7 +52,6 @@ require("lazy").setup({
     { import = "plugins.editor" },
     { import = "plugins.disable" },
     { import = "plugins.plamo-translate" },
-    { import = "plugins.plenary" },
   },
   defaults = {
     -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
