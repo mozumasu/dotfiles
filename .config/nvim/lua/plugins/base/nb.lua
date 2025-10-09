@@ -49,11 +49,12 @@ end
 
 local function sanitize_output(text)
   if type(text) == "string" then
-    return text:gsub(ANSI_ESCAPE_PATTERN, "")
+    return (text:gsub(ANSI_ESCAPE_PATTERN, ""))
   elseif type(text) == "table" then
     local sanitized = {}
     for _, line in ipairs(text) do
-      table.insert(sanitized, line:gsub(ANSI_ESCAPE_PATTERN, ""))
+      -- gsubの最初の戻り値（文字列）だけを取得するために括弧で囲む
+      table.insert(sanitized, (line:gsub(ANSI_ESCAPE_PATTERN, "")))
     end
     return sanitized
   end
@@ -350,7 +351,7 @@ local function add_and_open_note(opts)
   end
 
   -- Show success message
-  local display_message = info_line:gsub("^Added:%s*", "")
+  local display_message = (info_line:gsub("^Added:%s*", ""))
   local open_msg = MESSAGES[string.upper(M.config.open_mode) .. "_OPENED"] or MESSAGES.BUFFER_OPENED
   notify("nb add: " .. display_message .. " （" .. open_msg .. "）", vim.log.levels.INFO)
 end
