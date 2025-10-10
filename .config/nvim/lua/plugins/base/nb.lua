@@ -3,32 +3,35 @@
 
 local M = {}
 
--- Type definitions
----@class NbNoteItem
----@field text string
----@field note_id string
----@field file string?
+-- ============================================================================
+-- Type Definitions
+-- ============================================================================
 
--- Default configuration
+---@class NbNoteItem
+---@field text string Display text for the note
+---@field note_id string The note's ID in nb
+---@field file string? Optional file path
+
+-- ============================================================================
+-- Configuration
+-- ============================================================================
+
 M.config = {
-  -- How to open notes
-  open_mode = "buffer", -- "buffer", "tab", "split", "vsplit"
-  -- Default notebook (nil means use nb's default)
-  default_notebook = nil,
-  -- Auto save before running nb commands
-  auto_save = true,
-  -- Show preview in floating window
-  preview_float = true,
-  -- Snacks picker integration
-  use_snacks_picker = true,
+  open_mode = "buffer", -- How to open notes: 'buffer', 'tab', 'split', 'vsplit'
+  default_notebook = nil, -- Default notebook (nil means use nb's default)
+  auto_save = true, -- Auto save before running nb commands
+  preview_float = true, -- Show preview in floating window (unused for now)
+  use_snacks_picker = true, -- Enable Snacks.nvim picker integration
 }
 
+-- ============================================================================
 -- Constants
+-- ============================================================================
+
 local NB_ENV = "NB_EDITOR=: NO_COLOR=1"
 local NB_CMD = "nb"
 local ANSI_ESCAPE_PATTERN = "\x1b%[[0-9;]*m"
 
--- Messages
 local MESSAGES = {
   NB_NOT_FOUND = "nb CLI が見つかりません",
   UNKNOWN_ERROR = "nb add 実行中に不明なエラーが発生しました",
@@ -42,7 +45,10 @@ local MESSAGES = {
   SPLIT_OPENED = "分割ウィンドウで開きました",
 }
 
--- Utility functions
+-- ============================================================================
+-- Utility Functions
+-- ============================================================================
+
 local function notify(msg, level)
   vim.notify(msg, level or vim.log.levels.INFO, { title = "nb" })
 end
@@ -53,7 +59,6 @@ local function sanitize_output(text)
   elseif type(text) == "table" then
     local sanitized = {}
     for _, line in ipairs(text) do
-      -- gsubの最初の戻り値（文字列）だけを取得するために括弧で囲む
       table.insert(sanitized, (line:gsub(ANSI_ESCAPE_PATTERN, "")))
     end
     return sanitized
@@ -61,7 +66,10 @@ local function sanitize_output(text)
   return text
 end
 
--- nb command execution
+-- ============================================================================
+-- nb Command Execution
+-- ============================================================================
+
 local function execute_command(command)
   local full_command = NB_ENV .. " " .. command
   local output = vim.fn.systemlist(full_command)
@@ -88,7 +96,10 @@ local function get_note_path(note_id)
   return vim.trim(path or ""), exit_code
 end
 
--- Note processing
+-- ============================================================================
+-- Note Processing Functions
+-- ============================================================================
+
 local function extract_note_info(output)
   for _, line in ipairs(output) do
     if line:match("^Added:") then
@@ -108,13 +119,14 @@ end
 
 local function open_note(path)
   local mode = M.config.open_mode
-  local ok, err
 
   -- Auto save if configured
   if M.config.auto_save and vim.bo.modified then
     vim.cmd("write")
   end
 
+  -- Open based on mode
+  local ok, err
   if mode == "tab" then
     ok, err = pcall(vim.cmd.tabedit, path)
   elseif mode == "split" then
@@ -129,14 +141,16 @@ local function open_note(path)
     return false, err
   end
 
-  -- Ensure buffer is listed in the buffer list
+  -- Ensure buffer is listed
   local bufnr = vim.fn.bufnr("%")
   vim.bo[bufnr].buflisted = true
-
   return true
 end
 
--- List notes
+-- ============================================================================
+-- Core nb Functions
+-- ============================================================================
+
 local function list_notes(args)
   local command = NB_CMD .. " list --no-color"
   if args and args ~= "" then
@@ -147,7 +161,6 @@ local function list_notes(args)
   end
 
   local output, exit_code = execute_command(command)
-
   if exit_code ~= 0 then
     local error_output = sanitize_output(output)
     local message = table.concat(error_output, "\n")
@@ -158,7 +171,6 @@ local function list_notes(args)
   return sanitize_output(output)
 end
 
--- Search notes
 local function search_notes(args)
   local command = NB_CMD .. " search --no-color"
   if args and args ~= "" then
@@ -173,7 +185,6 @@ local function search_notes(args)
   end
 
   local output, exit_code = execute_command(command)
-
   if exit_code ~= 0 then
     local error_output = sanitize_output(output)
     local message = table.concat(error_output, "\n")
@@ -184,7 +195,30 @@ local function search_notes(args)
   return sanitize_output(output)
 end
 
--- Edit existing note
+local function delete_note(note_id)
+  if not note_id or note_id == "" then
+    notify("ノートIDを指定してください", vim.log.levels.ERROR)
+    return false
+  end
+
+  -- Confirm deletion
+  local confirm = vim.fn.confirm(string.format("ノート [%s] を削除しますか？", note_id), "&Yes\n&No", 2)
+  if confirm ~= 1 then
+    return false
+  end
+
+  local command = string.format("%s delete --force %q", NB_CMD, note_id)
+  local _, exit_code = execute_command(command)
+
+  if exit_code == 0 then
+    notify(string.format("ノート [%s] を削除しました", note_id), vim.log.levels.INFO)
+    return true
+  else
+    notify(string.format("ノート [%s] の削除に失敗しました", note_id), vim.log.levels.ERROR)
+    return false
+  end
+end
+
 local function edit_note(args)
   if not args or args == "" then
     notify("ノートIDまたは番号を指定してください", vim.log.levels.ERROR)
@@ -197,7 +231,6 @@ local function edit_note(args)
   end
 
   local note_path, exit_code = get_note_path(note_id)
-
   if exit_code ~= 0 then
     local error_msg = note_path ~= "" and note_path or "指定されたノートが見つかりません"
     notify(error_msg, vim.log.levels.ERROR)
@@ -218,8 +251,189 @@ local function edit_note(args)
   notify("ノートを開きました: " .. note_id, vim.log.levels.INFO)
 end
 
--- Snacks picker integration
-local function snacks_nb_picker()
+-- Get note title and content for search (unused but kept for future use)
+local function get_note_info(note_id, title_only)
+  local path, _ = get_note_path(note_id)
+  local title = ""
+  local content = ""
+
+  if path and path ~= "" then
+    if title_only then
+      local file = io.open(path, "r")
+      if file then
+        local first_line = file:read("*l")
+        if first_line then
+          local heading = first_line:match("^#%s+(.+)")
+          title = heading or first_line:sub(1, 50)
+        end
+        file:close()
+      end
+    else
+      local file = io.open(path, "r")
+      if file then
+        local all_content = file:read("*a")
+        file:close()
+
+        if all_content and all_content ~= "" then
+          local lines = {}
+          for line in all_content:gmatch("[^\n]*") do
+            if line ~= "" then
+              table.insert(lines, line)
+            end
+          end
+
+          if #lines > 0 then
+            local heading = lines[1]:match("^#%s+(.+)")
+            title = heading or lines[1]:sub(1, 50)
+          end
+          content = all_content
+        end
+      end
+    end
+  end
+
+  return title, content
+end
+
+-- ============================================================================
+-- Snacks Picker Functions
+-- ============================================================================
+
+-- Parse nb ls output to extract note items
+local function parse_note_list(notes)
+  local items = {}
+  for _, note in ipairs(notes) do
+    local note_id, title = note:match("^%[(.-)%]%s+(.+)")
+    if note_id then
+      if title then
+        title = title:gsub('^"', ""):gsub('"$', "")
+      else
+        title = "No title"
+      end
+
+      table.insert(items, {
+        text = string.format("[%s] %s", note_id, title),
+        note_id = note_id,
+        file = nil,
+      })
+    end
+  end
+  return items
+end
+
+-- Parse nb search output to extract note items
+local function parse_search_results(notes, search_query)
+  local items = {}
+  local i = 1
+  while i <= #notes do
+    local line = notes[i]
+    local note_id = line:match("^%[(.-)%]")
+    if note_id then
+      -- Extract title
+      local title_part = line:match("·%s+(.+)$")
+      if not title_part then
+        title_part = line:match("^%[.-%]%s+(.+)")
+      end
+
+      if title_part then
+        title_part = title_part:gsub('^"', ""):gsub('"$', "")
+      else
+        title_part = "No title"
+      end
+
+      -- Check for match context
+      local match_context = ""
+      if search_query and search_query ~= "" and i + 2 <= #notes then
+        local context_line = notes[i + 2]
+        if context_line and not context_line:match("^%-+$") then
+          local match_type = context_line:match("^(%w+ Match):")
+          if match_type then
+            match_context = " [" .. match_type .. "]"
+          end
+        end
+      end
+
+      table.insert(items, {
+        text = string.format("[%s] %s%s", note_id, title_part, match_context),
+        note_id = note_id,
+        file = nil,
+      })
+
+      -- Skip to next entry
+      i = i + 1
+      while i <= #notes and (notes[i]:match("^%-+$") or notes[i]:match("^%s*$") or notes[i]:match("Match:")) do
+        i = i + 1
+      end
+    else
+      i = i + 1
+    end
+  end
+  return items
+end
+
+-- Create a picker with common configuration
+local function create_picker(title, items, Snacks, picker_type, search_query)
+  return Snacks.picker({
+    title = title,
+    items = items,
+    format = function(item)
+      return {
+        { item.text, "TelescopeResultsIdentifier" },
+      }
+    end,
+    confirm = function(picker, item)
+      if item and item.note_id then
+        -- Close the picker first
+        picker:close()
+        -- Then open the note
+        vim.schedule(function()
+          edit_note(item.note_id)
+        end)
+      end
+    end,
+    -- Custom actions
+    actions = {
+      delete_note = function(picker)
+        local item = picker:current()
+        if item and item.note_id then
+          if delete_note(item.note_id) then
+            -- Close the picker and re-open with updated list
+            picker:close()
+            vim.schedule(function()
+              -- Re-run the appropriate picker command
+              if picker_type == "title" then
+                vim.cmd("NbPickerTitle")
+              elseif picker_type == "content" then
+                if search_query and search_query ~= "" then
+                  vim.cmd("NbPickerContent " .. search_query)
+                else
+                  vim.cmd("NbPickerContent")
+                end
+              end
+            end)
+          end
+        end
+      end,
+    },
+    -- Window configuration with keymaps
+    win = {
+      input = {
+        keys = {
+          ["<C-d>"] = { "delete_note", mode = { "n", "i" }, desc = "Delete note" },
+        },
+      },
+      list = {
+        keys = {
+          ["D"] = { "delete_note", mode = "n", desc = "Delete note" },
+          ["dd"] = { "delete_note", mode = "n", desc = "Delete note" },
+        },
+      },
+    },
+  })
+end
+
+-- Snacks picker for title search
+local function snacks_nb_picker_title()
   local has_snacks, Snacks = pcall(require, "snacks")
   if not has_snacks then
     notify("Snacks.nvimがインストールされていません", vim.log.levels.ERROR)
@@ -231,62 +445,47 @@ local function snacks_nb_picker()
     return
   end
 
-  -- Transform notes into picker items
-  ---@type NbNoteItem[]
-  local items = {}
-  for _, note in ipairs(notes) do
-    local note_id = note:match("^%[(.-)%]")
-    if note_id then
-      -- Get the full path for metadata extraction
-      local path, _ = get_note_path(note_id)
-      local title = note
+  local items = parse_note_list(notes)
+  local title = "📝 nb Notes | [Enter]: Open | [Ctrl-D/D/dd]: Delete"
+  create_picker(title, items, Snacks, "title", nil)
+end
 
-      -- Try to extract title from file if path is valid
-      if path and path ~= "" then
-        local file = io.open(path, "r")
-        if file then
-          local first_line = file:read("*l")
-          file:close()
-          if first_line then
-            local heading = first_line:match("^#%s+(.+)")
-            if heading then
-              title = "[" .. note_id .. "] " .. heading
-            end
-          end
-        end
-      end
-
-      ---@type NbNoteItem
-      local item = {
-        text = title,
-        note_id = note_id,
-        file = path,
-      }
-      table.insert(items, item)
-    end
+-- Snacks picker for content search
+local function snacks_nb_picker_content(search_query)
+  local has_snacks, Snacks = pcall(require, "snacks")
+  if not has_snacks then
+    notify("Snacks.nvimがインストールされていません", vim.log.levels.ERROR)
+    return
   end
 
-  -- Use Snacks picker
-  Snacks.picker({
-    title = "nb Notes",
-    items = items,
-    format = function(item)
-      ---@cast item NbNoteItem
-      return {
-        { "📝 ", "TelescopeResultsSpecialComment" },
-        { item.text, "TelescopeResultsIdentifier" },
-      }
-    end,
-    confirm = function(_, item)
-      ---@cast item NbNoteItem
-      if item and item.note_id then
-        vim.schedule(function()
-          edit_note(item.note_id)
-        end)
-      end
-    end,
-  })
+  -- Get notes based on search query
+  local notes
+  if search_query and search_query ~= "" then
+    notes = search_notes(search_query)
+  else
+    notes = list_notes("")
+  end
+  if not notes then
+    return
+  end
+
+  -- Parse and create picker
+  local items = parse_search_results(notes, search_query)
+  local base_title = search_query and search_query ~= "" and string.format("🔍 nb Search: '%s'", search_query)
+    or "📝 nb Notes (All)"
+  local title = base_title .. " | [Enter]: Open | [Ctrl-D/D/dd]: Delete"
+
+  create_picker(title, items, Snacks, "content", search_query)
 end
+
+-- Legacy picker (for backward compatibility)
+local function snacks_nb_picker()
+  snacks_nb_picker_title()
+end
+
+-- ============================================================================
+-- Main Command Functions
+-- ============================================================================
 
 -- Main function for adding notes
 local function add_and_open_note(opts)
@@ -305,18 +504,15 @@ local function add_and_open_note(opts)
   local args = vim.trim(opts and opts.args or "")
   local output, exit_code = run_nb_add(args)
 
-  -- Handle command execution errors
+  -- Handle errors
   if exit_code ~= 0 then
     local error_output = sanitize_output(output)
     local message = table.concat(error_output, "\n")
-    if message == "" then
-      message = MESSAGES.UNKNOWN_ERROR
-    end
-    notify(message, vim.log.levels.ERROR)
+    notify(message ~= "" and message or MESSAGES.UNKNOWN_ERROR, vim.log.levels.ERROR)
     return
   end
 
-  -- Extract note information from output
+  -- Extract note information
   local info_line = extract_note_info(output)
   if not info_line then
     notify(MESSAGES.NOTE_INFO_ERROR, vim.log.levels.ERROR)
@@ -330,7 +526,7 @@ local function add_and_open_note(opts)
     return
   end
 
-  -- Get the full path of the created note
+  -- Get note path
   local note_path, path_exit_code = get_note_path(note_id)
   if path_exit_code ~= 0 then
     local error_msg = note_path ~= "" and note_path or MESSAGES.NB_SHOW_ERROR
@@ -356,7 +552,10 @@ local function add_and_open_note(opts)
   notify("nb add: " .. display_message .. " （" .. open_msg .. "）", vim.log.levels.INFO)
 end
 
--- Setup function
+-- ============================================================================
+-- Setup Function
+-- ============================================================================
+
 function M.setup(opts)
   -- Merge user options with defaults
   if opts then
@@ -364,106 +563,59 @@ function M.setup(opts)
   end
 
   -- Remove existing commands if they exist
-  local commands = { "NbAdd", "NbList", "NbSearch", "NbEdit", "NbPicker" }
+  local commands = { "NbAdd", "NbSearch", "NbEdit", "NbPicker", "NbPickerTitle", "NbPickerContent" }
   for _, cmd in ipairs(commands) do
     pcall(vim.api.nvim_del_user_command, cmd)
   end
 
-  -- Create the NbAdd command
+  -- Create NbAdd command
   vim.api.nvim_create_user_command("NbAdd", add_and_open_note, {
     desc = "nb add を実行して作成されたノートを開く",
     nargs = "*",
     complete = "shellcmd",
-    bang = true,
   })
 
-  -- Create the NbList command
-  vim.api.nvim_create_user_command("NbList", function(cmd_opts)
-    local notes = list_notes(cmd_opts and cmd_opts.args or "")
-    if notes then
-      -- Create a scratch buffer to display the list
-      local buf = vim.api.nvim_create_buf(false, true)
-      vim.api.nvim_buf_set_lines(buf, 0, -1, false, notes)
-      vim.bo[buf].buftype = "nofile"
-      vim.bo[buf].bufhidden = "wipe"
-      vim.bo[buf].modifiable = false
-
-      -- Open in a split window
-      vim.cmd("split")
-      vim.api.nvim_win_set_buf(0, buf)
-
-      -- Set up keymaps for the list buffer
-      vim.keymap.set("n", "<CR>", function()
-        local line = vim.api.nvim_get_current_line()
-        local note_id = line:match("^%[(.-)%]")
-        if note_id then
-          vim.cmd("close")
-          edit_note(note_id)
-        end
-      end, {
-        buffer = buf,
-        noremap = true,
-        silent = true,
-        desc = "Open note",
-      })
-
-      vim.keymap.set("n", "q", ":close<CR>", {
-        buffer = buf,
-        noremap = true,
-        silent = true,
-        desc = "Close list",
-      })
-    end
-  end, {
-    desc = "nbのノート一覧を表示",
-    nargs = "*",
-    complete = "shellcmd",
-  })
-
-  -- Create the NbSearch command
+  -- Create NbSearch command
   vim.api.nvim_create_user_command("NbSearch", function(cmd_opts)
     local results = search_notes(cmd_opts and cmd_opts.args or "")
-    if results then
-      -- Create a scratch buffer to display results
-      local buf = vim.api.nvim_create_buf(false, true)
-      vim.api.nvim_buf_set_lines(buf, 0, -1, false, results)
-      vim.bo[buf].buftype = "nofile"
-      vim.bo[buf].bufhidden = "wipe"
-      vim.bo[buf].modifiable = false
-
-      -- Open in a split window
-      vim.cmd("split")
-      vim.api.nvim_win_set_buf(0, buf)
-
-      -- Set up keymaps
-      vim.keymap.set("n", "<CR>", function()
-        local line = vim.api.nvim_get_current_line()
-        local note_id = line:match("^%[(.-)%]")
-        if note_id then
-          vim.cmd("close")
-          edit_note(note_id)
-        end
-      end, {
-        buffer = buf,
-        noremap = true,
-        silent = true,
-        desc = "Open note",
-      })
-
-      vim.keymap.set("n", "q", ":close<CR>", {
-        buffer = buf,
-        noremap = true,
-        silent = true,
-        desc = "Close search results",
-      })
+    if not results then
+      return
     end
+
+    -- Create scratch buffer
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, results)
+    vim.bo[buf].buftype = "nofile"
+    vim.bo[buf].bufhidden = "wipe"
+    vim.bo[buf].modifiable = false
+
+    -- Open in split
+    vim.cmd("split")
+    vim.api.nvim_win_set_buf(0, buf)
+
+    -- Set up keymaps
+    vim.keymap.set("n", "<CR>", function()
+      local line = vim.api.nvim_get_current_line()
+      local note_id = line:match("^%[(.-)%]")
+      if note_id then
+        vim.cmd("close")
+        edit_note(note_id)
+      end
+    end, { buffer = buf, noremap = true, silent = true, desc = "Open note" })
+
+    vim.keymap.set("n", "q", ":close<CR>", {
+      buffer = buf,
+      noremap = true,
+      silent = true,
+      desc = "Close search results",
+    })
   end, {
     desc = "nbでノートを検索",
     nargs = "+",
     complete = "shellcmd",
   })
 
-  -- Create the NbEdit command
+  -- Create NbEdit command
   vim.api.nvim_create_user_command("NbEdit", function(cmd_opts)
     if cmd_opts and cmd_opts.args then
       edit_note(cmd_opts.args)
@@ -471,11 +623,12 @@ function M.setup(opts)
   end, {
     desc = "既存のnbノートを編集",
     nargs = "+",
-    complete = function(arglead, _, _)
+    complete = function(arglead)
       local notes = list_notes("")
       if not notes then
         return {}
       end
+
       local completions = {}
       for _, note in ipairs(notes) do
         local id = note:match("^%[(.-)%]")
@@ -487,79 +640,125 @@ function M.setup(opts)
     end,
   })
 
-  -- Create the NbPicker command if Snacks picker is available
+  -- Create Snacks picker commands if available
   if M.config.use_snacks_picker then
     vim.api.nvim_create_user_command("NbPicker", snacks_nb_picker, {
-      desc = "Snacksピッカーでnbノートを検索",
+      desc = "Snacksピッカーでnbノートを検索（タイトル）",
       nargs = 0,
+    })
+
+    vim.api.nvim_create_user_command("NbPickerTitle", snacks_nb_picker_title, {
+      desc = "Snacksピッカーでタイトルから検索",
+      nargs = 0,
+    })
+
+    vim.api.nvim_create_user_command("NbPickerContent", function(cmd_opts)
+      local query = cmd_opts and cmd_opts.args or ""
+      snacks_nb_picker_content(query)
+    end, {
+      desc = "Snacksピッカーで内容から検索",
+      nargs = "*",
     })
   end
 end
 
--- Plugin configuration
-return {
-  {
-    name = "nb-integration",
-    dir = vim.fn.stdpath("config"),
-    config = function()
-      M.setup()
-    end,
-    dependencies = {
-      "folke/snacks.nvim", -- For picker functionality
+-- ============================================================================
+-- Export Module
+-- ============================================================================
+
+M.name = "nb-integration"
+
+-- ============================================================================
+-- LazyNvim Plugin Configuration
+-- ============================================================================
+
+local plugin = {
+  name = "nb-integration",
+  dir = vim.fn.stdpath("config"),
+  lazy = false,
+  config = function()
+    M.setup()
+  end,
+  dependencies = {
+    "folke/snacks.nvim",
+  },
+  keys = {
+    {
+      "<leader>na",
+      function()
+        vim.cmd("NbAdd")
+      end,
+      desc = "nb add (create new note)",
+      silent = true,
     },
-    keys = {
-      {
-        "<leader>na",
-        function()
-          vim.cmd("NbAdd!")
-        end,
-        desc = "nb add (create new note)",
-        silent = true,
-      },
-      {
-        "<leader>nl",
-        function()
-          vim.cmd("NbList")
-        end,
-        desc = "nb list notes",
-        silent = true,
-      },
-      {
-        "<leader>ns",
-        function()
-          vim.ui.input({ prompt = "Search notes: " }, function(input)
-            if input then
-              vim.cmd("NbSearch " .. input)
-            end
-          end)
-        end,
-        desc = "nb search notes",
-        silent = true,
-      },
-      {
-        "<leader>ne",
-        function()
-          vim.ui.input({ prompt = "Edit note ID: " }, function(input)
-            if input then
-              vim.cmd("NbEdit " .. input)
-            end
-          end)
-        end,
-        desc = "nb edit note",
-        silent = true,
-      },
-      {
-        "<leader>np",
-        function()
+    {
+      "<leader>ns",
+      function()
+        vim.ui.input({ prompt = "Search notes: " }, function(input)
+          if input then
+            vim.cmd("NbSearch " .. input)
+          end
+        end)
+      end,
+      desc = "nb search notes",
+      silent = true,
+    },
+    {
+      "<leader>ne",
+      function()
+        vim.ui.input({ prompt = "Edit note ID: " }, function(input)
+          if input then
+            vim.cmd("NbEdit " .. input)
+          end
+        end)
+      end,
+      desc = "nb edit note",
+      silent = true,
+    },
+    {
+      "<leader>np",
+      function()
+        if M.config.use_snacks_picker then
+          vim.cmd("NbPicker")
+        else
+          vim.notify("Snacksピッカー統合が無効です", vim.log.levels.WARN, { title = "nb" })
+        end
+      end,
+      desc = "nb picker (title search)",
+      silent = true,
+    },
+    {
+      "<leader>nt",
+      function()
+        if M.config.use_snacks_picker then
+          vim.cmd("NbPickerTitle")
+        else
+          vim.notify("Snacksピッカー統合が無効です", vim.log.levels.WARN, { title = "nb" })
+        end
+      end,
+      desc = "nb picker title search",
+      silent = true,
+    },
+    {
+      "<leader>nc",
+      function()
+        vim.ui.input({ prompt = "Content search query: " }, function(input)
           if M.config.use_snacks_picker then
-            vim.cmd("NbPicker")
+            if input then
+              vim.cmd("NbPickerContent " .. input)
+            else
+              vim.cmd("NbPickerContent")
+            end
           else
             vim.notify("Snacksピッカー統合が無効です", vim.log.levels.WARN, { title = "nb" })
           end
-        end,
-        desc = "nb picker",
-        silent = true,
-      },
+        end)
+      end,
+      desc = "nb picker content search",
+      silent = true,
     },
   },
 }
+
+-- Return the plugin configuration
+return plugin
