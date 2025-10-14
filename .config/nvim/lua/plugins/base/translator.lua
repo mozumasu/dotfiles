@@ -23,38 +23,38 @@ return {
         mode = "v",
         desc = "Read aloud the selected text using say command and register",
       },
-      { "<leader>te", "<cmd>TranslateW --target_lang=en<CR>", mode = "n", desc = "Translate words into English" },
-      { "<leader>te", ":'<,'>TranslateW --target_lang=en<CR>", mode = "v", desc = "Translate lines into English" },
-      -- Replace
-      { "<leader>tr", "", desc = "Translate Replace" },
-      -- Replace to Japanese
-      { "<leader>trj", ":'<,'>TranslateR<CR>", mode = "v", desc = "Replace to Japanese" },
-      {
-        "<leader>trj",
-        function()
-          vim.api.nvim_feedkeys("^vg_", "n", false)
-          -- Execute the conversion command after a short delay.
-          vim.defer_fn(function()
-            vim.api.nvim_feedkeys(":TranslateR\n", "n", false)
-          end, 100) -- 100ms delay
-        end,
-        mode = "n",
-        desc = "Replace to Japanese",
-      },
-      -- Replace to English
-      { "<leader>tre", ":'<,'>TranslateR --target_lang=en<CR>", mode = "v", desc = "Replace to English" },
-      {
-        "<leader>tre",
-        function()
-          vim.api.nvim_feedkeys("^vg_", "n", false)
-          -- Run translator command after a short delay
-          vim.defer_fn(function()
-            vim.api.nvim_feedkeys(":TranslateR --target_lang=en\n", "n", false)
-          end, 100) -- 100ms delay
-        end,
-        mode = "n",
-        desc = "Replace to English",
-      },
+      -- { "<leader>te", "<cmd>TranslateW --target_lang=en<CR>", mode = "n", desc = "Translate words into English" },
+      -- { "<leader>te", ":'<,'>TranslateW --target_lang=en<CR>", mode = "v", desc = "Translate lines into English" },
+      -- -- Replace
+      -- { "<leader>tr", "", desc = "Translate Replace" },
+      -- -- Replace to Japanese
+      -- { "<leader>trj", ":'<,'>TranslateR<CR>", mode = "v", desc = "Replace to Japanese" },
+      -- {
+      --   "<leader>trj",
+      --   function()
+      --     vim.api.nvim_feedkeys("^vg_", "n", false)
+      --     -- Execute the conversion command after a short delay.
+      --     vim.defer_fn(function()
+      --       vim.api.nvim_feedkeys(":TranslateR\n", "n", false)
+      --     end, 100) -- 100ms delay
+      --   end,
+      --   mode = "n",
+      --   desc = "Replace to Japanese",
+      -- },
+      -- -- Replace to English
+      -- { "<leader>tre", ":'<,'>TranslateR --target_lang=en<CR>", mode = "v", desc = "Replace to English" },
+      -- {
+      --   "<leader>tre",
+      --   function()
+      --     vim.api.nvim_feedkeys("^vg_", "n", false)
+      --     -- Run translator command after a short delay
+      --     vim.defer_fn(function()
+      --       vim.api.nvim_feedkeys(":TranslateR --target_lang=en\n", "n", false)
+      --     end, 100) -- 100ms delay
+      --   end,
+      --   mode = "n",
+      --   desc = "Replace to English",
+      -- },
     },
     config = function()
       vim.g.translator_target_lang = "ja"
