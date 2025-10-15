@@ -1,0 +1,21 @@
+{
+  "version": "5",
+  "specifiers": {
+    "jsr:@std/path@1.1.0": "1.1.0",
+    "jsr:@yuki-yano/zeno@0.1.0": "0.1.0"
+  },
+  "jsr": {
+    "@std/path@1.1.0": {
+      "integrity": "ddc94f8e3c275627281cbc23341df6b8bcc874d70374f75fec2533521e3d6886"
+    },
+    "@yuki-yano/zeno@0.1.0": {
+      "integrity": "820d7a3ad113f8a8671747f1853c20823105101f931e6cc6f7bc065c2ae8f066"
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@std/path@1.1.0",
+      "jsr:@yuki-yano/zeno@0.1.0"
+    ]
+  }
+}
