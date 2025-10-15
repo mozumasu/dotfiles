@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "lib": ["deno.window"],
+    "strict": true
+  },
+  "imports": {
+    "@yuki-yano/zeno": "jsr:@yuki-yano/zeno@0.1.0",
+    "@std/path": "jsr:@std/path@1.1.0"
+  }
+}

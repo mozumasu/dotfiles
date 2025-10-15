@@ -185,11 +185,6 @@ snippets:
   - keyword: cs;
     snippet: claude --append-system-prompt $(uvx --from git+https://github.com/oraios/serena serena print-system-prompt)
 
-  - name: npm
-    keyword: npm
-    snippet: zsh -c "$HOME/.config/zeno/scripts/package-manager.ts"
-    evaluate: true
-
   - name: notify function
     keyword: n
     snippet: notify
