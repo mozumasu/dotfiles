@@ -1,6 +1,7 @@
 return {
   "mattn/emmet-vim",
-  ft = { "html", "javascriptreact", "typescriptreact", "php", "ejs", "svelte" },
+  dependencies = { "nvim-treesitter/nvim-treesitter" },
+  ft = { "html", "javascriptreact", "typescriptreact", "php", "ejs", "svelte", "astro" },
   init = function()
     vim.cmd([[
       let g:user_emmet_leader_key='<c-y>'
