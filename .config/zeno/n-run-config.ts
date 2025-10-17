@@ -1,5 +1,5 @@
-import { defineConfig, fileExists } from "@yuki-yano/zeno";
-import { dirname, join, resolve } from "@std/path";
+import { defineConfig, fileExists } from "jsr:@yuki-yano/zeno@0.1.0";
+import { dirname, join, resolve } from "jsr:@std/path@1.1.0";
 type PackageManager = "npm" | "yarn" | "pnpm" | "bun";
 const LOCKFILE_HINTS: ReadonlyArray<{
   manager: PackageManager;
