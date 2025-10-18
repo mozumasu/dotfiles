@@ -1,0 +1,23 @@
+snippets:
+  - name: mise plugins
+    keyword: mp
+    snippet: mise plugins
+
+  - name: mise plugins install
+    keyword: mpi
+    snippet: mise plugins install
+
+  - name: mise plugins uninstall
+    keyword: mpu
+    snippet: mise plugins uninstall
+
+completions:
+  - name: mise plugins install
+    patterns:
+    - '^.*\bmise plugins install\s*$'
+    sourceCommand: mise plugins ls-remote
+  
+  - name: mise plugins uninstall
+    patterns:
+    - '^.*\bmise plugins uninstall\s*$'
+    sourceCommand: mise plugins ls
