@@ -26,6 +26,9 @@ snippets:
     snippet:
       aws cloudformation describe-stacks --profile {{aws-profile}} --query 'Stacks[?contains(StackName,`prod-`)].[StackName,StackStatus]' --output table
 
+  - keyword: cdkls
+    snippet: cdk list -c env=
+
 completions:
   - name: instance-id
     patterns:

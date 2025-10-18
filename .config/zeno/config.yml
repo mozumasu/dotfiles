@@ -1,17 +1,4 @@
 snippets:
-  # snippet and keyword abbrev
-  - name: git status
-    keyword: gs
-    snippet: git status --short --branch
-
-  # snippet with placeholder
-  - name: git commit message
-    keyword: gcim
-    snippet: git commit -m '{{commit_message}}'
-
-  - keyword: proot
-    snippet: cd $(git rev-parse --show-toplevel)
-
   - name: "null"
     keyword: "null"
     snippet: ">/dev/null 2>&1"
@@ -21,13 +8,6 @@ snippets:
       # buffer: ''
       lbuffer: '.+\s'
       # rbuffer: ''
-
-  - name: branch
-    keyword: B
-    snippet: git symbolic-ref --short HEAD
-    context:
-      lbuffer: '^git\s+checkout\s+'
-    evaluate: true # eval snippet
 
   - name: today
     keyword: td
@@ -54,9 +34,6 @@ snippets:
   - keyword: '-'
     snippet: cd -
 
-  - keyword: proot
-    snippet: 'cd $(git rev-parse --show-toplevel)'
-
   - keyword: ll
     snippet: ls -l
 
@@ -80,24 +57,6 @@ snippets:
 
   - keyword: zenn
     snippet: nvim ~/src/private/zenn
-
-  - keyword: g
-    snippet: git
-
-  - keyword: gs
-    snippet: git status
-
-  - keyword: gsw
-    snippet: git switch
-
-  - keyword: gpl
-    snippet: git pull
-
-  - keyword: gfe
-    snippet: git fetch
-
-  - keyword: lg
-    snippet: lazygit
 
   - keyword: mul
     snippet: multipass
@@ -151,16 +110,6 @@ snippets:
   - keyword: ld
     snippet: lazydocker
 
-  - keyword: ghc
-    snippet: gh repo create '{{repo_name}}' --private
-
-  - name: gh pr create
-    keyword: ghpr
-    snippet:
-      gh pr create --title "{{title}}" --body "$(cat <<'EOF'
-      {{content}}
-      EOF)"
-
     # Claude Code
   - keyword: cc
     snippet: claude -c
@@ -178,21 +127,6 @@ snippets:
     snippet: notify
     context:
       lbuffer: '.+;'
-
-  - keyword: cdkls
-    snippet: cdk list -c env=
-
-  - name: mise plugins
-    keyword: mp
-    snippet: mise plugins
-
-  - name: mise plugins install
-    keyword: mpi
-    snippet: mise plugins install
-
-  - name: mise plugins uninstall
-    keyword: mpu
-    snippet: mise plugins uninstall
 
 completions:
   # simple sourceCommand, no callback
@@ -237,17 +171,6 @@ completions:
     options:
       --prompt: "'ssh > '"
 
-  - name: package scripts
-    patterns:
-      - "npm run(?: .*)? $"
-      - "yarn run(?: .*)? $"
-      - "pnpm run(?: .*)? $"
-      - "bun run(?: .*)? $"
-    sourceCommand: 'jq -r ''.scripts | to_entries | .[] | .key + " = " + .value'' package.json'
-    options:
-      --prompt: "'npm run > '"
-    callback: "awk -F ' = ' '{ print $1 }'"
-
   - name: nb edit
     patterns:
       - "^nb e( .*)? $"
@@ -257,31 +180,6 @@ completions:
       --prompt: "'nb edit >'"
       --preview: "echo {} | sed -E 's/^\\[([0-9]+)\\].*/\\1/' | xargs nb show"
     callback: "sed -E 's/^\\[([0-9]+)\\].*/\\1/'"
-
-  - name: gh browse
-    patterns:
-      - "^gh browse -R( .*)? $"
-    sourceCommand: "gh repo list --visibility=public | awk '{print $1}'"
-    options:
-      --prompt: "'browse repo >'"
-
-  - name: ghq get
-    patterns:
-      - "^ghqg"
-      - "^ghq get( .*)? $"
-    sourceCommand: "gh repo list | awk '{print $1}'"
-    options:
-      --prompt: "'browse repo >'"
-    callback: "ghq get ${1}"
-
-  - name: gh run ID
-    patterns:
-      - "^gh run (watch|view|cancel|download|rerun)( .*)? $"
-    sourceCommand: gh run list --limit 20 --json databaseId,status,conclusion,displayTitle,workflowName | jq -r '.[] | "\(.databaseId)\t[\(if .status != "completed" then "⚡" elif .conclusion == "success" then "✓" elif .conclusion == "failure" then "✗" else "⚠" end)] \(.displayTitle) (\(.workflowName))"'
-    options:
-      --prompt: "'Run ID> '"
-      --preview: "echo {} | cut -f2-"
-    callback: "awk '{print $1}'"
 
   - name: Makefile
     patterns:
@@ -296,14 +194,3 @@ completions:
       - "^fg $"
     sourceCommand: "jobs"
     callback: "cut -d'[' -f2 | cut -d']' -f1 | sed 's/^/%/'"
-
-  - name: mise plugins install
-    patterns:
-    - '^.*\bmise plugins install\s*$'
-    sourceCommand: mise plugins ls-remote
-  
-  - name: mise plugins uninstall
-    patterns:
-    - '^.*\bmise plugins uninstall\s*$'
-    sourceCommand: mise plugins ls
-

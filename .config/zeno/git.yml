@@ -1,0 +1,76 @@
+snippets:
+  - name: git status
+    keyword: gs
+    snippet: git status --short --branch
+
+  # snippet with placeholder
+  - name: git commit message
+    keyword: gcim
+    snippet: git commit -m '{{commit_message}}'
+
+  - keyword: proot
+    snippet: cd $(git rev-parse --show-toplevel)
+
+  - name: branch
+    keyword: B
+    snippet: git symbolic-ref --short HEAD
+    context:
+      lbuffer: '^git\s+checkout\s+'
+    evaluate: true # eval snippet
+
+  - keyword: proot
+    snippet: 'cd $(git rev-parse --show-toplevel)'
+
+  - keyword: ghc
+    snippet: gh repo create '{{repo_name}}' --private
+
+  - name: gh pr create
+    keyword: ghpr
+    snippet:
+      gh pr create --title "{{title}}" --body "$(cat <<'EOF'
+      {{content}}
+      EOF)"
+
+  - keyword: g
+    snippet: git
+
+  - keyword: gs
+    snippet: git status
+
+  - keyword: gsw
+    snippet: git switch
+
+  - keyword: gpl
+    snippet: git pull
+
+  - keyword: gfe
+    snippet: git fetch
+
+  - keyword: lg
+    snippet: lazygit
+
+completions:
+  - name: gh browse
+    patterns:
+      - "^gh browse -R( .*)? $"
+    sourceCommand: "gh repo list --visibility=public | awk '{print $1}'"
+    options:
+      --prompt: "'browse repo >'"
+
+  - name: ghq get
+    patterns:
+      - "^ghqg"
+      - "^ghq get( .*)? $"
+    sourceCommand: "gh repo list | awk '{print $1}'"
+    options:
+      --prompt: "'browse repo >'"
+    callback: "ghq get ${1}"
+
+  - name: gh run ID
+    patterns:
+      - "^gh run (watch|view|cancel|download|rerun)( .*)? $"
+    sourceCommand: gh run list --limit 20 --json databaseId,status,conclusion,displayTitle,workflowName | jq -r '.[] | "\(.databaseId)\t[\(if .status != "completed" then "⚡" elif .conclusion == "success" then "✓" elif .conclusion == "failure" then "✗" else "⚠" end)] \(.displayTitle) (\(.workflowName))"'
+    options:
+      --prompt: "'Run ID> '"
+      --preview: "echo {} | cut -f2-"
+    callback: "awk '{print $1}'"
