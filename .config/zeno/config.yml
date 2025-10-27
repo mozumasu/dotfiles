@@ -1,3 +1,14 @@
+history:
+  defaultScope: global
+  fzfCommand: fzf-tmux
+  fzfOptions: 
+    - "-p 50%,50%"
+  redact:
+  keymap:
+    deleteSoft: ctrl-d
+    deleteHard: alt-d
+    toggleScope: ctrl-r
+
 snippets:
   - name: "null"
     keyword: "null"

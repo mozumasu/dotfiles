@@ -46,7 +46,8 @@ if [[ -n $ZENO_LOADED ]]; then
   # (default: fzf-completion if exists; otherwise expand-or-complete)
   # export ZENO_COMPLETION_FALLBACK=expand-or-complete
  
-  bindkey '^r'   zeno-history-selection
+  # bindkey '^r'   zeno-history-selection
+  bindkey '^r' zeno-smart-history-selection
   bindkey '^x^s' zeno-insert-snippet
   bindkey '^x^f' zeno-snippet-next-placeholder
   bindkey "^X^[[C" zeno-snippet-next-placeholder

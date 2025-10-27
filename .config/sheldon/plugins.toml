@@ -18,5 +18,6 @@ github = "zsh-users/zsh-autosuggestions"
 github = "zsh-users/zsh-completions"
 [plugins.zeno]
 github = "yuki-yano/zeno.zsh"
+branch = "feature/sqlite-history-subsystem"
 [plugins.fast-syntax-highlighting ]
 github = "zdharma-continuum/fast-syntax-highlighting"
