@@ -182,15 +182,23 @@ completions:
     options:
       --prompt: "'ssh > '"
 
-  - name: nb edit
-    patterns:
-      - "^nb e( .*)? $"
-      - "^nb edit( .*)? $"
-    sourceCommand: "nb ls --all --no-color | grep -E '^\\[[0-9]+\\]'"
-    options:
-      --prompt: "'nb edit >'"
-      --preview: "echo {} | sed -E 's/^\\[([0-9]+)\\].*/\\1/' | xargs nb show"
-    callback: "sed -E 's/^\\[([0-9]+)\\].*/\\1/'"
+  # nb completions are now handled by nb-config.ts
+  # - name: nb subcommands
+  #   patterns:
+  #     - '^\s*nb\s*$'
+  #     - '^\s*nb\s+help\s*$'
+  #   sourceCommand: "nb subcommands"
+  #   options:
+  #     --prompt: "'nb subcommand >'"
+  #
+  # - name: nb notes
+  #   patterns:
+  #     - "^nb (e|edit|delete|show|open|peek|copy|move|mv|rename|export|do|pin|unpin|history|browse)( .*)? $"
+  #   sourceCommand: "nb ls --all --no-color | grep -E '^\\[[0-9]+\\]'"
+  #   options:
+  #     --prompt: "'nb >'"
+  #     --preview: "echo {} | sed -E 's/^\\[([0-9]+)\\].*/\\1/' | xargs -I ID sh -c 'nb show ID --info-line 2>/dev/null; nb show ID --print 2>/dev/null || true'"
+  #   callback: "sed -E 's/^\\[([0-9]+)\\].*/\\1/'"
 
   - name: Makefile
     patterns:
