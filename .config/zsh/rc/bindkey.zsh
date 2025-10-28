@@ -10,7 +10,7 @@ bindkey -r "^X^F"
 
 # fzf
 zle -N fzf-history-widget
-bindkey '^R' fzf-history-widget
+# bindkey '^R' fzf-history-widget  # Disabled: Using zeno-smart-history-selection instead
 bindkey '^g' ghq-fzf
 
 # History search
