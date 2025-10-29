@@ -30,5 +30,29 @@ return {
       end,
       desc = "Close all folds",
     },
+    {
+      "zr",
+      function()
+        require("ufo").openFoldsExceptKinds()
+      end,
+      desc = "Fold less",
+    },
+    {
+      "zm",
+      function()
+        require("ufo").closeFoldsWith()
+      end,
+      desc = "Fold more",
+    },
+    {
+      "K",
+      function()
+        local winid = require("ufo").peekFoldedLinesUnderCursor()
+        if not winid then
+          vim.lsp.buf.hover()
+        end
+      end,
+      desc = "Peek fold or hover",
+    },
   },
 }
