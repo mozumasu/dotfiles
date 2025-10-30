@@ -472,6 +472,84 @@ function ghq-fzf() {
 }
 zle -N ghq-fzf
 
+# GitHub fork and clone with gh and ghq
+gh-fork-get() {
+  set -e
+
+  # 1) Check dependencies
+  for c in gh ghq git; do
+    command -v $c >/dev/null || { echo "$c not found" >&2; return 127; }
+  done
+
+  # 2) Determine target repository
+  local repo
+  if [[ -n "$1" ]]; then
+    case "$1" in
+      https://github.com/*|http://github.com/*|git@github.com:*)
+        repo="${1#git@github.com:}"
+        repo="${repo#https://github.com/}"
+        repo="${repo#http://github.com/}"
+        repo="${repo%.git}"
+        ;;
+      */*)
+        repo="$1"
+        ;;
+      *)
+        echo "Argument must be OWNER/REPO or GitHub URL" >&2
+        return 2
+        ;;
+    esac
+  else
+    # Infer from current directory
+    git rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
+      echo "When no argument given, must be inside a git repository" >&2
+      return 2
+    }
+    # Extract OWNER/REPO from origin
+    local url
+    url="$(git remote get-url origin 2>/dev/null || true)"
+    [[ -z "$url" ]] && { echo "origin not found" >&2; return 2; }
+    repo="${url#git@github.com:}"
+    repo="${repo#https://github.com/}"
+    repo="${repo#http://github.com/}"
+    repo="${repo%.git}"
+  fi
+
+  # 3) Get my GitHub login name
+  local me
+  me="$(gh api user -q .login)" || { echo "Please run: gh auth login" >&2; return 1; }
+
+  # 4) Create fork - treat as success even if already exists
+  if ! gh repo fork "$repo" --remote=false >/dev/null 2>&1; then
+    echo "Skip fork creation - may already exist" >&2
+  fi
+
+  # 5) ghq placement - skip if already retrieved
+  local name="${repo#*/}"
+  local root; root="$(ghq root)"
+  local dst="$root/github.com/$me/$name"
+
+  if [[ -d "$dst/.git" ]]; then
+    echo "Already exists: $dst" >&2
+  else
+    ghq get "$me/$name" || { echo "ghq get failed" >&2; return 1; }
+  fi
+
+  # 6) Add upstream remote
+  cd "$dst" || { echo "Failed to cd to $dst" >&2; return 1; }
+
+  if git remote get-url upstream >/dev/null 2>&1; then
+    :
+  else
+    git remote add upstream "https://github.com/$repo"
+  fi
+
+  git fetch upstream --prune
+
+  # 7) Show confirmation
+  echo "done"
+  git remote -v
+}
 
 # Move to the open finder directory
 cdf() {
