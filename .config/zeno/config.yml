@@ -139,6 +139,11 @@ snippets:
     context:
       lbuffer: '.+;'
 
+  - keyword: plj
+    snippet: '| plamo-translate --to Japanese'
+    context:
+      lbuffer: '.+;'
+
 completions:
   # simple sourceCommand, no callback
   - name: kill signal
