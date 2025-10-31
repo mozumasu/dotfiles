@@ -32,6 +32,7 @@
       "NotebookEdit",
       "Fetch",
       "mcp__context7",
+      "mcp__chrome-devtools",
       "mcp__serena",
       "mcp__gemini-cli",
       "mcp__aws-cdk-mcp-server",
