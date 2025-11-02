@@ -29,6 +29,11 @@ return {
         -- preset = "none",
         ["<CR>"] = {}, -- Do not use enter to confirm completion
       },
+      sources = {
+        default = {
+          cmdline = {}, -- Disable cmdline completions (conflicts with Snacks picker)
+        },
+      },
     },
   },
 }
