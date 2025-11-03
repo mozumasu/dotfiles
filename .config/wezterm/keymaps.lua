@@ -3,6 +3,7 @@ local act = wezterm.action
 local toggle_term = require("toggle_term")
 local edit_prompt = require("edit_prompt")
 local workspace = require("workspace")
+local translate = require("translate")
 
 local module = {}
 
@@ -136,7 +137,7 @@ local keys = {
   -- Other
   { key = "K", mods = "CTRL", action = act.ClearScrollback("ScrollbackOnly") },
   { key = "k", mods = "SUPER", action = act.ClearScrollback("ScrollbackOnly") },
-  { key = "L", mods = "CTRL", action = act.ShowDebugOverlay },
+  { key = "L", mods = "SUPER", action = act.ShowDebugOverlay },
 
   -- Claude Code
   { key = "Enter", mods = "SHIFT", action = wezterm.action.SendString("\n") },
@@ -212,7 +213,7 @@ local keys = {
     }),
   },
   -- ShowLauncher
-  { key = "l", mods = "SUPER", action = wezterm.action.ShowLauncher }, -- default: Alt + l
+  -- { key = "l", mods = "SUPER", action = wezterm.action.ShowLauncher }, -- default: Alt + l
   {
     key = ";",
     mods = "ALT",
@@ -326,6 +327,26 @@ local key_tables = {
         { CopyTo = "ClipboardAndPrimarySelection" },
         { Multiple = { "ScrollToBottom", { CopyMode = "Close" } } },
       }),
+    },
+    -- yank and translate
+    {
+      key = "Y",
+      mods = "NONE",
+      action = wezterm.action_callback(function(window, pane)
+        -- Copy Modeが開いている間に選択テキストを取得
+        local text = window:get_selection_text_for_pane(pane)
+
+        -- クリップボードにコピー
+        window:perform_action(act.CopyTo("ClipboardAndPrimarySelection"), pane)
+
+        -- Copy Modeを閉じる
+        window:perform_action(act.Multiple({ "ScrollToBottom", { CopyMode = "Close" } }), pane)
+
+        -- 翻訳を直接実行
+        if text and text ~= "" then
+          translate.translate_text_in_pane(text, window, pane)
+        end
+      end),
     },
     -- scroll
     { key = "PageUp", mods = "NONE", action = act.CopyMode("PageUp") },
