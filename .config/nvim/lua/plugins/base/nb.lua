@@ -107,6 +107,41 @@ local function get_note_path(note_id)
   return vim.trim(path or ""), exit_code
 end
 
+local function resolve_note_identifier(note_id)
+  if not note_id or note_id == "" then
+    return nil
+  end
+  if M.config.default_notebook and not note_id:find(":") then
+    return M.config.default_notebook .. ":" .. note_id
+  end
+  return note_id
+end
+
+local function ensure_note_item_file(item)
+  if not item or not item.note_id then
+    return nil, "Missing note ID"
+  end
+
+  if item.file and item.file ~= "" then
+    return item.file, nil
+  end
+
+  local resolved_id = resolve_note_identifier(item.note_id)
+  if not resolved_id then
+    return nil, MESSAGES.NOTE_ID_PARSE_ERROR
+  end
+
+  local path, exit_code = get_note_path(resolved_id)
+  if exit_code ~= 0 or path == "" then
+    local err = path ~= "" and sanitize_output(path) or MESSAGES.NOTE_PATH_ERROR
+    return nil, err
+  end
+
+  item.file = path
+  item._resolved_note_id = resolved_id
+  return path, nil
+end
+
 -- ============================================================================
 -- Note Processing Functions
 -- ============================================================================
@@ -325,6 +360,7 @@ local function parse_note_list(notes)
       table.insert(items, {
         text = string.format("[%s] %s", note_id, title),
         note_id = note_id,
+        title = title,
         file = nil,
       })
     end
@@ -367,6 +403,7 @@ local function parse_search_results(notes, search_query)
       table.insert(items, {
         text = string.format("[%s] %s%s", note_id, title_part, match_context),
         note_id = note_id,
+        title = title_part,
         file = nil,
       })
 
@@ -391,6 +428,35 @@ local function create_picker(title, items, Snacks, picker_type, search_query)
       return {
         { item.text, "TelescopeResultsIdentifier" },
       }
+    end,
+    preview = function(ctx)
+      local item = ctx.item
+      if not item then
+        return
+      end
+
+      local path, err = ensure_note_item_file(item)
+      if not path then
+        local message
+        if type(err) == "table" then
+          message = table.concat(err, "\n")
+        else
+          message = tostring(err)
+        end
+        ctx.preview:notify(message, "warn", { item = false })
+        return
+      end
+
+      if not item.preview_title then
+        if item.note_id and item.title then
+          item.preview_title = string.format("[%s] %s", item.note_id, item.title)
+        elseif item.text then
+          item.preview_title = item.text
+        elseif item.note_id then
+          item.preview_title = string.format("[%s]", item.note_id)
+        end
+      end
+      return Snacks.picker.preview.file(ctx)
     end,
     confirm = function(picker, item)
       if item and item.note_id then
