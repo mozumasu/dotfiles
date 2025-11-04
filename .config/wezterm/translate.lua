@@ -41,26 +41,21 @@ local function translate_text_in_pane(text, _, pane)
           --no-stream --from '%s' --to '%s' --input '%s' 2>&1)
         exit_code=$?
 
-        clear
-
         if [ $exit_code -eq 0 ] && [ -n "$result" ]; then
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "翻訳結果 (%s → %s)"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo ""
-          echo "$result"
-          echo ""
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          printf "Press Enter to close..."
+          {
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "Translation Result (%s → %s)"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo ""
+            echo "$result"
+          } | /opt/homebrew/bin/nvim -R -c 'set filetype=markdown' -c 'nnoremap q :q<CR>' -c 'normal! gg' -
         else
-          echo "✗ Translation Error"
-          echo ""
-          echo "$result"
-          echo ""
-          printf "Press Enter to close..."
+          {
+            echo "✗ Translation Error"
+            echo ""
+            echo "$result"
+          } | /opt/homebrew/bin/nvim -R -c 'set filetype=markdown' -c 'nnoremap q :q<CR>' -c 'normal! gg' -
         fi
-
-        read
       ]],
         from_lang,
         to_lang,
