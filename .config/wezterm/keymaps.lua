@@ -33,6 +33,7 @@ local keys = {
     action = wezterm.action_callback(function(window, pane)
       window:perform_action(act.CopyMode("ClearPattern"), pane)
       window:perform_action(act.ActivateCopyMode, pane)
+      window:perform_action(act.CopyMode("MoveToViewportMiddle"), pane)
     end),
   },
   -- Command Palette
