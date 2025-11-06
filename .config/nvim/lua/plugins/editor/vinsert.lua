@@ -1,6 +1,6 @@
 return {
   "yuki-yano/vinsert.vim",
-  lazy = true,
+  lazy = false,
   cmd = { "VinsertToggle" },
   keys = {
     { "<C-.>", mode = { "i" } },
@@ -16,6 +16,7 @@ return {
     vim.g.vinsert_always_yank = true
 
     vim.g.vinsert_debug = true
+    vim.g.vinsert_text_stream = false
 
     vim.keymap.set("i", "<C-.>", function()
       vim.cmd("VinsertToggle insert")
