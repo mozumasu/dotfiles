@@ -56,9 +56,46 @@ local keys = {
       )
     end),
   },
-  -- Zoom mode
-  --     { key = "Z", mods = "CTRL", action = act.TogglePaneZoomState },
-  { key = "z", mods = "LEADER", action = act.TogglePaneZoomState },
+  -- Copy last command and its output
+  {
+    key = "z",
+    mods = "LEADER",
+    action = wezterm.action_callback(function(window, pane)
+      -- Enter copy mode
+      window:perform_action(act.ActivateCopyMode, pane)
+
+      -- Move to the previous Input zone (last command)
+      window:perform_action(act.CopyMode({ MoveBackwardZoneOfType = "Input" }), pane)
+
+      -- Start cell selection mode
+      window:perform_action(act.CopyMode({ SetSelectionMode = "Cell" }), pane)
+
+      -- Select up to the next Prompt zone (includes command and output)
+      window:perform_action(act.CopyMode({ MoveForwardZoneOfType = "Prompt" }), pane)
+
+      -- Move up one line and to end of line (exclude current prompt line)
+      window:perform_action(act.CopyMode("MoveUp"), pane)
+      window:perform_action(act.CopyMode("MoveToEndOfLineContent"), pane)
+
+      -- Copy to clipboard
+      window:perform_action(
+        act.Multiple({
+          { CopyTo = "ClipboardAndPrimarySelection" },
+          { Multiple = { "ScrollToBottom", { CopyMode = "Close" } } },
+        }),
+        pane
+      )
+
+      -- Show temporary status in status bar
+      window:set_right_status("📋 Copied!")
+      -- Clear after 3 seconds
+      wezterm.time.call_after(3, function()
+        window:set_right_status("")
+      end)
+    end),
+  },
+  -- Zoom mode (moved from leader+z to leader+Z)
+  { key = "Z", mods = "LEADER", action = act.TogglePaneZoomState },
   -- View terminal history in nvim
   {
     key = "a",
