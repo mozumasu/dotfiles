@@ -1,4 +1,4 @@
-~/src/github.com/mozumasu/nb/homeにYYYYMMDDHHMMSS.md形式でファイルを追加し、この内容の説明を書いて
+~/src/github.com/mozumasu/nb/homeにここまでのログをマークダウン形式で追加して
 nbは自動コミットされるためコミット不要
 
 - 公式ドキュメントを重視すること
