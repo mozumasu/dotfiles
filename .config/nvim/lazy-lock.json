@@ -79,10 +79,10 @@
   "vim-sandwich": { "branch": "master", "commit": "74cf93d58ccc567d8e2310a69860f1b93af19403" },
   "vim-translator": { "branch": "master", "commit": "6f0639c6d471a3a90ac19db96e1e379c030f74e3" },
   "vimdoc-ja": { "branch": "master", "commit": "800d34c52ab699cb4452e274ecbf9ff0b774626b" },
-  "vinsert.vim": { "branch": "main", "commit": "e47c1da4578e6d70184c966991dab78eba581c9b" },
+  "vinsert.vim": { "branch": "main", "commit": "f141061f2afe337fbad67e044c1cad8514bc3013" },
   "volt": { "branch": "main", "commit": "620de1321f275ec9d80028c68d1b88b409c0c8b1" },
   "which-key.nvim": { "branch": "main", "commit": "3aab2147e74890957785941f0c1ad87d0a44c15a" },
   "winresizer": { "branch": "master", "commit": "9bd559a03ccec98a458e60c705547119eb5350f3" },
-  "yazi.nvim": { "branch": "main", "commit": "08e8a671f4e66b4ee67d9e25bff1bb5aa8306d04" },
+  "yazi.nvim": { "branch": "main", "commit": "3023aaf372f2367d9018071fbba9c700f4df86cd" },
   "zenbones.nvim": { "branch": "main", "commit": "a934bc07d2ed4a98b74526c172d7f043736d8935" }
 }
