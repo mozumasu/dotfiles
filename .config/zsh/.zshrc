@@ -46,7 +46,20 @@ source "$ZRCDIR/function.zsh"
 # ----------------------------------------------------
 # Manage shell plugins by sheldon
 # https://sheldon.cli.rs/
-eval "$(sheldon source)"
+# eval "$(sheldon source)"
+
+# Storing file names in a variable
+cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}
+sheldon_cache="$cache_dir/sheldon.zsh"
+sheldon_toml="$HOME/.config/sheldon/plugins.toml"
+# Create cache when cache is missing or outdated
+if [[ ! -r "$sheldon_cache" || "$sheldon_toml" -nt "$sheldon_cache" ]]; then
+  mkdir -p $cache_dir
+  sheldon source > $sheldon_cache
+fi
+source "$sheldon_cache"
+# Remove variables that are no longer needed
+unset cache_dir sheldon_cache sheldon_toml
 
 # ----------------------------------------------------
 # Alias
