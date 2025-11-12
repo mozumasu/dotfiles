@@ -28,6 +28,7 @@
       "Read",
       "Create",
       "Write",
+      "Search",
       "MultiEdit",
       "NotebookEdit",
       "Fetch",
@@ -83,6 +84,21 @@
           {
             "type": "command",
             "command": "terminal-notifier -title \"Claude Notification\" -message \"$(basename \"$PWD\")\" & \nafplay /System/Library/Sounds/Glass.aiff"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path | select(endswith(\".js\") or endswith(\".ts\"))' | xargs -r prettier --write"
+          },
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path | select(endswith(\".md\"))' | xargs -r rumdl fmt"
           }
         ]
       }
