@@ -763,3 +763,8 @@ svnb() {
 svno() {
   open "$(svn info | grep ^URL | awk '{print $2}')"
 }
+
+# Co-Authored-By
+function cab() {
+  gh api /users/$1 -q '"Co-Authored-By: \(.name) <\(.id)+\(.login)@users.noreply.github.com>"'
+}
