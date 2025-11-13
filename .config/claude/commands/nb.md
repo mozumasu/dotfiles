@@ -1,4 +1,4 @@
-~/src/github.com/mozumasu/nb/homeにYYYYMMDDHHMMSS.md形式でファイルを追加し、この内容の説明を書いて
+~/src/github.com/mozumasu/nb/logにYYYYMMDDHHMMSS.md形式でファイルを追加し、この内容の説明を書いて
 nbは自動コミットされるためコミット不要
 
 - 公式ドキュメントを重視すること
