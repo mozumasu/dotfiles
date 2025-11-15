@@ -768,3 +768,16 @@ svno() {
 function cab() {
   gh api /users/$1 -q '"Co-Authored-By: \(.name) <\(.id)+\(.login)@users.noreply.github.com>"'
 }
+
+# suspend
+fancy-ctrl-z () {
+  if [[ $#BUFFER -eq 0 ]]; then
+    BUFFER=" fg"
+    zle accept-line
+  else
+    zle push-input
+  fi
+zle clear-screen
+}
+zle -N fancy-ctrl-z
+bindkey '^Z' fancy-ctrl-z
