@@ -43,6 +43,9 @@ export PATH="/usr/local/sbin:/usr/local/bin:$PATH"
 
 # ----------------------------------------------------
 
+# Nix
+export PATH="/nix/var/nix/profiles/default/bin:$HOME/.nix-profile/bin:$PATH"
+
 # Go
 export GOPATH="$XDG_DATA_HOME/go"
 export GO111MODULE="on"
