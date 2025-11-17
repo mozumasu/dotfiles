@@ -5,14 +5,14 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
   const nbSubcommandsCompletion = {
     name: "nb subcommands",
     patterns: [
-      "^\\s*nb\\s*$",        // Just "nb"
+      "^\\s*nb\\s*$", // Just "nb"
       "^\\s*nb\\s+help\\s*$", // "nb help"
     ],
     sourceCommand: "nb subcommands",
     options: {
       "--prompt": "'nb subcommand >'",
     },
-    callback: "echo {}",  // Just pass through the selected subcommand
+    callback: "echo {}", // Just pass through the selected subcommand
   };
 
   // nb notes completion with smart preview
@@ -20,7 +20,7 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
     name: "nb notes",
     patterns: [
       "^nb (e|edit|delete|show|open|peek|copy|move|mv|rename|export|do|pin|unpin|history|browse)( .*)? $",
-      "^nb (s|view)( .*)? $",  // Add shortcuts
+      "^nb (s|view)( .*)? $", // Add shortcuts
     ],
     sourceCommand: "nb ls --all --no-color | grep -E '^\\[[0-9]+\\]'",
     options: {
@@ -38,7 +38,8 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
       "^nb add --type $",
       "^nb a --type $",
     ],
-    sourceCommand: "echo -e 'bookmark\\nfolder\\nimage\\naudio\\nvideo\\ndocument\\ntext\\ntodo'",
+    sourceCommand:
+      "echo -e 'bookmark\\nfolder\\nimage\\naudio\\nvideo\\ndocument\\ntext\\ntodo'",
     options: {
       "--prompt": "'File type >'",
     },
@@ -72,7 +73,8 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
       "^nb s --tag $",
       "^nb s #",
     ],
-    sourceCommand: "nb ls --tags --no-color | tr ',' '\\n' | tr ' ' '\\n' | grep '^#' | sort -u",
+    sourceCommand:
+      "nb ls --tags --no-color | tr ',' '\\n' | tr ' ' '\\n' | grep '^#' | sort -u",
     options: {
       "--prompt": "'Tag >'",
     },
@@ -86,7 +88,8 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
       "^nb import $",
       "^nb i $",
     ],
-    sourceCommand: "find . -maxdepth 3 -type f \\( -name '*.md' -o -name '*.txt' -o -name '*.pdf' -o -name '*.html' \\) 2>/dev/null",
+    sourceCommand:
+      "find . -maxdepth 3 -type f \\( -name '*.md' -o -name '*.txt' -o -name '*.pdf' -o -name '*.html' \\) 2>/dev/null",
     options: {
       "--prompt": "'Import file >'",
       "--preview": "head -20 {}",
@@ -101,7 +104,8 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
       "^nb (move|mv) [0-9]+ $",
       "^nb (move|mv) .+ $",
     ],
-    sourceCommand: "nb notebooks --names --no-color && nb ls --folders --no-color | grep -E '^\\[[0-9]+\\]' | sed -E 's/^\\[([0-9]+)\\].*/\\1/'",
+    sourceCommand:
+      "nb notebooks --names --no-color && nb ls --folders --no-color | grep -E '^\\[[0-9]+\\]' | sed -E 's/^\\[([0-9]+)\\].*/\\1/'",
     options: {
       "--prompt": "'Move to >'",
     },
@@ -131,7 +135,8 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
     patterns: [
       "^nb git $",
     ],
-    sourceCommand: "echo -e 'status\\nlog\\ndiff\\nadd\\ncommit\\npush\\npull\\nfetch\\nbranch\\ncheckout\\nremote'",
+    sourceCommand:
+      "echo -e 'status\\nlog\\ndiff\\nadd\\ncommit\\npush\\npull\\nfetch\\nbranch\\ncheckout\\nremote'",
     options: {
       "--prompt": "'Git command >'",
     },
@@ -145,7 +150,8 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
       "^nb export [0-9]+ $",
       "^nb export .+ $",
     ],
-    sourceCommand: "echo -e 'html\\npdf\\ndocx\\nodtx\\nrtf\\nlatex\\nmarkdown\\nplain'",
+    sourceCommand:
+      "echo -e 'html\\npdf\\ndocx\\nodtx\\nrtf\\nlatex\\nmarkdown\\nplain'",
     options: {
       "--prompt": "'Export format >'",
     },
@@ -257,6 +263,11 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
       keyword: "nbep",
       snippet: "nb export --format pdf",
     },
+    {
+      name: "nb todos only incomplete",
+      keyword: "nt",
+      snippet: "nb todos open",
+    },
   ];
 
   return {
@@ -264,3 +275,4 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
     completions,
   };
 });
+
