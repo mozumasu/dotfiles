@@ -16,8 +16,8 @@ return {
     require("plamo-translate").setup({
       cli = {
         cmd = { "plamo-translate", "--no-stream" }, -- CLI command
-        from = "English", -- Source language
-        to = "Japanese", -- Target language
+        from = "Auto", -- Source language
+        to = "Auto", -- Target language
       },
       window = {
         position = "cursor", -- "center" | "cursor" | "right"
