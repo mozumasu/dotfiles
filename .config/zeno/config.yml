@@ -137,12 +137,12 @@ snippets:
     keyword: n
     snippet: notify
     context:
-      lbuffer: '.+;'
+      lbuffer: '.+\s'
 
   - keyword: plj
     snippet: '| plamo-translate --to Japanese'
     context:
-      lbuffer: '.+;'
+      lbuffer: '.+\s'
 
 completions:
   # simple sourceCommand, no callback
