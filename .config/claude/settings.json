@@ -108,6 +108,9 @@
     "type": "command",
     "command": "npx ccusage@latest statusline"
   },
+  "enabledPlugins": {
+    "example-skills@anthropic-agent-skills": true
+  },
   "alwaysThinkingEnabled": false,
   "maxTokens": 8192,
   "temperature": 0,
