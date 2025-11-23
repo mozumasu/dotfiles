@@ -1,0 +1,73 @@
+#!/usr/bin/env zsh
+
+local content_file="$1"   # 第1引数でファイルパスを受け取る
+local document_name="$2" # 第2引数でドキュメント名を受け取る
+local region="${3:-ap-northeast-1}" # 第3引数でリージョンを指定（デフォルトは ap-northeast-1）
+
+# 引数が指定されていない場合はエラーメッセージを表示して終了
+if [[ -z "$content_file" ]]; then
+  echo "Usage: create_ssm_document <content_file> [document_name] [region]"
+  return 1
+fi
+
+# 引数のファイルが存在しない場合
+if [[ ! -f "$content_file" ]]; then
+  echo "Error: File '$content_file' not found."
+  return 1
+fi
+
+# ドキュメント名が指定されていない場合、プロンプトで入力を求める
+if [[ -z "$document_name" ]]; then
+  echo "Enter the name for the SSM Document:"
+  read -r document_name
+fi
+
+# ドキュメント名が空の場合はエラーを表示して終了
+if [[ -z "$document_name" ]]; then
+  echo "Error: Document name cannot be empty."
+  return 1
+fi
+
+# fzfでドキュメントタイプを選択
+local document_type
+document_type=$(echo -e "Command\nAutomation\nPolicy\nSession\nPackage" | fzf --prompt="Select Document Type: ")
+
+if [[ -z "$document_type" ]]; then
+  echo "Error: No document type selected."
+  return 1
+fi
+
+# fzfでファイル形式を選択
+local file_format
+file_format=$(echo -e "YAML\nJSON" | fzf --prompt="Select File Format: ")
+
+if [[ -z "$file_format" ]]; then
+  echo "Error: No file format selected."
+  return 1
+fi
+
+# ファイル形式に応じて content の指定を変更
+local content_option
+if [[ "$file_format" == "YAML" ]]; then
+  content_option="file://$content_file"
+elif [[ "$file_format" == "JSON" ]]; then
+  content_option="file://$content_file"
+else
+  echo "Error: Invalid file format selected."
+  return 1
+fi
+
+# AWS CLIコマンドを実行してSSMドキュメントを作成
+aws ssm create-document \
+  --name "$document_name" \
+  --document-type "$document_type" \
+  --content "$content_option" \
+  --document-format "$file_format" \
+  --region "$region"
+
+# 結果を表示
+if [[ $? -eq 0 ]]; then
+  echo "SSM Document '$document_name' of type '$document_type' with format '$file_format' created successfully in region '$region'."
+else
+  echo "Failed to create SSM Document."
+fi

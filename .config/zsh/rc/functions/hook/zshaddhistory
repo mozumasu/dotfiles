@@ -1,0 +1,8 @@
+#!/usr/bin/env zsh
+# https://zsh.sourceforge.io/Doc/Release/Functions.html#Hook%E2%80%90Functions
+
+local line="${1%%$'\n'}"
+if [ $? -ne 0 ]; then
+    return 1
+fi
+[[ ! "$line" =~ "^(cd|jj?|lazygit|la|ll|ls|rm|rmdir|z)($| )" ]]

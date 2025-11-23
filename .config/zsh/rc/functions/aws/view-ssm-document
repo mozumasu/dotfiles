@@ -1,0 +1,37 @@
+#!/usr/bin/env zsh
+
+local region="${1:-ap-northeast-1}" # default region
+local temp_aws_file="/tmp/ssm_document_content.yml"
+
+# Get the list of ssm documents you created and select them with fzf.
+local document_name
+document_name=$(aws ssm list-documents \
+  --region "$region" \
+  --filters Key=Owner,Values=Self \
+  --query "DocumentIdentifiers[].Name" \
+  --output json | jq -r '.[]' | fzf --prompt="Select SSM Document to view: ")
+
+if [[ -z "$document_name" ]]; then
+  echo "No SSM Document selected. Exiting."
+  return 1
+fi
+
+echo "Selected SSM Document: $document_name"
+
+# Retrieves the contents of the selected document.
+aws ssm get-document \
+  --name "$document_name" \
+  --region "$region" \
+  --query "Content" \
+  --output text > "$temp_aws_file" 2>/dev/null
+
+if [[ $? -ne 0 ]]; then
+  echo "Error: Failed to retrieve content for SSM Document '$document_name'."
+  return 1
+fi
+
+# Display the contents of the retrieved document.
+echo "Content of SSM Document '$document_name':"
+bat "$temp_aws_file"
+
+rm -f "$temp_aws_file"

@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+
+touch README.md
+echo "# $(basename "$PWD")" >> README.md
+create_gitignore

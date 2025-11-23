@@ -1,0 +1,16 @@
+#!/usr/bin/env zsh
+
+# Open the selected application with new window
+local app=$(find /Applications -name "*.app" -maxdepth 1 | sed 's|/Applications/||' | fzf \
+  --prompt="Select an application: " \
+  --height=20% \
+  --preview="echo '🍎 Application Name: {1}\n' && echo '' && mdls -name kMDItemDisplayName -name kMDItemVersion -name kMDItemKind /Applications/{1} || echo 'No metadata available'" \
+  --preview-window=right:40%)
+
+if [[ -z "$app" ]]; then
+  echo "No application selected."
+  return 1
+fi
+
+echo "Opening $app..."
+open -n "/Applications/$app"

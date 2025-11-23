@@ -10,6 +10,9 @@ history:
     toggleScope: ctrl-r
 
 snippets:
+  - keyword: sym
+    snippet: ~/dotfiles/.bin/symlink.sh
+
   - name: "null"
     keyword: "null"
     snippet: ">/dev/null 2>&1"

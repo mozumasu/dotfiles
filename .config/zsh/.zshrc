@@ -10,11 +10,6 @@
 
 
 # ----------------------------------------------------
-# Keybind
-# ----------------------------------------------------
-source "$ZRCDIR/bindkey.zsh"
-
-# ----------------------------------------------------
 # homebrew
 # ----------------------------------------------------
 # eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -39,8 +34,16 @@ fi
 # ----------------------------------------------------
 # Function
 # ----------------------------------------------------
-source "$ZRCDIR/function.zsh"
+# Add functions directory and all subdirectories to the fpath
+fpath=($ZRCDIR/functions $ZRCDIR/functions/*(/N) $fpath)
 
+# Autoload all Files
+autoload -Uz $ZRCDIR/functions/*(N:t) $ZRCDIR/functions/**/*(N:t)
+
+# ----------------------------------------------------
+# Keybind
+# ----------------------------------------------------
+source "$ZRCDIR/bindkey.zsh"
 # ----------------------------------------------------
 # sheldon
 # ----------------------------------------------------
