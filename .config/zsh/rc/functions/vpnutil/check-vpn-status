@@ -1,0 +1,15 @@
+#!/usr/bin/env zsh
+
+# https://github.com/Timac/VPNStatus
+# Extract the output of vpnutil list as json.
+vpn_data=$(vpnutil list)
+
+# Extract connected vpn.
+connected_vpns=$(echo "$vpn_data" | jq -r '.VPNs[] | select(.status == "Connected") | "\(.name) (\(.status))"')
+
+if [[ -z "$connected_vpns" ]]; then
+  echo "No Connected"
+else
+  echo "Connected VPN:"
+  echo "$connected_vpns"
+fi

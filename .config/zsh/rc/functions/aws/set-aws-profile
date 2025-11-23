@@ -1,0 +1,31 @@
+#!/usr/bin/env zsh
+
+local selected_profile=$(aws configure list-profiles |
+  grep -v "default" |
+  sort |
+  fzf --prompt "Select PROFILE. If press Ctrl-C, unset PROFILE. > " \
+      --height 50% --layout=reverse --border --preview-window 'right:50%' \
+      --preview "grep {} -A5 ~/.aws/config")
+
+if [ -z "$selected_profile" ]; then
+  echo "Unset aws profile!"
+  unset AWS_PROFILE
+  unset AWS_ACCESS_KEY_ID
+  unset AWS_SECRET_ACCESS_KEY
+  return
+fi
+
+echo "Set the environment variable 'AWS_PROFILE' to '${selected_profile}'!"
+export AWS_PROFILE="$selected_profile"
+unset AWS_ACCESS_KEY_ID
+unset AWS_SECRET_ACCESS_KEY
+
+check_sso_session=$(aws sts get-caller-identity 2>&1)
+
+if [[ "$check_sso_session" == *"Token has expired"* || "$check_sso_session" == *"Token for ${selected_profile} does not exist"* ]]; then
+  echo -e "\n----------------------------\nSSO session is missing or expired! Logging in...\n----------------------------\n"
+  aws sso login --profile "${selected_profile}"
+  aws sts get-caller-identity
+else
+  echo "${check_sso_session}"
+fi

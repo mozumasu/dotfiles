@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+
+local selected_profile=$(aws-vault list | fzf --prompt "Select AWS Profile: " | awk '{print $1}')
+aws-vault login "$selected_profile"

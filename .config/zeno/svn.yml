@@ -1,0 +1,20 @@
+snippets:
+  - name: svn browse root dir
+    keyword: svnbr
+    snippet: open "$(svn info | awk '/Repository Root/ {print $3}')"
+
+  - name: nvn browse current dir
+    keyword: svnb
+    snippet: open "$(svn info | grep ^URL | awk '{print $2}')"
+
+  - name: svn status help
+    keyword: svnbat
+    snippet: bat ~/dotfiles/docs/svn.md
+
+  - name: svn add
+    keyword: svna
+    snippet: svn st | grep "^?" | awk "{print $2}" | xargs svn add
+
+  - name: svn remove
+    keyword: svnr
+    snippet: svn st | grep "^!" | awk "{print $2}" | xargs svn rm

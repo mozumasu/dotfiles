@@ -1,0 +1,20 @@
+#!/usr/bin/env zsh
+
+# https://github.com/Timac/VPNStatus
+vpn_data=$(vpnutil list)
+
+# Get the name and status of the VPN and select it with fzf.
+selected_vpn=$(echo "$vpn_data" | jq -r '.VPNs[] | "\(.name) (\(.status))"' | fzf --prompt="choose a vpn: ")
+
+# If there is no selected VPN, exit
+if [[ -z "$selected_vpn" ]]; then
+  echo "VPN selection canceled."
+  return
+fi
+
+# Extract the vpn name
+vpn_name=$(echo "$selected_vpn" | sed 's/ (.*)//')
+
+# Connection place
+echo "connection: $vpn_name"
+vpnutil start "$vpn_name"

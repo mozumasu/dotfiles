@@ -1,0 +1,21 @@
+#!/usr/bin/env zsh
+
+# https://github.com/Timac/VPNStatus
+vpn_data=$(vpnutil list)
+
+# Extract connected VPN
+connected_vpns=$(echo "$vpn_data" | jq -r '.VPNs[] | select(.status == "Connected") | .name')
+
+if [[ -z "$connected_vpns" ]]; then
+  echo "No vpn connected."
+else
+  echo "Disconnect the following VPN connections:"
+  echo "$connected_vpns"
+  
+  # Turn off each connected VPN.
+  for vpn in $connected_vpns; do
+    echo "cutting: $vpn"
+    vpnutil stop "$vpn"
+  done
+  echo "Disconnected all vpn connections."
+fi

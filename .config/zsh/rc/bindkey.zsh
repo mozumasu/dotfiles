@@ -11,7 +11,14 @@ bindkey -r "^X^F"
 # fzf
 zle -N fzf-history-widget
 # bindkey '^R' fzf-history-widget  # Disabled: Using zeno-smart-history-selection instead
+
+# ghq
+zle -N ghq-fzf
 bindkey '^g' ghq-fzf
+
+# custom Ctrl+Z to suspend only when running in terminal
+zle -N fancy-ctrl-z
+bindkey '^Z' fancy-ctrl-z
 
 # History search
 autoload -Uz history-search-end

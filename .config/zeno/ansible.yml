@@ -1,0 +1,6 @@
+snippets:
+  - keyword: ansible-init
+    snippets: mkdir -p group_vars/{development,production}/server_account group_vars/all/{secret,server_account} playbooks roles/{account,os_settings,pre_setup}/{defaults,tasks}
+
+  - keyword: ansible-create-role
+    snippets: mkdir -p roles/$1/{tasks,handlers,templates,files,vars,defaults,meta}

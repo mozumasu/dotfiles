@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+
+# Co-Authored-By
+gh api /users/$1 -q '"Co-Authored-By: \(.name) <\(.id)+\(.login)@users.noreply.github.com>"'

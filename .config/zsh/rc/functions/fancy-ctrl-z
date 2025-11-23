@@ -1,0 +1,9 @@
+#!/usr/bin/env zsh
+
+if [[ $#BUFFER -eq 0 ]]; then
+  BUFFER=" fg"
+  zle accept-line
+else
+  zle push-input
+fi
+zle clear-screen
