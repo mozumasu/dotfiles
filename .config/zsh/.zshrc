@@ -37,8 +37,8 @@ fi
 # Add functions directory and all subdirectories to the fpath
 fpath=($ZRCDIR/functions $ZRCDIR/functions/*(/N) $fpath)
 
-# Autoload all Files
-autoload -Uz $ZRCDIR/functions/*(N:t) $ZRCDIR/functions/**/*(N:t)
+# Autoload all Files and symlinks (exclude directories)
+autoload -Uz $ZRCDIR/functions/*(-.N:t) $ZRCDIR/functions/**/*(-.N:t)
 
 # ----------------------------------------------------
 # Keybind
