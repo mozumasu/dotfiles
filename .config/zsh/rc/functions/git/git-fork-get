@@ -1,0 +1,529 @@
+#!/usr/bin/env zsh
+
+# GitHub fork and clone with gh and ghq
+# Supports --private flag to create private repository instead of fork
+
+# ============================================
+# Helper Functions
+# ============================================
+
+# Check if required commands are available
+check_dependencies() {
+  local missing=()
+  for cmd in gh ghq git; do
+    if ! command -v "$cmd" >/dev/null; then
+      missing+=("$cmd")
+    fi
+  done
+
+  if [[ ${#missing[@]} -gt 0 ]]; then
+    echo "Error: Missing required commands: ${missing[*]}" >&2
+    echo "Please install them first." >&2
+    return 127
+  fi
+}
+
+# Show help message
+show_help() {
+  cat <<EOF
+Usage: git-fork-get [--private|-p] [OWNER/REPO | GITHUB_URL]
+
+Fork or create private copy of a GitHub repository and manage with ghq.
+
+Options:
+  --private, -p    Create a private copy instead of forking
+  --help, -h       Show this help message
+
+Examples:
+  git-fork-get owner/repo              # Fork the repository
+  git-fork-get --private owner/repo    # Create private copy
+  git-fork-get https://github.com/owner/repo
+  git-fork-get                         # Fork current repository
+EOF
+}
+
+# Parse command line arguments
+parse_arguments() {
+  local private_mode=false
+  local repo=""
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --private|-p)
+        private_mode=true
+        shift
+        ;;
+      --help|-h)
+        show_help
+        return 1
+        ;;
+      *)
+        if [[ -z "$repo" ]]; then
+          repo="$1"
+        else
+          echo "Too many arguments" >&2
+          return 2
+        fi
+        shift
+        ;;
+    esac
+  done
+
+  echo "$private_mode $repo"
+}
+
+# Normalize GitHub URL to OWNER/REPO format
+normalize_github_url() {
+  local url="$1"
+  local normalized="$url"
+
+  # Remove git@ prefix
+  normalized="${normalized#git@github.com:}"
+  # Remove https/http prefix
+  normalized="${normalized#https://github.com/}"
+  normalized="${normalized#http://github.com/}"
+  # Remove .git suffix
+  normalized="${normalized%.git}"
+
+  echo "$normalized"
+}
+
+# Get repository from current directory
+get_repo_from_current_dir() {
+  # Check if we're in a git repository
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "When no argument given, must be inside a git repository" >&2
+    return 2
+  fi
+
+  # Extract OWNER/REPO from origin
+  local url
+  url="$(git remote get-url origin 2>/dev/null || true)"
+  if [[ -z "$url" ]]; then
+    echo "origin remote not found" >&2
+    return 2
+  fi
+
+  normalize_github_url "$url"
+}
+
+# Determine target repository
+determine_repository() {
+  local repo="$1"
+
+  if [[ -n "$repo" ]]; then
+    case "$repo" in
+      https://github.com/*|http://github.com/*|git@github.com:*)
+        normalize_github_url "$repo"
+        ;;
+      */*)
+        echo "$repo"  # Already in OWNER/REPO format
+        ;;
+      *)
+        echo "Argument must be OWNER/REPO or GitHub URL" >&2
+        return 2
+        ;;
+    esac
+  else
+    get_repo_from_current_dir
+  fi
+}
+
+# Get GitHub username
+get_github_user() {
+  local me
+  me="$(gh api user -q .login 2>/dev/null)" || {
+    echo "Please run: gh auth login" >&2
+    return 1
+  }
+  echo "$me"
+}
+
+# Check if repository exists on GitHub
+repo_exists_on_github() {
+  local repo_path="$1"
+  gh repo view "$repo_path" >/dev/null 2>&1
+}
+
+# Suggest repository name for private mode
+suggest_private_repo_name() {
+  local base_name="$1"
+  local me="$2"
+  local suggested_name="$base_name"
+
+  # Check if repository with same name already exists
+  if repo_exists_on_github "$me/$suggested_name"; then
+    # Suggest a different name if it exists
+    local suffix_num=1
+    while repo_exists_on_github "$me/$suggested_name-private-$suffix_num"; do
+      suffix_num=$((suffix_num + 1))
+    done
+    suggested_name="$base_name-private-$suffix_num"
+    echo ""
+    echo "⚠️  Repository '$me/$base_name' already exists on GitHub"
+  fi
+
+  echo "$suggested_name"
+}
+
+# Prompt user for repository name
+prompt_for_repo_name() {
+  local suggested="$1"
+  local me="$2"
+
+  echo ""
+  echo "Repository name: $suggested"
+  echo -n "Use this name? (y/Enter to accept, or type a new name): "
+  read -r user_input
+
+  if [[ -z "$user_input" ]] || [[ "$user_input" == "y" ]] || [[ "$user_input" == "Y" ]]; then
+    echo "$suggested"
+  else
+    # Validate the new name
+    if [[ -z "$user_input" ]]; then
+      echo "Invalid repository name" >&2
+      return 1
+    fi
+
+    # Check if the new name already exists
+    if repo_exists_on_github "$me/$user_input"; then
+      echo "⚠️  Repository '$me/$user_input' already exists on GitHub" >&2
+      echo -n "Do you want to continue anyway? (y/n): "
+      read -r confirm
+      if [[ "$confirm" != "y" ]] && [[ "$confirm" != "Y" ]]; then
+        echo "Cancelled" >&2
+        return 1
+      fi
+    fi
+
+    echo "$user_input"
+  fi
+}
+
+# Handle existing local repository
+handle_existing_local_repo() {
+  local dst="$1"
+  local mode="$2"  # "private" or "fork"
+
+  echo ""
+  echo "⚠️  Repository already exists: $dst"
+  echo ""
+  echo "What would you like to do?"
+  echo "  1) Update existing repository"
+
+  if [[ "$mode" == "fork" ]]; then
+    echo "  2) Replace with fresh fork"
+  else
+    echo "  2) Use a different name"
+  fi
+
+  echo "  3) Cancel"
+  echo ""
+  echo -n "Enter your choice (1-3): "
+  read -r choice
+
+  echo "$choice"
+}
+
+# Clean up temporary directory
+cleanup_temp_dir() {
+  local tmp_dir="$1"
+  local original_dir="$2"
+
+  [[ -n "$original_dir" ]] && cd "$original_dir" 2>/dev/null
+  [[ -d "$tmp_dir" ]] && rm -rf "$tmp_dir"
+}
+
+# Create private repository on GitHub
+create_private_repo() {
+  local repo_name="$1"
+
+  echo "Creating private repository: $repo_name"
+  gh repo create "$repo_name" --private --clone=false || {
+    echo "Failed to create private repository" >&2
+    return 1
+  }
+}
+
+# Clone and push to private repository
+clone_and_push_to_private() {
+  local source_repo="$1"
+  local target_repo="$2"
+  local tmp_dir="$3"
+
+  echo "Cloning original repository..."
+  git clone "https://github.com/$source_repo" "$tmp_dir" || {
+    echo "Failed to clone original repository" >&2
+    return 1
+  }
+
+  cd "$tmp_dir" || {
+    echo "Failed to enter temporary directory" >&2
+    return 1
+  }
+
+  git remote set-url origin "https://github.com/$target_repo"
+  git remote add upstream "https://github.com/$source_repo"
+
+  echo "Pushing to private repository..."
+  git push origin --all || {
+    echo "Failed to push branches" >&2
+    return 1
+  }
+
+  git push origin --tags 2>/dev/null || {
+    echo "Note: No tags to push or failed to push tags" >&2
+  }
+}
+
+# Move repository to ghq location
+move_to_ghq_location() {
+  local tmp_dir="$1"
+  local dst="$2"
+
+  mkdir -p "$(dirname "$dst")" || {
+    echo "Failed to create destination directory" >&2
+    return 1
+  }
+
+  mv "$tmp_dir" "$dst" || {
+    echo "Failed to move repository to ghq location" >&2
+    return 1
+  }
+
+  cd "$dst" || {
+    echo "Failed to change to destination directory" >&2
+    return 1
+  }
+}
+
+# Handle private mode
+handle_private_mode() {
+  local repo="$1"
+  local me="$2"
+  local name="$3"
+  local root="$4"
+
+  echo "Private mode: Creating private copy of $repo"
+
+  local original_dir="$(pwd)"
+  local tmp_dir="/tmp/git-fork-get-$$"
+
+  # Suggest and prompt for repository name
+  local suggested_name=$(suggest_private_repo_name "$name" "$me")
+  local private_name=$(prompt_for_repo_name "$suggested_name" "$me") || {
+    cleanup_temp_dir "$tmp_dir" "$original_dir"
+    return 1
+  }
+
+  # Create private repository
+  create_private_repo "$me/$private_name" || {
+    cleanup_temp_dir "$tmp_dir" "$original_dir"
+    return 1
+  }
+
+  # Clone and push
+  clone_and_push_to_private "$repo" "$me/$private_name" "$tmp_dir" || {
+    cleanup_temp_dir "$tmp_dir" "$original_dir"
+    return 1
+  }
+
+  local dst="$root/github.com/$me/$private_name"
+
+  # Handle existing local repository
+  if [[ -d "$dst/.git" ]]; then
+    local choice=$(handle_existing_local_repo "$dst" "private")
+
+    case "$choice" in
+      1)  # Update existing
+        echo "Updating existing repository..."
+        cd "$dst" || {
+          cleanup_temp_dir "$tmp_dir" "$original_dir"
+          return 1
+        }
+        git fetch --all --prune
+        ;;
+      2)  # Use different name
+        echo -n "Enter new repository name: "
+        read -r new_name
+        if [[ -z "$new_name" ]]; then
+          echo "Invalid name" >&2
+          cleanup_temp_dir "$tmp_dir" "$original_dir"
+          return 1
+        fi
+
+        # Rename on GitHub
+        echo "Renaming GitHub repository to: $me/$new_name"
+        gh repo rename "$new_name" -R "$me/$private_name" || {
+          echo "Failed to rename GitHub repository" >&2
+          cleanup_temp_dir "$tmp_dir" "$original_dir"
+          return 1
+        }
+
+        private_name="$new_name"
+        dst="$root/github.com/$me/$private_name"
+
+        # Update remote and move
+        cd "$tmp_dir"
+        git remote set-url origin "https://github.com/$me/$private_name"
+        move_to_ghq_location "$tmp_dir" "$dst" || {
+          cleanup_temp_dir "$tmp_dir" "$original_dir"
+          return 1
+        }
+        ;;
+      3)  # Cancel
+        echo "Cancelled"
+        echo "Deleting created repository: $me/$private_name"
+        gh repo delete "$me/$private_name" --yes 2>/dev/null || {
+          echo "Note: Failed to delete repository. Please delete manually if needed." >&2
+        }
+        cleanup_temp_dir "$tmp_dir" "$original_dir"
+        return 0
+        ;;
+      *)
+        echo "Invalid choice" >&2
+        cleanup_temp_dir "$tmp_dir" "$original_dir"
+        return 1
+        ;;
+    esac
+  else
+    # Move to ghq location
+    move_to_ghq_location "$tmp_dir" "$dst" || {
+      cleanup_temp_dir "$tmp_dir" "$original_dir"
+      return 1
+    }
+  fi
+
+  # Clean up and set defaults
+  cleanup_temp_dir "$tmp_dir" ""
+  gh repo set-default "$me/$private_name" >/dev/null 2>&1 || true
+
+  # Show confirmation
+  echo ""
+  echo "✓ Private repository created: $me/$private_name"
+  echo "✓ Location: $dst"
+}
+
+# Handle fork mode
+handle_fork_mode() {
+  local repo="$1"
+  local me="$2"
+  local name="$3"
+  local root="$4"
+
+  echo "Fork mode: Creating fork of $repo"
+
+  # Create fork
+  if ! gh repo fork "$repo" --remote=false >/dev/null 2>&1; then
+    echo "Skip fork creation - may already exist" >&2
+  fi
+
+  local dst="$root/github.com/$me/$name"
+
+  # Handle existing local repository
+  if [[ -d "$dst/.git" ]]; then
+    local choice=$(handle_existing_local_repo "$dst" "fork")
+
+    case "$choice" in
+      1)  # Update existing
+        echo "Updating existing repository..."
+        cd "$dst" || {
+          echo "Failed to cd to $dst" >&2
+          return 1
+        }
+        ;;
+      2)  # Replace with fresh fork
+        echo "Backing up and replacing with fresh fork..."
+        local backup_dir="${dst}.backup.$(date +%Y%m%d%H%M%S)"
+        mv "$dst" "$backup_dir" || {
+          echo "Failed to backup existing repository" >&2
+          return 1
+        }
+        echo "Existing repository backed up to: $backup_dir"
+
+        ghq get "$me/$name" || {
+          echo "ghq get failed" >&2
+          echo "Restoring backup..."
+          mv "$backup_dir" "$dst"
+          return 1
+        }
+        cd "$dst" || {
+          echo "Failed to cd to $dst" >&2
+          return 1
+        }
+        ;;
+      3)  # Cancel
+        echo "Cancelled"
+        return 0
+        ;;
+      *)
+        echo "Invalid choice" >&2
+        return 1
+        ;;
+    esac
+  else
+    # Get fresh fork
+    ghq get "$me/$name" || {
+      echo "ghq get failed" >&2
+      return 1
+    }
+    cd "$dst" || {
+      echo "Failed to cd to $dst" >&2
+      return 1
+    }
+  fi
+
+  # Add upstream remote
+  if ! git remote get-url upstream >/dev/null 2>&1; then
+    git remote add upstream "https://github.com/$repo"
+  fi
+
+  git fetch upstream --prune
+  gh repo set-default "$me/$name" >/dev/null 2>&1 || true
+
+  # Show confirmation
+  echo ""
+  echo "✓ Fork created/updated: $me/$name"
+  echo "✓ Location: $dst"
+}
+
+# ============================================
+# Main Function (autoload format)
+# ============================================
+
+# Check dependencies
+check_dependencies || return $?
+
+# Parse arguments
+local args_result
+args_result=$(parse_arguments "$@") || return 0
+
+local private_mode="${args_result%% *}"
+local repo_arg="${args_result#* }"
+[[ "$repo_arg" == "$private_mode" ]] && repo_arg=""
+
+# Determine repository
+local repo
+repo=$(determine_repository "$repo_arg") || return $?
+
+# Get GitHub user
+local me
+me=$(get_github_user) || return $?
+
+# Extract repository info
+local name="${repo#*/}"
+local owner="${repo%/*}"
+local root
+root="$(ghq root)"
+
+# Execute based on mode
+if [[ "$private_mode" == "true" ]]; then
+  handle_private_mode "$repo" "$me" "$name" "$root"
+else
+  handle_fork_mode "$repo" "$me" "$name" "$root"
+fi
+
+# Show remote configuration
+echo ""
+echo "Remote configuration:"
+git remote -v
