@@ -134,7 +134,9 @@ alias mmv='noglob zmv -W'
 # completion
 # ----------------------------------------------------
 
-autoload -Uz compinit && compinit
+# Use -C to skip security check for faster startup
+# Completions are auto-refreshed by brew function wrapper
+autoload -Uz compinit && compinit -C
 # 補完候補をそのまま探す -> 小文字を大文字に変えて探す -> 大文字を小文字に変えて探す
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' '+m:{[:upper:]}={[:lower:]}'
 # Group by completion method
