@@ -75,6 +75,7 @@ return {
           input = {
             keys = {
               ["h"] = { "toggle_hidden", mode = { "n" } },
+              ["I"] = { "toggle_ignored", mode = { "n" } },
             },
           },
         },
