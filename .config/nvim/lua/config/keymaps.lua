@@ -62,6 +62,14 @@ end, { desc = "Terminal (cwd)" })
 keydel("n", "<leader>ft", { desc = "Terminal (cwd)" })
 keydel("n", "<leader>fT", { desc = "Terminal (root)" })
 
+-- Swap LazyGit keymaps (gg: cwd, gG: root)
+keymap("n", "<leader>gg", function()
+  Snacks.lazygit({ cwd = vim.fn.getcwd() })
+end, { desc = "LazyGit (cwd)" })
+keymap("n", "<leader>gG", function()
+  Snacks.lazygit({ cwd = LazyVim.root.get({ buf = 0 }) })
+end, { desc = "LazyGit (Root Dir)" })
+
 -- Find Files from project root
 keymap("n", "<leader><leader>", function()
   local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
