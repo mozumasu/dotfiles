@@ -19,10 +19,12 @@ defer = "{{ hooks | get: \"pre\" | nl }}{% for file in files %}zsh-defer source 
 github = "romkatv/zsh-defer"
 [plugins.zsh-autosuggestions]
 github = "zsh-users/zsh-autosuggestions"
+apply = ["defer"]
 [plugins.zsh-completions]
 github = "zsh-users/zsh-completions"
 [plugins.zeno]
 github = "yuki-yano/zeno.zsh"
 branch = "feature/sqlite-history-subsystem"
-[plugins.fast-syntax-highlighting ]
+[plugins.fast-syntax-highlighting]
 github = "zdharma-continuum/fast-syntax-highlighting"
+apply = ["defer"]
