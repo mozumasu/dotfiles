@@ -22,7 +22,6 @@ alias run-help >/dev/null 2>&1 && unalias run-help
 autoload -Uz run-help run-help-git run-help-openssl run-help-sudo
 
 # aws
-alias qc="q chat --model claude-4-sonnet --trust-tools=mcp,fs_read,fs_write"
 alias awsp='set-aws-profile'
 alias awsvl='aws-vault-login'
 alias ec2ls='(echo -e "InstanceId\tName\tPublicIpAddress" && aws ec2 describe-instances --query '\''Reservations[*].Instances[*].[InstanceId, Tags[?Key==`Name`].Value | [0], PublicIpAddress]'\'' --output text) | column -t'
