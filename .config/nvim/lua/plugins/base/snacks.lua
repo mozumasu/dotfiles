@@ -71,6 +71,13 @@ return {
         },
       },
       picker = {
+        win = {
+          input = {
+            keys = {
+              ["h"] = { "toggle_hidden", mode = { "n" } },
+            },
+          },
+        },
         sources = {
           recent = {
             transform = function(item, ctx)
