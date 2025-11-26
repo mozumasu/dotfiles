@@ -6,6 +6,23 @@
 #
 # ----------------------------------------------------
 
+# ----------------------------------------------------
+# zcompile - Compile zsh files for faster loading
+# ----------------------------------------------------
+# Compile zsh file if not compiled or source is newer
+function ensure_zcompiled {
+  local src=$1
+  local zwc="$src.zwc"
+  if [[ ! -r "$zwc" || "$src" -nt "$zwc" ]]; then
+    zcompile "$src"
+  fi
+}
+
+# Override source to auto-compile
+function source {
+  ensure_zcompiled "$1"
+  builtin source "$1"
+}
 
 # ----------------------------------------------------
 # homebrew
@@ -29,6 +46,7 @@ if type mise &>/dev/null; then
   if [[ ! -r "$_mise_cache" || "$(command -v mise)" -nt "$_mise_cache" ]]; then
     mise activate zsh > "$_mise_cache"
     mise activate --shims >> "$_mise_cache"
+    zcompile "$_mise_cache"
   fi
   source "$_mise_cache"
   unset _mise_cache
@@ -61,7 +79,8 @@ sheldon_toml="$HOME/.config/sheldon/plugins.toml"
 # Create cache when cache is missing or outdated
 if [[ ! -r "$sheldon_cache" || "$sheldon_toml" -nt "$sheldon_cache" ]]; then
   mkdir -p $cache_dir
-  sheldon source > $sheldon_cache
+  sheldon source > "$sheldon_cache"
+  zcompile "$sheldon_cache"
 fi
 source "$sheldon_cache"
 # Remove variables that are no longer needed
@@ -179,6 +198,7 @@ _starship_cache="${XDG_CACHE_HOME:-$HOME/.cache}/starship.zsh"
 _starship_config="${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
 if [[ ! -r "$_starship_cache" || "$_starship_config" -nt "$_starship_cache" || "$(command -v starship)" -nt "$_starship_cache" ]]; then
   starship init zsh > "$_starship_cache"
+  zcompile "$_starship_cache"
 fi
 source "$_starship_cache"
 unset _starship_cache _starship_config
@@ -189,6 +209,7 @@ unset _starship_cache _starship_config
 _zoxide_cache="${XDG_CACHE_HOME:-$HOME/.cache}/zoxide.zsh"
 if [[ ! -r "$_zoxide_cache" || "$(command -v zoxide)" -nt "$_zoxide_cache" ]]; then
   zoxide init zsh > "$_zoxide_cache"
+  zcompile "$_zoxide_cache"
 fi
 source "$_zoxide_cache"
 unset _zoxide_cache
