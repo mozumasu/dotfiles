@@ -92,11 +92,6 @@ unset cache_dir sheldon_cache sheldon_toml
 source "$ZRCDIR/alias.zsh"
 
 # ----------------------------------------------------
-# SSH WezTerm integration
-# ----------------------------------------------------
-source "$ZRCDIR/ssh-wezterm.zsh"
-
-# ----------------------------------------------------
 # Options
 # ----------------------------------------------------
 source "$ZRCDIR/option.zsh"
