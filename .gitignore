@@ -28,8 +28,8 @@ Session.vim
 # zsh
 .zsh_history
 .config/zsh/.zsh_sessions/*
-.config/zsh/.zshrc.zwc
 .config/zsh/.zcompdump
+*.zwc
 .config/zsh-abbr/*
 
 # nvm
