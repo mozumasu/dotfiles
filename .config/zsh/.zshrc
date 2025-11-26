@@ -156,7 +156,7 @@ fi
 # ----------------------------------------------------
 # wezterm
 # ----------------------------------------------------
-source "$HOME/.config/zsh/rc/pluginconfig/wezterm.zsh"
+zsh-defer -a source "$HOME/.config/zsh/rc/pluginconfig/wezterm.zsh"
 
 # ----------------------------------------------------
 # aws
@@ -177,7 +177,7 @@ fi
 # Disable fzf completion to use zeno completion
 # source "/opt/homebrew/opt/fzf/shell/completion.zsh"
 # key-bindings (default: /opt/homebrew/opt/fzf/shell/key-bindings.zsh)
-source "$HOME/dotfiles/.config/zsh/rc/pluginconfig/fzf.key-bindings.zsh"
+zsh-defer source "$HOME/dotfiles/.config/zsh/rc/pluginconfig/fzf.key-bindings.zsh"
 
 # ----------------------------------------------------
 # starship
