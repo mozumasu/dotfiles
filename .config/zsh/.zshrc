@@ -169,17 +169,6 @@ source "$HOME/.config/zsh/rc/pluginconfig/aws.zsh"
 source "$HOME/.config/zsh/rc/pluginconfig/zeno.zsh"
 
 # ----------------------------------------------------
-# NVM (Node Version Manager)
-# ----------------------------------------------------
-export NVM_DIR="$HOME/.config/nvm"
-if [[ -s "$NVM_DIR/nvm.sh" ]]; then
-  zsh-defer source "$NVM_DIR/nvm.sh"
-fi
-if [[ -s "$NVM_DIR/bash_completion" ]]; then
-  zsh-defer source "$NVM_DIR/bash_completion"
-fi
-
-# ----------------------------------------------------
 # fzf
 # ----------------------------------------------------
 if [[ ! "$PATH" == */opt/homebrew/opt/fzf/bin* ]]; then
