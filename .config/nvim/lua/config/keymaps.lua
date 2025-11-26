@@ -62,22 +62,33 @@ end, { desc = "Terminal (cwd)" })
 keydel("n", "<leader>ft", { desc = "Terminal (cwd)" })
 keydel("n", "<leader>fT", { desc = "Terminal (root)" })
 
+-- Get git root from current buffer
+local function get_git_root()
+  local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
+  local git_root = vim.fn.systemlist("git -C " .. vim.fn.shellescape(buf_dir) .. " rev-parse --show-toplevel")[1]
+  return (vim.v.shell_error == 0 and git_root) or LazyVim.root.get({ buf = 0 })
+end
+
 -- Swap LazyGit keymaps (gg: cwd, gG: root)
 keymap("n", "<leader>gg", function()
   Snacks.lazygit({ cwd = vim.fn.getcwd() })
 end, { desc = "LazyGit (cwd)" })
 keymap("n", "<leader>gG", function()
-  Snacks.lazygit({ cwd = LazyVim.root.get({ buf = 0 }) })
+  Snacks.lazygit({ cwd = get_git_root() })
 end, { desc = "LazyGit (Root Dir)" })
 
 -- Find Files from project root
 keymap("n", "<leader><leader>", function()
-  local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
-  local git_root = vim.fn.systemlist("git -C " .. vim.fn.shellescape(buf_dir) .. " rev-parse --show-toplevel")[1]
-  local cwd = (vim.v.shell_error == 0 and git_root) or LazyVim.root.get({ buf = 0 })
+  local cwd = get_git_root()
   local hidden = cwd:match("dotfiles$") ~= nil
   Snacks.picker.files({ cwd = cwd, hidden = hidden })
 end, { desc = "Find Files (Root Dir)" })
+
+-- Grep from project root
+keymap("n", "<leader>/", function()
+  local cwd = get_git_root()
+  Snacks.picker.grep({ cwd = cwd })
+end, { desc = "Grep (Root Dir)" })
 
 -- browse under cursor
 keymap("n", "gh", function()
