@@ -25,8 +25,13 @@ export MANPATH="/usr/local/share/man/ja_JP.UTF-8:$(manpath)"
 # mise
 # ----------------------------------------------------
 if type mise &>/dev/null; then
-  eval "$(mise activate zsh)"
-  eval "$(mise activate --shims)"
+  _mise_cache="${XDG_CACHE_HOME:-$HOME/.cache}/mise.zsh"
+  if [[ ! -r "$_mise_cache" || "$(command -v mise)" -nt "$_mise_cache" ]]; then
+    mise activate zsh > "$_mise_cache"
+    mise activate --shims >> "$_mise_cache"
+  fi
+  source "$_mise_cache"
+  unset _mise_cache
 fi
 
 # ----------------------------------------------------
@@ -170,11 +175,22 @@ source "$HOME/dotfiles/.config/zsh/rc/pluginconfig/fzf.key-bindings.zsh"
 # ----------------------------------------------------
 # starship
 # ----------------------------------------------------
-eval "$(starship init zsh)"
+_starship_cache="${XDG_CACHE_HOME:-$HOME/.cache}/starship.zsh"
+_starship_config="${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
+if [[ ! -r "$_starship_cache" || "$_starship_config" -nt "$_starship_cache" || "$(command -v starship)" -nt "$_starship_cache" ]]; then
+  starship init zsh > "$_starship_cache"
+fi
+source "$_starship_cache"
+unset _starship_cache _starship_config
 
 # ----------------------------------------------------
-# Must be at the end of the file
+# zoxide (Must be at the end of the file)
 # ----------------------------------------------------
-eval "$(zoxide init zsh)"
+_zoxide_cache="${XDG_CACHE_HOME:-$HOME/.cache}/zoxide.zsh"
+if [[ ! -r "$_zoxide_cache" || "$(command -v zoxide)" -nt "$_zoxide_cache" ]]; then
+  zoxide init zsh > "$_zoxide_cache"
+fi
+source "$_zoxide_cache"
+unset _zoxide_cache
 
 source ~/.safe-chain/scripts/init-posix.sh # Safe-chain Zsh initialization script
