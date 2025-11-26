@@ -161,11 +161,6 @@ fi
 zsh-defer -a source "$HOME/.config/zsh/rc/pluginconfig/wezterm.zsh"
 
 # ----------------------------------------------------
-# aws
-# ----------------------------------------------------
-source "$HOME/.config/zsh/rc/pluginconfig/aws.zsh"
-
-# ----------------------------------------------------
 # zeno.zsh
 # ----------------------------------------------------
 source "$HOME/.config/zsh/rc/pluginconfig/zeno.zsh"
