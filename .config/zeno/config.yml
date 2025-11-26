@@ -147,6 +147,9 @@ snippets:
     context:
       lbuffer: '.+\s'
 
+  - keyword: speed
+    snippet: hyperfine --warmup 5 --runs 10 'zsh -i -c exit'
+
 completions:
   # simple sourceCommand, no callback
   - name: kill signal
