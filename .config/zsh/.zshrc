@@ -1,5 +1,3 @@
-# Amazon Q pre block. Keep at the top of this file.
-[[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh"
 # ----------------------------------------------------
 # .zshrc
 #
@@ -178,8 +176,5 @@ eval "$(starship init zsh)"
 # Must be at the end of the file
 # ----------------------------------------------------
 eval "$(zoxide init zsh)"
-
-# Amazon Q post block. Keep at the bottom of this file.
-[[ -f "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh"
 
 source ~/.safe-chain/scripts/init-posix.sh # Safe-chain Zsh initialization script
