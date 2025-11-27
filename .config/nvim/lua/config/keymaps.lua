@@ -87,7 +87,8 @@ end, { desc = "Find Files (Root Dir)" })
 -- Grep from project root
 keymap("n", "<leader>/", function()
   local cwd = get_git_root()
-  Snacks.picker.grep({ cwd = cwd })
+  local hidden = cwd:match("dotfiles$") ~= nil
+  Snacks.picker.grep({ cwd = cwd, hidden = hidden })
 end, { desc = "Grep (Root Dir)" })
 
 -- browse under cursor

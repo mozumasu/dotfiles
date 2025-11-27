@@ -52,6 +52,29 @@ return {
     ---@type snacks.Config
     opts = {
       scroll = { enabled = false },
+      dashboard = {
+        preset = {
+          keys = {
+            { icon = " ", key = "f", desc = "Find File", action = function()
+              local cwd = vim.fn.getcwd()
+              local hidden = cwd:match("dotfiles$") ~= nil
+              Snacks.picker.files({ cwd = cwd, hidden = hidden })
+            end },
+            { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
+            { icon = " ", key = "g", desc = "Find Text", action = function()
+              local cwd = vim.fn.getcwd()
+              local hidden = cwd:match("dotfiles$") ~= nil
+              Snacks.picker.grep({ cwd = cwd, hidden = hidden })
+            end },
+            { icon = " ", key = "r", desc = "Recent Files", action = function() Snacks.picker.recent() end },
+            { icon = " ", key = "c", desc = "Config", action = function() Snacks.picker.files({ cwd = vim.fn.stdpath("config"), hidden = true }) end },
+            { icon = " ", key = "s", desc = "Restore Session", section = "session" },
+            { icon = "󰒲 ", key = "x", desc = "Lazy Extras", action = ":LazyExtras" },
+            { icon = "󰒲 ", key = "l", desc = "Lazy", action = ":Lazy" },
+            { icon = " ", key = "q", desc = "Quit", action = ":qa" },
+          },
+        },
+      },
       image = {
         enabled = true,
         doc = {
