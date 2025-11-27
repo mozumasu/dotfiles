@@ -184,11 +184,6 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
       snippet: "nb add --type todo --title",
     },
     {
-      name: "nb add note",
-      keyword: "nba",
-      snippet: "nb add",
-    },
-    {
       name: "nb add folder",
       keyword: "nbf",
       snippet: "nb add --type folder",
@@ -275,4 +270,3 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
     completions,
   };
 });
-
