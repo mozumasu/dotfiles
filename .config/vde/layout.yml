@@ -1,0 +1,25 @@
+presets:
+  web-dev:
+    name: My Scratch Workspace
+    description: editor, container
+    layout:
+      type: horizontal
+      ratio: [3, 2]
+      panes:
+        - name: editor
+          command: nvim
+          focus: true
+        - type: vertical
+          ratio: [7, 3]
+          panes:
+            - name: git
+              command: lazygit
+              env:
+                NODE_ENV: development
+            - name: logs
+              command: cmatrix
+              title: cmatrix
+              # delay: 500
+  monitor:
+    name: Monitor
+    command: htop
