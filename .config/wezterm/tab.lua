@@ -101,11 +101,13 @@ function module.apply_to_config(config)
     wezterm.log_info("Current workspace: " .. tostring(workspace))
     table.insert(left_status, " " .. workspace .. " ")
 
-    -- Check if in copy mode
+    -- Check key table mode for workspace color
     local key_table = window:active_key_table()
     local workspace_color = "#80EBDF"  -- Default color (cyan)
     if key_table == "copy_mode" then
       workspace_color = "#ffd700"  -- Yellow for copy mode
+    elseif key_table == "setting_mode" then
+      workspace_color = "#39FF14"  -- Neon green for setting mode
     end
 
     -- Shown on the left
