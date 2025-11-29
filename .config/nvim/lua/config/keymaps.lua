@@ -62,6 +62,12 @@ end, { desc = "Terminal (cwd)" })
 keydel("n", "<leader>ft", { desc = "Terminal (cwd)" })
 keydel("n", "<leader>fT", { desc = "Terminal (root)" })
 
+-- Notification History: <leader>n -> <leader>nn
+keydel("n", "<leader>n")
+keymap("n", "<leader>nn", function()
+  Snacks.notifier.show_history()
+end, { desc = "Notification History" })
+
 -- Get git root from current buffer
 local function get_git_root()
   local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
