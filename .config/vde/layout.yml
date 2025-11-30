@@ -23,3 +23,23 @@ presets:
   monitor:
     name: Monitor
     command: htop
+  zenn:
+    name: Zenn Workspace
+    description: nvim, claude, server
+    layout:
+      type: horizontal
+      ratio: [1, 1]
+      panes:
+      - name: editor
+        command: nvim
+        cwd: /Users/mozumasu/src/github.com/mozumasu/zenn
+        focus: true
+      - type: vertical
+        ratio: [9, 1]
+        panes:
+          - name: claude
+            command: claude
+            cwd: /Users/mozumasu/src/github.com/mozumasu/zenn
+          - name: server
+            command: task pv
+            cwd: /Users/mozumasu/src/github.com/mozumasu/zenn
