@@ -7,19 +7,29 @@
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
 
--- 背景透過を常に適用する
--- vim.api.nvim_create_autocmd("ColorScheme", {
---   pattern = "*",
---   callback = function()
---     vim.cmd([[
---       highlight Normal guibg=NONE ctermbg=NONE
---       highlight NormalNC guibg=NONE ctermbg=NONE
---       highlight NormalFloat guibg=NONE ctermbg=NONE
---       highlight FloatBorder guibg=NONE ctermbg=NONE
---       highlight VertSplit guibg=NONE ctermbg=NONE
---     ]])
---   end,
--- })
+-- 背景透過を維持（Zenモードで:w後も透明を保つ）
+local function apply_transparent_bg()
+  vim.cmd([[
+    highlight Normal guibg=NONE ctermbg=NONE
+    highlight NormalNC guibg=NONE ctermbg=NONE
+    highlight NormalFloat guibg=NONE ctermbg=NONE
+    highlight FloatBorder guibg=NONE ctermbg=NONE
+    highlight VertSplit guibg=NONE ctermbg=NONE
+    highlight SnacksBackdrop guibg=NONE ctermbg=NONE
+    highlight SnacksNormal guibg=NONE ctermbg=NONE
+    highlight SnacksNormalNC guibg=NONE ctermbg=NONE
+  ]])
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    pcall(vim.api.nvim_win_set_option, win, "winblend", 0)
+  end
+end
+
+vim.api.nvim_create_autocmd({ "BufWritePost", "ColorScheme" }, {
+  pattern = "*",
+  callback = function()
+    vim.schedule(apply_transparent_bg)
+  end,
+})
 
 vim.api.nvim_create_user_command("CountCleanTextLength", function()
   local bufnr = 0
