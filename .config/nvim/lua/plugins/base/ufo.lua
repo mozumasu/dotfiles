@@ -1,26 +1,69 @@
--- Custom provider for :::details folding (Zenn markdown syntax)
-local function detailsFoldProvider(bufnr)
+-- Custom markdown fold provider for :::details and headings
+---@param bufnr number
+---@return UfoFoldingRange[]
+local function markdownFoldProvider(bufnr)
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
   local folds = {}
-  local stack = {}
+  local detailsStack = {}
+  local headingStack = {} -- {lineNum, level}
+
+  local function getHeadingLevel(line)
+    local hashes = line:match("^(#+)%s")
+    return hashes and #hashes or 0
+  end
+
+  local function skipTrailingEmptyLines(endLine)
+    while endLine > 0 and lines[endLine + 1] and lines[endLine + 1]:match("^%s*$") do
+      endLine = endLine - 1
+    end
+    return endLine
+  end
+
+  local function closeHeadingsAtOrAbove(level, endLine)
+    while #headingStack > 0 and headingStack[#headingStack].level >= level do
+      local h = table.remove(headingStack)
+      local adjustedEnd = skipTrailingEmptyLines(endLine - 1)
+      if adjustedEnd > h.lineNum then
+        table.insert(folds, { startLine = h.lineNum, endLine = adjustedEnd })
+      end
+    end
+  end
 
   for i, line in ipairs(lines) do
     local lineNum = i - 1 -- 0-indexed
+
+    -- Handle :::details
     if line:match("^:::details") then
-      table.insert(stack, lineNum)
-    elseif line:match("^:::$") and #stack > 0 then
-      local startLine = table.remove(stack)
-      table.insert(folds, { startLine = startLine, endLine = lineNum, kind = "region" })
+      table.insert(detailsStack, lineNum)
+    elseif line:match("^:::$") and #detailsStack > 0 then
+      local startLine = table.remove(detailsStack)
+      table.insert(folds, { startLine = startLine, endLine = lineNum })
+    end
+
+    -- Handle headings
+    local level = getHeadingLevel(line)
+    if level > 0 then
+      closeHeadingsAtOrAbove(level, lineNum)
+      table.insert(headingStack, { lineNum = lineNum, level = level })
+    end
+  end
+
+  -- Close remaining headings at end of file
+  local lastLine = skipTrailingEmptyLines(#lines - 1)
+  for j = #headingStack, 1, -1 do
+    local h = headingStack[j]
+    if lastLine > h.lineNum then
+      table.insert(folds, { startLine = h.lineNum, endLine = lastLine })
     end
   end
 
   return folds
 end
 
--- Custom fold text handler to show :::details title
+-- Custom fold text handler to show fold info
 local function foldTextHandler(virtText, lnum, endLnum, width, truncate)
   local newVirtText = {}
-  local suffix = (" 󰁂 %d lines"):format(endLnum - lnum)
+  local suffix = (" 󰁂 %d "):format(endLnum - lnum)
   local sufWidth = vim.fn.strdisplaywidth(suffix)
   local targetWidth = width - sufWidth
   local curWidth = 0
@@ -43,7 +86,7 @@ local function foldTextHandler(virtText, lnum, endLnum, width, truncate)
     curWidth = curWidth + chunkWidth
   end
 
-  table.insert(newVirtText, { suffix, "Comment" })
+  table.insert(newVirtText, { suffix, "MoreMsg" })
   return newVirtText
 end
 
@@ -57,20 +100,14 @@ return {
     fold_virt_text_handler = foldTextHandler,
     provider_selector = function(bufnr, filetype, buftype)
       if filetype == "markdown" then
-        return function(bufnr)
-          local detailsFolds = detailsFoldProvider(bufnr)
-          if #detailsFolds > 0 then
-            return detailsFolds
-          end
-          return nil -- Fallback to default providers
-        end
+        return markdownFoldProvider
       end
       return { "treesitter", "indent" }
     end,
   },
   init = function()
-    vim.o.foldcolumn = "1" -- '0' is not bad
-    vim.o.foldlevel = 99 -- Using ufo provider need a large value
+    vim.o.foldcolumn = "1"
+    vim.o.foldlevel = 99
     vim.o.foldlevelstart = 99
     vim.o.foldenable = true
   end,
