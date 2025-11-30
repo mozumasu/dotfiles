@@ -1,10 +1,10 @@
--- Custom markdown fold provider for :::details and headings
+-- Custom markdown fold provider for Zenn blocks (:::details, :::message) and headings
 ---@param bufnr number
 ---@return UfoFoldingRange[]
 local function markdownFoldProvider(bufnr)
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
   local folds = {}
-  local detailsStack = {}
+  local zennBlockStack = {}
   local headingStack = {} -- {lineNum, level}
 
   local function getHeadingLevel(line)
@@ -39,12 +39,12 @@ local function markdownFoldProvider(bufnr)
       inCodeBlock = not inCodeBlock
     end
 
-    -- Handle :::details (outside code blocks)
+    -- Handle Zenn blocks: :::details, :::message (outside code blocks)
     if not inCodeBlock then
-      if line:match("^:::details") then
-        table.insert(detailsStack, lineNum)
-      elseif line:match("^:::$") and #detailsStack > 0 then
-        local startLine = table.remove(detailsStack)
+      if line:match("^:::details") or line:match("^:::message") then
+        table.insert(zennBlockStack, lineNum)
+      elseif line:match("^:::$") and #zennBlockStack > 0 then
+        local startLine = table.remove(zennBlockStack)
         table.insert(folds, { startLine = startLine, endLine = lineNum })
       end
 
