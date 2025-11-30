@@ -29,22 +29,31 @@ local function markdownFoldProvider(bufnr)
     end
   end
 
+  local inCodeBlock = false
+
   for i, line in ipairs(lines) do
     local lineNum = i - 1 -- 0-indexed
 
-    -- Handle :::details
-    if line:match("^:::details") then
-      table.insert(detailsStack, lineNum)
-    elseif line:match("^:::$") and #detailsStack > 0 then
-      local startLine = table.remove(detailsStack)
-      table.insert(folds, { startLine = startLine, endLine = lineNum })
+    -- Track code blocks (``` or ~~~)
+    if line:match("^```") or line:match("^~~~") then
+      inCodeBlock = not inCodeBlock
     end
 
-    -- Handle headings
-    local level = getHeadingLevel(line)
-    if level > 0 then
-      closeHeadingsAtOrAbove(level, lineNum)
-      table.insert(headingStack, { lineNum = lineNum, level = level })
+    -- Handle :::details (outside code blocks)
+    if not inCodeBlock then
+      if line:match("^:::details") then
+        table.insert(detailsStack, lineNum)
+      elseif line:match("^:::$") and #detailsStack > 0 then
+        local startLine = table.remove(detailsStack)
+        table.insert(folds, { startLine = startLine, endLine = lineNum })
+      end
+
+      -- Handle headings (outside code blocks)
+      local level = getHeadingLevel(line)
+      if level > 0 then
+        closeHeadingsAtOrAbove(level, lineNum)
+        table.insert(headingStack, { lineNum = lineNum, level = level })
+      end
     end
   end
 
