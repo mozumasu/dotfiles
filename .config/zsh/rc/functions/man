@@ -1,27 +1,27 @@
 #!/usr/bin/env zsh
 # https://rcmdnk.com/blog/2014/07/20/computer-vim/
 
-local p
-local m
-if [ "$PAGER" != "" ];then
-  p="$PAGER"
-fi
-if [ "$MANPAGER" != "" ];then
-  m="$MANPAGER"
-fi
+local p="$PAGER"
+local m="$MANPAGER"
+local val ret
+
 unset PAGER
 unset MANPAGER
-val=$(command man $@ 2>&1)
+
+val=$(command man "$@" 2>&1)
 ret=$?
-if [ $ret -eq 0 ];then
-  echo "$val"|col -bx|nvim -R -c 'set ft=man' -
+
+if [ $ret -eq 0 ]; then
+  printf '%s\n' "$val" | col -bx | nvim -R -c 'set ft=man' -
 else
-  echo "$val"
+  printf '%s\n' "$val"
 fi
-if [ "$p" != "" ];then
+
+if [ -n "$p" ]; then
   export PAGER="$p"
 fi
-if [ "$m" != "" ];then
+if [ -n "$m" ]; then
   export MANPAGER="$m"
 fi
+
 return $ret
