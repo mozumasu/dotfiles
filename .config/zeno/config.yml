@@ -13,6 +13,9 @@ snippets:
   - keyword: sym
     snippet: ~/dotfiles/.bin/symlink.sh
 
+  - keyword: rm-ln
+    snippet: find ~/.config -type l ! -exec test -e {} \; -exec rm -i {} \;
+
   - name: "null"
     keyword: "null"
     snippet: ">/dev/null 2>&1"
