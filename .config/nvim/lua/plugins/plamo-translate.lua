@@ -31,7 +31,7 @@ return {
             height = 0.6, -- 60% of screen height
           },
           cursor = {
-            width = 0.5, -- Smaller, less intrusive
+            width = 0.7, -- Smaller, less intrusive
             height = 0.1,
           },
           right = {
