@@ -1,12 +1,60 @@
 #!/usr/bin/env zsh
 
 # List tags for S3 buckets (only for buckets with tags)
+# Usage: s3-bucket-tags [-a|--all]
+#   -a, --all  Include AWS system tags (aws:* prefix)
+
+local bucket result key value
+local -i found=0
+local -i show_system_tags=0
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -a|--all)
+      show_system_tags=1
+      shift
+      ;;
+    -h|--help)
+      echo "Usage: s3-bucket-tags [-a|--all]"
+      echo "  -a, --all  Include AWS system tags (aws:* prefix)"
+      return 0
+      ;;
+    *)
+      echo "Unknown option: $1"
+      return 1
+      ;;
+  esac
+done
+
+print -P "%F{cyan}Fetching S3 bucket tags...%f"
+echo ""
 
 for bucket in $(aws s3api list-buckets --query 'Buckets[].Name' --output text); do
   result=$(aws s3api get-bucket-tagging --bucket "$bucket" 2>&1)
   if ! echo "$result" | grep -q "NoSuchTagSet"; then
-    echo "=== $bucket ==="
-    echo "$result"
-    echo ""
+    local -i bucket_has_tags=0
+    local tag_output=""
+
+    while IFS=$'\t' read -r key value; do
+      # Skip system tags unless -a flag is set
+      if (( ! show_system_tags )) && [[ "$key" == aws:* ]]; then
+        continue
+      fi
+      bucket_has_tags=1
+      tag_output+="   %F{yellow}$key%f: %F{white}$value%f\n"
+    done < <(echo "$result" | jq -r '.TagSet[] | "\(.Key)\t\(.Value)"' 2>/dev/null)
+
+    if (( bucket_has_tags )); then
+      found+=1
+      print -P "%F{green}%B📦 $bucket%b%f"
+      print -P "$tag_output"
+    fi
   fi
 done
+
+if (( found == 0 )); then
+  print -P "%F{yellow}No buckets with tags found.%f"
+else
+  print -P "%F{cyan}Found $found bucket(s) with tags.%f"
+fi
