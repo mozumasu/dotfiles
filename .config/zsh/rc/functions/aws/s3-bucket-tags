@@ -1,0 +1,12 @@
+#!/usr/bin/env zsh
+
+# List tags for S3 buckets (only for buckets with tags)
+
+for bucket in $(aws s3api list-buckets --query 'Buckets[].Name' --output text); do
+  result=$(aws s3api get-bucket-tagging --bucket "$bucket" 2>&1)
+  if ! echo "$result" | grep -q "NoSuchTagSet"; then
+    echo "=== $bucket ==="
+    echo "$result"
+    echo ""
+  fi
+done
