@@ -29,6 +29,12 @@ snippets:
   - keyword: cdkls
     snippet: cdk list -c env=
 
+  - keyword: iamlr
+    snippet:
+      aws iam list-roles
+        --query 'Roles[?starts_with(RoleName, `{{prefix}}`)].RoleName'
+        --output table
+
 completions:
   - name: instance-id
     patterns:
