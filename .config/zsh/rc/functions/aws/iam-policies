@@ -1,0 +1,25 @@
+#!/usr/bin/env zsh
+
+# List customer-managed IAM policies (excludes AWS-managed and auto-generated names)
+
+print -P "%F{cyan}Fetching IAM policies...%f"
+echo ""
+
+local policies
+policies=$(aws iam list-policies --scope Local \
+  --query 'Policies[].PolicyName' --output text | tr '\t' '\n' | \
+  grep -v -E '(^AWS|^Amazon-|[0-9a-f]{8}-[0-9a-f]{4}-|[A-Za-z0-9]{12}$)')
+
+if [[ -z "$policies" ]]; then
+  print -P "%F{yellow}No customer-managed policies found.%f"
+  return 0
+fi
+
+local -i count=0
+while IFS= read -r policy; do
+  print -P "%F{green}%B📋 $policy%b%f"
+  ((count++))
+done <<< "$policies"
+
+echo ""
+print -P "%F{cyan}Found $count policy(s).%f"
