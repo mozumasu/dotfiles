@@ -25,15 +25,15 @@ function source {
 }
 
 # ----------------------------------------------------
-# homebrew
+# homebrew (cached)
 # ----------------------------------------------------
-# eval "$(/opt/homebrew/bin/brew shellenv)"
-export HOMEBREW_PREFIX="/opt/homebrew";
-export HOMEBREW_CELLAR="/opt/homebrew/Cellar";
-export HOMEBREW_REPOSITORY="/opt/homebrew";
-fpath[1,0]="/opt/homebrew/share/zsh/site-functions";
-[ -z "${MANPATH-}" ] || export MANPATH=":${MANPATH#:}";
-export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
+_brew_cache="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/brew-shellenv.zsh"
+if [[ ! -f "$_brew_cache" ]]; then
+  mkdir -p "${_brew_cache:h}"
+  /opt/homebrew/bin/brew shellenv > "$_brew_cache"
+fi
+source "$_brew_cache"
+unset _brew_cache
 
 # Prioritize Japanese man pages
 export MANPATH="/usr/local/share/man/ja_JP.UTF-8:$(manpath)"
