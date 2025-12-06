@@ -30,13 +30,25 @@ local function markdownFoldProvider(bufnr)
   end
 
   local inCodeBlock = false
+  local codeBlockStart = nil
 
   for i, line in ipairs(lines) do
     local lineNum = i - 1 -- 0-indexed
 
-    -- Track code blocks (``` or ~~~)
+    -- Track code blocks (``` or ~~~) and create folds for them
     if line:match("^```") or line:match("^~~~") then
-      inCodeBlock = not inCodeBlock
+      if not inCodeBlock then
+        -- Starting a code block
+        inCodeBlock = true
+        codeBlockStart = lineNum
+      else
+        -- Ending a code block
+        inCodeBlock = false
+        if codeBlockStart and lineNum > codeBlockStart then
+          table.insert(folds, { startLine = codeBlockStart, endLine = lineNum })
+        end
+        codeBlockStart = nil
+      end
     end
 
     -- Handle Zenn blocks: :::details, :::message (outside code blocks)
