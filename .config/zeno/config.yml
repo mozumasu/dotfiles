@@ -156,6 +156,10 @@ snippets:
   - keyword: fnl
     snippet: functions + | perl -ne 'print unless /^[-_.\/:→]/ || /chroma/'
 
+  - name: nb search
+    keyword: nbg
+    snippet: rg "{{keyword}}" "$(nb notebooks current --path)"
+
 completions:
   # simple sourceCommand, no callback
   - name: kill signal
