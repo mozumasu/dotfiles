@@ -13,7 +13,8 @@
 # https://github.com/xwmx/nb
 ###############################################################################
 
-export EDITOR="nvim" # Set by `nb` • Thu Jan  9 12:52:05 JST 2025
+export EDITOR="nvim"                                                  # Set by `nb` • Thu Jan  9 12:52:05 JST 2025
+export NB_DIR="${NB_DIR:-/Users/mozumasu/src/github.com/mozumasu/nb}" # Set by `nb` • Sat Jan 11 20:09:06 JST 2025
 
 export NB_INDICATOR_AUDIO="🔉"
 export NB_INDICATOR_BOOKMARK="🔖"
@@ -26,8 +27,3 @@ export NB_INDICATOR_PINNED="📌"
 export NB_INDICATOR_TODO="✔️ "
 export NB_INDICATOR_TODO_DONE="✅"
 export NB_INDICATOR_VIDEO="📹"
-
-# export NB_DIR="${NB_DIR:-~/src/github.com/nb}" # Set by `nb` • Sat Jan 11 18:52:29 JST 2025
-# export NB_DIR="~/src/github.com/nb" # Set by `nb` • Sat Jan 11 18:52:29 JST 2025
-
-export NB_DIR="${NB_DIR:-/Users/mozumasu/src/github.com/mozumasu/nb}" # Set by `nb` • Sat Jan 11 20:09:06 JST 2025
