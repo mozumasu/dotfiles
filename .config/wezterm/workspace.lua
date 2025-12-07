@@ -93,53 +93,6 @@ local function switch_to_prev_workspace_skip_scratch()
   end)
 end
 
-local function kill_workspace(workspace)
-  return function(_, _, _)
-    workspace = workspace or wezterm.mux.get_active_workspace()
-
-    local success, stdout = wezterm.run_child_process({
-      "wezterm",
-      "cli",
-      "list",
-      "--format=json",
-    })
-
-    if not success then
-      return
-    end
-
-    local json = wezterm.json_parse(stdout)
-    if not json then
-      return
-    end
-
-    -- フィルタ関数定義（共通で使いたいなら別モジュール化してもOK）
-    local function filter(tbl, predicate)
-      local result = {}
-      for _, v in ipairs(tbl) do
-        if predicate(v) then
-          table.insert(result, v)
-        end
-      end
-      return result
-    end
-
-    local workspace_panes = filter(json, function(p)
-      return p.workspace == workspace
-    end)
-
-    for _, p in ipairs(workspace_panes) do
-      wezterm.run_child_process({
-        "wezterm",
-        "cli",
-        "kill-pane",
-        "--pane-id=" .. p.pane_id,
-      })
-      wezterm.log_info("kill-pane", p.pane_id, success)
-    end
-  end
-end
-
 local keys = {
   -- Toggle scratch workspace with CTRL+CMD+s
   { key = "s", mods = "CTRL|CMD", action = toggle_scratch_workspace() },
