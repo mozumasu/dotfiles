@@ -14,18 +14,10 @@ local title=""
 local url=""
 
 if [ $# -eq 1 ]; then
-  # Auto-fetch title from URL
   url="$1"
   echo "Fetching title from: $url"
 
-  # Determine fetch size based on domain (Zenn/Qiita have title early)
-  local fetch_size=3072
-  if [[ "$url" =~ ^https?://(zenn\.dev|qiita\.com)/ ]]; then
-    fetch_size=512
-  fi
-
-  title=$(curl -sL --max-time 10 "$url" | head -c $fetch_size | perl -0777 -ne 'print $1 if /<title[^>]*>([^<]+)<\/title>/i')
-  # Clean up title (remove extra whitespace and newlines)
+  title=$(curl -sL --max-redirs 3 --max-time 5 --compressed "$url" | head -c 512 | perl -0777 -ne 'print $1 if /<title[^>]*>([^<]+)<\/title>/i')
   title=$(echo "$title" | perl -pe 's/^\s+|\s+$//g; s/\s+/ /g')
 
   if [ -z "$title" ]; then
@@ -34,18 +26,13 @@ if [ $# -eq 1 ]; then
   fi
   echo "Title: $title"
 else
-  # Use provided title and URL
   title="$1"
   url="$2"
 fi
 
-# Create note content
 local content="# ${title}
 
-参照: [${title}](${url})
-"
+参照: [${title}](${url})"
 
-# Add note using nb
-echo "$content" | nb add --filename "${title}.md"
-
+nb add --filename "${title}.md" --content "$content"
 echo "Note created: [${title}](${url})"
