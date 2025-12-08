@@ -69,10 +69,34 @@ local function add_note()
   end)
 end
 
+-- 画像をインポートしてマークダウンリンクを挿入
+local function import_image()
+  local nb = require("config.nb")
+  vim.ui.input({ prompt = "Image path: ", completion = "file" }, function(image_path)
+    if not image_path or image_path == "" then
+      return
+    end
+
+    -- 新しいファイル名を入力（空ならそのまま）
+    vim.ui.input({ prompt = "New filename (empty to keep original): " }, function(new_filename)
+      local note_id, result = nb.import_image(image_path, new_filename)
+      if note_id then
+        local filename = result
+        local link = string.format("![%s](%s)", filename, filename)
+        vim.api.nvim_put({ link }, "c", true, true)
+        vim.notify("Imported: " .. filename, vim.log.levels.INFO)
+      else
+        vim.notify(result or "Failed to import image", vim.log.levels.ERROR)
+      end
+    end)
+  end)
+end
+
 return {
   "folke/snacks.nvim",
   keys = {
     { "<leader>na", add_note, desc = "nb add" },
+    { "<leader>ni", import_image, desc = "nb import image" },
     { "<leader>np", pick_notes, desc = "nb picker" },
     { "<leader>ng", grep_notes, desc = "nb grep" },
   },

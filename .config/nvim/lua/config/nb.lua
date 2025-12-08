@@ -69,4 +69,53 @@ function M.add_note(title)
   return nil
 end
 
+-- 画像をnbにインポートする
+function M.import_image(image_path, new_filename)
+  if not image_path or image_path == "" then
+    return nil, "No path provided"
+  end
+
+  -- 前後の空白とクォートを除去してパスを展開
+  local cleaned_path = image_path:gsub("^%s*['\"]?", ""):gsub("['\"]?%s*$", "")
+  local expanded_path = vim.fn.expand(cleaned_path)
+
+  -- ファイルが存在するか確認
+  if vim.fn.filereadable(expanded_path) == 0 then
+    return nil, "File not found: " .. expanded_path
+  end
+
+  -- シェルエスケープを使用してコマンドを構築
+  local escaped_path = vim.fn.shellescape(expanded_path)
+  local cmd = "NB_EDITOR=: NO_COLOR=1 nb import --no-color " .. escaped_path
+
+  -- 新しいファイル名が指定されていれば追加
+  local final_filename
+  if new_filename and new_filename ~= "" then
+    -- 拡張子がなければ元の拡張子を追加
+    if not new_filename:match("%.%w+$") then
+      local ext = vim.fn.fnamemodify(expanded_path, ":e")
+      new_filename = new_filename .. "." .. ext
+    end
+    cmd = cmd .. " " .. vim.fn.shellescape(new_filename)
+    final_filename = new_filename
+  else
+    final_filename = vim.fn.fnamemodify(expanded_path, ":t")
+  end
+
+  local output = vim.fn.systemlist(cmd)
+
+  if vim.v.shell_error ~= 0 then
+    return nil, "Import failed"
+  end
+
+  -- インポートされたファイル名を取得
+  for _, line in ipairs(output) do
+    local note_id = line:match("%[(%d+)%]")
+    if note_id then
+      return note_id, final_filename
+    end
+  end
+  return nil, "Could not parse import result"
+end
+
 return M
