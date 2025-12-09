@@ -2,25 +2,13 @@
 local function pick_notes()
   local nb = require("config.nb")
   local Snacks = require("snacks")
-  local notes = nb.list_notes()
-  if not notes then
-    vim.notify("Failed to get notes", vim.log.levels.ERROR)
+  local items = nb.list_items()
+
+  if not items or #items == 0 then
+    vim.notify("No notes found", vim.log.levels.WARN)
     return
   end
 
-  -- ノート一覧をパース
-  local items = {}
-  for _, line in ipairs(notes) do
-    local note_id, title = line:match("^%[(.-)%]%s+(.+)")
-    if note_id then
-      table.insert(items, {
-        text = string.format("[%s] %s", note_id, title or "No title"),
-        note_id = note_id,
-      })
-    end
-  end
-
-  -- ピッカーを表示
   Snacks.picker({
     title = "nb Notes",
     items = items,
@@ -37,8 +25,7 @@ local function pick_notes()
     confirm = function(picker, item)
       picker:close()
       if item then
-        local path = nb.get_note_path(item.note_id)
-        vim.cmd.edit(path)
+        vim.cmd.edit(nb.get_note_path(item.note_id))
       end
     end,
   })
@@ -96,29 +83,11 @@ end
 local function link_item()
   local nb = require("config.nb")
   local Snacks = require("snacks")
-  local raw_items = nb.list_notes()
+  local items = nb.list_items()
 
-  if not raw_items or #raw_items == 0 then
+  if not items or #items == 0 then
     vim.notify("No items found", vim.log.levels.WARN)
     return
-  end
-
-  -- アイテム一覧をパース
-  local items = {}
-  for _, line in ipairs(raw_items) do
-    local note_id = line:match("^%[(.-)%]")
-    if note_id then
-      local is_image = line:match("🌄") ~= nil
-      local name = is_image and line:match("%[%d+%]%s*🌄%s*(.+)$") or line:match("%[%d+%]%s*(.+)$")
-      if name then
-        table.insert(items, {
-          text = line,
-          note_id = note_id,
-          name = vim.trim(name),
-          is_image = is_image,
-        })
-      end
-    end
   end
 
   Snacks.picker({
