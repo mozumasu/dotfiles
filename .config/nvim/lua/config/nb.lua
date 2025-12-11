@@ -167,4 +167,10 @@ function M.import_image(image_path, new_filename)
   return nil, "Could not parse import result"
 end
 
+-- ノートを削除
+function M.delete_note(note_id)
+  local output = M.run_cmd("delete --force " .. note_id)
+  return output ~= nil
+end
+
 return M

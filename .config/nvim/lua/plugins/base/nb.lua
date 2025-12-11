@@ -28,6 +28,33 @@ local function pick_notes()
         vim.cmd.edit(nb.get_note_path(item.note_id))
       end
     end,
+    actions = {
+      delete_note = function(picker)
+        local item = picker:current()
+        if item then
+          vim.ui.select({ "Yes", "No" }, {
+            prompt = "Delete: " .. item.name .. "?",
+          }, function(choice)
+            if choice == "Yes" then
+              if nb.delete_note(item.note_id) then
+                vim.notify("Deleted: " .. item.name, vim.log.levels.INFO)
+                picker:close()
+                pick_notes()
+              else
+                vim.notify("Failed to delete", vim.log.levels.ERROR)
+              end
+            end
+          end)
+        end
+      end,
+    },
+    win = {
+      input = {
+        keys = {
+          ["<C-d>"] = { "delete_note", mode = { "n", "i" }, desc = "Delete note" },
+        },
+      },
+    },
   })
 end
 
