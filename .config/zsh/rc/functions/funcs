@@ -1,0 +1,19 @@
+#!/usr/bin/env zsh
+# fzfで関数一覧を表示してコマンドラインに挿入
+
+local func_dir="${ZDOTDIR:-$HOME/.config/zsh}/rc/functions"
+
+export _FUNCS_DIR="$func_dir"
+
+local selected=$(find -L "$func_dir" -type f -not -path "*/hook/*" | \
+  perl -pe 's|^\Q$ENV{_FUNCS_DIR}\E/||' | \
+  fzf --preview 'bat --color=always --style=header,grid "$_FUNCS_DIR/{}"' \
+      --preview-window=right:60%:wrap \
+      --header "Select function")
+
+unset _FUNCS_DIR
+
+if [ -n "$selected" ]; then
+  local func_name=$(basename "$selected")
+  print -z "$func_name "
+fi
