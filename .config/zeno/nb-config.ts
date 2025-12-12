@@ -1,6 +1,6 @@
 import { defineConfig } from "jsr:@yuki-yano/zeno@0.2.0";
 
-export default defineConfig(async ({ projectRoot, currentDirectory }) => {
+export default defineConfig(async () => {
   // nb subcommands completion
   const nbSubcommandsCompletion = {
     name: "nb subcommands",
@@ -31,13 +31,26 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
     callback: "sed -E 's/^\\[([0-9]+)\\].*/\\1/'",
   };
 
+  // nb notebook:notes completion (e.g., nb e log:)
+  const nbNotebookNotesCompletion = {
+    name: "nb notebook notes",
+    patterns: [
+      "^nb (e|edit|delete|show|open|peek|copy|move|mv|rename|export|do|pin|unpin|history|browse) log:$",
+    ],
+    sourceCommand:
+      "nb log:ls --all --no-color | grep -E '^\\[[a-zA-Z0-9_-]+:[0-9]+\\]'",
+    options: {
+      "--prompt": "'nb log: >'",
+      "--preview": "$ZENO_HOME/nb-preview.sh {}",
+      "--preview-window": "'right:60%:wrap'",
+    },
+    callback: "sed -E 's/^\\[[a-zA-Z0-9_-]+:([0-9]+)\\].*/\\1/'",
+  };
+
   // nb add file type completion
   const nbAddTypeCompletion = {
     name: "nb add type",
-    patterns: [
-      "^nb add --type $",
-      "^nb a --type $",
-    ],
+    patterns: ["^nb add --type $", "^nb a --type $"],
     sourceCommand:
       "echo -e 'bookmark\\nfolder\\nimage\\naudio\\nvideo\\ndocument\\ntext\\ntodo'",
     options: {
@@ -84,10 +97,7 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
   // nb import file completion
   const nbImportCompletion = {
     name: "nb import",
-    patterns: [
-      "^nb import $",
-      "^nb i $",
-    ],
+    patterns: ["^nb import $", "^nb i $"],
     sourceCommand:
       "find . -maxdepth 3 -type f \\( -name '*.md' -o -name '*.txt' -o -name '*.pdf' -o -name '*.html' \\) 2>/dev/null",
     options: {
@@ -100,10 +110,7 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
   // nb move destination completion
   const nbMoveDestinationCompletion = {
     name: "nb move destination",
-    patterns: [
-      "^nb (move|mv) [0-9]+ $",
-      "^nb (move|mv) .+ $",
-    ],
+    patterns: ["^nb (move|mv) [0-9]+ $", "^nb (move|mv) .+ $"],
     sourceCommand:
       "nb notebooks --names --no-color && nb ls --folders --no-color | grep -E '^\\[[0-9]+\\]' | sed -E 's/^\\[([0-9]+)\\].*/\\1/'",
     options: {
@@ -115,12 +122,7 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
   // nb todo operations
   const nbTodoCompletion = {
     name: "nb todo operations",
-    patterns: [
-      "^nb todo $",
-      "^nb todos $",
-      "^nb do $",
-      "^nb undo $",
-    ],
+    patterns: ["^nb todo $", "^nb todos $", "^nb do $", "^nb undo $"],
     sourceCommand: "nb ls --type todo --no-color | grep -E '^\\[[0-9]+\\]'",
     options: {
       "--prompt": "'TODO >'",
@@ -132,9 +134,7 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
   // nb git operations
   const nbGitCompletion = {
     name: "nb git",
-    patterns: [
-      "^nb git $",
-    ],
+    patterns: ["^nb git $"],
     sourceCommand:
       "echo -e 'status\\nlog\\ndiff\\nadd\\ncommit\\npush\\npull\\nfetch\\nbranch\\ncheckout\\nremote'",
     options: {
@@ -146,10 +146,7 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
   // nb export format completion
   const nbExportFormatCompletion = {
     name: "nb export format",
-    patterns: [
-      "^nb export [0-9]+ $",
-      "^nb export .+ $",
-    ],
+    patterns: ["^nb export [0-9]+ $", "^nb export .+ $"],
     sourceCommand:
       "echo -e 'html\\npdf\\ndocx\\nodtx\\nrtf\\nlatex\\nmarkdown\\nplain'",
     options: {
@@ -160,6 +157,7 @@ export default defineConfig(async ({ projectRoot, currentDirectory }) => {
 
   const completions = [
     nbSubcommandsCompletion,
+    nbNotebookNotesCompletion, // Must be before nbNotesCompletion (more specific pattern)
     nbNotesCompletion,
     nbAddTypeCompletion,
     nbNotebooksCompletion,
