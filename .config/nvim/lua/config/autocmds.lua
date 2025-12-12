@@ -79,6 +79,24 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+-- nb形式のリンク（notebook:note）のMarksman警告を無視
+local original_diagnostics_handler = vim.lsp.handlers["textDocument/publishDiagnostics"]
+vim.lsp.handlers["textDocument/publishDiagnostics"] = function(err, result, ctx, config)
+  if result and result.diagnostics then
+    result.diagnostics = vim.tbl_filter(function(diagnostic)
+      -- Marksmanのnbリンクエラーを除外（例: "Link to non-existent document 'home:note'"）
+      if diagnostic.source == "Marksman" then
+        local msg = diagnostic.message or ""
+        if msg:match("Link to non%-existent document '[%w_%-]+:") then
+          return false
+        end
+      end
+      return true
+    end, result.diagnostics)
+  end
+  return original_diagnostics_handler(err, result, ctx, config)
+end
+
 vim.api.nvim_create_user_command("InsertDatetime", function()
   local handle = io.popen('date "+%Y-%m-%d %H:%M:%S"')
   if not handle then
