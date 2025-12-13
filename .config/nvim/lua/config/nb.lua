@@ -130,9 +130,14 @@ function M.import_image(image_path, new_filename)
     return nil, "No path provided"
   end
 
-  -- 前後の空白とクォートを除去してパスを展開
-  local cleaned_path = image_path:gsub("^%s*['\"]?", ""):gsub("['\"]?%s*$", "")
-  local expanded_path = vim.fn.expand(cleaned_path)
+  -- パスをクリーンアップ: 空白/改行/クォート除去、エスケープされたスペースを復元
+  local cleaned_path = image_path
+    :gsub("^[%s\n]*['\"]?", "")
+    :gsub("['\"]?[%s\n]*$", "")
+    :gsub("/ ([^/])", " %1") -- Vim補完で「\ 」が「/ 」に変換される問題を修正
+    :gsub("\\ ", " ")
+
+  local expanded_path = vim.fn.resolve(vim.fn.fnamemodify(cleaned_path, ":p"))
 
   -- ファイルが存在するか確認
   if vim.fn.filereadable(expanded_path) == 0 then
