@@ -77,6 +77,16 @@ return {
       },
       image = {
         enabled = true,
+        -- nb の --original URL形式を実際のファイルパスに変換
+        resolve = function(file, src)
+          -- http://localhost:6789/--original/{notebook}/{filename} 形式を検出
+          local notebook, filename = src:match("http://localhost:6789/%-%-original/([^/]+)/(.+)$")
+          if notebook and filename then
+            local nb = require("config.nb")
+            return nb.get_nb_dir() .. "/" .. notebook .. "/" .. filename
+          end
+          return nil
+        end,
         doc = {
           -- enable image viewer for documents
           -- a treesitter parser must be available for the enabled languages.
