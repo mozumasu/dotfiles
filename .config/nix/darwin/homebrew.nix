@@ -4,7 +4,7 @@
     enable = true;
     onActivation = {
       autoUpdate = true;
-      cleanup = "none";
+      cleanup = "uninstall";
     };
 
     taps = [
@@ -19,109 +19,104 @@
       "xwmx/taps"
     ];
 
+    # macOS 固有、または nixpkgs にないツール
     brews = [
+      # Git (システム全体で使用)
       "git"
-      "fzf"
-      "zoxide"
-      "sheldon"
-      "ripgrep"
-      "tlrc"
-      "deno"
-      "gh"
-      "ghq"
-      "gibo"
-      "bat"
-      "fd"
-      "actionlint"
-      "cryptography"
-      "ansible"
-      "ansible-lint"
-      "aom"
-      "asciinema"
-      "asciiquarium"
-      "python@3.12"
-      "awscli"
-      "bottom"
-      "glib"
-      "cmake"
-      "cmatrix"
-      "lima"
-      "colima"
-      "cowsay"
-      "diffutils"
-      "docker"
-      "eza"
-      "fastfetch"
-      "harfbuzz"
-      "tesseract"
-      "ffmpeg"
-      "freetds"
-      "ghostscript"
-      "git-delta"
       "git-secrets"
-      "glow"
-      "go"
-      "go-task"
-      "gomi"
-      "gradle"
-      "groff"
-      "libheif"
-      "imagemagick"
+
+      # シェル関連
+      "sheldon"
+      "zsh-completions"
+
+      # macOS 固有
+      "felixkratz/formulae/borders"
+      "switchaudio-osx"
+      "nowplaying-cli"
+      "terminal-notifier"
       "iproute2mac"
-      "k6"
-      "lazydocker"
-      "lazygit"
-      "libffi"
-      "libgccjit"
+      "timac/vpnstatus/vpnutil"
+      "xwmx/taps/nb"
+
+      # バージョン管理ツール
+      "tfenv"
+      "mise"
+
+      # 言語環境/ランタイム
+      "deno"
+      "go"
+      "rust"
       "lua"
       "luajit"
-      "maven"
-      "mise"
-      "mysql"
-      "navi"
-      "tree-sitter"
-      "neovim"
-      "ninja"
-      "nkf"
-      "nowplaying-cli"
-      "nyancat"
-      "oha"
+      "python@3.12"
+      "python@3.9"
       "openjdk@11"
       "php"
       "php-cs-fixer"
-      "pipx"
+
+      # データベース
       "postgresql@14"
       "postgresql@16"
-      "pre-commit"
-      "python@3.9"
+      "mysql"
+      "freetds"
+
+      # ビルドツール
+      "cmake"
+      "ninja"
+      "gradle"
+      "maven"
+      "tree-sitter"
+
+      # インフラ/DevOps
+      "ansible"
+      "ansible-lint"
+      "awscli"
+      "docker"
+      "colima"
+      "lima"
       "qemu"
-      "rename"
-      "rust"
-      "sshpass"
-      "sshs"
-      "starship"
-      "stylua"
-      "subversion"
-      "switchaudio-osx"
-      "telnet"
-      "terminal-notifier"
-      "texinfo"
-      "tfenv"
-      "tig"
-      "tmux"
-      "translate-shell"
-      "tree"
-      "typos-cli"
-      "uv"
+      "k6"
+      "oha"
       "vhs"
-      "wget"
-      "yazi"
-      "zsh-completions"
+      "actionlint"
+      "pre-commit"
+
+      # Python ツール
+      "pipx"
+      "uv"
+      "cryptography"
+
+      # メディア処理
+      "ffmpeg"
+      "imagemagick"
+      "ghostscript"
+      "tesseract"
+      "harfbuzz"
+      "aom"
+      "libheif"
+
+      # その他ユーティリティ
+      "tlrc"
+      "gibo"
+      "gomi"
+      "navi"
+      "sshs"
+      "sshpass"
+      "telnet"
+      "subversion"
+      "texinfo"
+      "groff"
+      "diffutils"
+      "lazydocker"
+
+      # ライブラリ
+      "glib"
+      "libffi"
+      "libgccjit"
+
+      # 特殊 tap
       "d12frosted/emacs-plus/emacs-plus@30"
-      "felixkratz/formulae/borders"
       "shu-pf/tap/dpl"
-      "timac/vpnstatus/vpnutil"
-      "xwmx/taps/nb"
     ];
 
     casks = [

@@ -1,7 +1,8 @@
-{ lib, ... }:
+{ lib, pkgs, ... }:
 {
   imports = [
     ./dotfiles.nix
+    ./packages.nix
   ];
 
   home.username = "mozumasu";
