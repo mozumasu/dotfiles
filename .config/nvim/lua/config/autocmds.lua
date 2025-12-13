@@ -7,6 +7,14 @@
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
 
+-- SpellCap（青い波線）を無効化
+vim.api.nvim_create_autocmd("ColorScheme", {
+  callback = function()
+    vim.api.nvim_set_hl(0, "SpellCap", {})
+  end,
+})
+vim.api.nvim_set_hl(0, "SpellCap", {})
+
 -- 背景透過を維持（Zenモードで:w後も透明を保つ）
 local function apply_transparent_bg()
   vim.cmd([[
