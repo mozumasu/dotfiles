@@ -21,8 +21,8 @@
     }:
     {
       darwinConfigurations = {
-        hostname = darwin.lib.darwinSystem {
-          system = "x86_64-darwin";
+        geisha = darwin.lib.darwinSystem {
+          system = "aarch64-darwin";
           modules = [
             ./configuration.nix
             home-manager.darwinModules.home-manager
@@ -30,7 +30,7 @@
               home-manager = {
                   useGlobalPkgs = true;
                   useUserPackages = true;
-                  users.jdoe = ./home.nix;
+                  users.mozumasu = ./home.nix;
               };
             }
           ];
