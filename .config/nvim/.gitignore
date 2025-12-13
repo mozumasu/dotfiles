@@ -6,6 +6,5 @@ debug
 foo.*
 *.log
 data
-en.utf-8.add.spl
-en.utf-8.add
+*.utf-8.add.spl
 zenn-cli.json

@@ -6,6 +6,12 @@
 -- vim.opt.winbar = "%=%m %f"
 -- vim標準スペルチェックから日本語を除外
 vim.opt.spelllang:append("cjk")
+-- スペル辞書の設定（dotfiles管理 + ローカル専用）
+-- zg: dotfiles管理の辞書、2zg: ローカル専用の辞書
+vim.opt.spellfile = {
+  vim.fn.stdpath("config") .. "/spell/en.utf-8.add",
+  vim.fn.stdpath("data") .. "/spell/local.utf-8.add",
+}
 
 -- Enable this option to avoid conflicts with Prettier.
 vim.g.lazyvim_prettier_needs_config = true
