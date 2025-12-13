@@ -171,12 +171,16 @@ local function link_item()
       picker:close()
       if item then
         local link
+        -- 異なるノートブックの場合は notebook:name 形式
+        local needs_prefix = current_notebook and item.notebook ~= current_notebook
         if item.is_image then
-          -- 画像は同一ノートブック内でのみ参照可能と仮定
-          link = string.format("![%s](%s)", item.name, item.name)
+          if needs_prefix then
+            link = string.format("![%s](%s:%s)", item.name, item.notebook, item.name)
+          else
+            link = string.format("![%s](%s)", item.name, item.name)
+          end
         else
-          -- 異なるノートブックの場合は notebook:name 形式
-          if current_notebook and item.notebook ~= current_notebook then
+          if needs_prefix then
             link = string.format("[[%s:%s]]", item.notebook, item.name)
           else
             link = string.format("[[%s]]", item.name)
