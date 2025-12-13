@@ -21,10 +21,6 @@
 
     # macOS 固有、または nixpkgs にないツール
     brews = [
-      # Git (システム全体で使用)
-      "git"
-      "git-secrets"
-
       # シェル関連
       "sheldon"
       "zsh-completions"
@@ -42,8 +38,7 @@
       "tfenv"
       "mise"
 
-      # 言語環境/ランタイム
-      "deno"
+      # 言語環境/ランタイム (mise で管理)
       "go"
       "rust"
       "lua"
@@ -60,25 +55,18 @@
       "mysql"
       "freetds"
 
-      # ビルドツール
-      "cmake"
-      "ninja"
+      # ビルドツール (Java 依存)
       "gradle"
       "maven"
-      "tree-sitter"
 
       # インフラ/DevOps
       "ansible"
       "ansible-lint"
-      "awscli"
       "docker"
       "colima"
       "lima"
       "qemu"
-      "k6"
       "oha"
-      "vhs"
-      "actionlint"
       "pre-commit"
 
       # Python ツール
@@ -86,28 +74,21 @@
       "uv"
       "cryptography"
 
-      # メディア処理
-      "ffmpeg"
-      "imagemagick"
-      "ghostscript"
+      # メディア処理 (ライブラリ)
       "tesseract"
       "harfbuzz"
       "aom"
       "libheif"
 
       # その他ユーティリティ
-      "tlrc"
-      "gibo"
       "gomi"
       "navi"
       "sshs"
       "sshpass"
-      "telnet"
       "subversion"
       "texinfo"
       "groff"
       "diffutils"
-      "lazydocker"
 
       # ライブラリ
       "glib"

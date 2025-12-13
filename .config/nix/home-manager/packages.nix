@@ -11,13 +11,17 @@
     tree
     wget
     jq
+    tlrc # tldr
 
     # Git 関連
+    git
     gh
     ghq
     lazygit
     delta # git-delta
     tig
+    gibo
+    git-secrets
 
     # エディタ/ターミナル
     neovim
@@ -27,12 +31,30 @@
     # 開発ツール
     stylua
     typos
+    actionlint
+    tree-sitter
+    deno
+
+    # ビルドツール
+    cmake
+    ninja
+
+    # インフラ/DevOps
+    awscli2
+    k6
+    vhs
+
+    # メディア処理
+    ffmpeg
+    imagemagick
+    ghostscript
 
     # モニタリング/ユーティリティ
     bottom
     fastfetch
     glow
     yazi
+    lazydocker
 
     # ネタ系
     cowsay
@@ -45,5 +67,6 @@
     translate-shell
     nkf
     rename
+    inetutils # telnet
   ];
 }
