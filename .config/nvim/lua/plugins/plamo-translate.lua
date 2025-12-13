@@ -1,7 +1,7 @@
 return {
   dir = "~/src/github.com/mozumasu/plamo-translate.nvim",
   name = "plamo-translate.nvim",
-  cmd = { "PlamoTranslate", "PlamoTranslateReplace", "PlamoTranslateLine", "PlamoTranslateWord" },
+  cmd = { "PlamoTranslate", "PlamoTranslateReplace", "PlamoTranslateLine", "PlamoTranslateWord", "PlamoTranslateBuffer", "PlamoTranslateBufferReplace" },
   keys = {
     -- Normal mode: interactive window
     { "<leader>tt", "<cmd>PlamoTranslate<cr>", mode = "n", desc = "Translate text (interactive)" },
@@ -11,6 +11,9 @@ return {
     -- Normal mode: line and word
     { "<leader>tl", "<cmd>PlamoTranslateLine<cr>", mode = "n", desc = "Translate current line" },
     { "<leader>tw", "<cmd>PlamoTranslateWord<cr>", mode = "n", desc = "Translate word under cursor" },
+    -- Normal mode: buffer
+    { "<leader>tb", "<cmd>PlamoTranslateBuffer<cr>", mode = "n", desc = "Translate entire buffer (split)" },
+    { "<leader>tB", "<cmd>PlamoTranslateBufferReplace<cr>", mode = "n", desc = "Replace buffer with translation" },
   },
   config = function()
     require("plamo-translate").setup({
