@@ -15,6 +15,7 @@
 
   outputs =
     {
+      nixpkgs,
       home-manager,
       darwin,
       ...
@@ -24,13 +25,14 @@
         geisha = darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           modules = [
-            ./configuration.nix
+            ./hosts/geisha
+            ./darwin
             home-manager.darwinModules.home-manager
             {
               home-manager = {
                   useGlobalPkgs = true;
                   useUserPackages = true;
-                  users.mozumasu = ./home.nix;
+                  users.mozumasu = import ./home-manager;
               };
             }
           ];
