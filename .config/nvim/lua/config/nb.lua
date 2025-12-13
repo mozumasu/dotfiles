@@ -180,6 +180,25 @@ function M.delete_note(note_id)
   return output ~= nil
 end
 
+-- ノートを別のノートブックに移動
+function M.move_note(note_id, dest_notebook)
+  local escaped_id = vim.fn.shellescape(note_id)
+  local output = M.run_cmd("move --force " .. escaped_id .. " " .. dest_notebook .. ":")
+  if not output then
+    return nil
+  end
+
+  -- 移動後のノートIDを取得
+  for _, line in ipairs(output) do
+    local new_id = line:match("%[([%w:]+%d+)%]")
+    if new_id then
+      return new_id
+    end
+  end
+  -- IDが取得できなくても成功とみなす
+  return dest_notebook
+end
+
 -- ノートブック一覧を取得
 function M.list_notebooks()
   -- nbディレクトリ内のサブディレクトリを直接読み取る（より確実）

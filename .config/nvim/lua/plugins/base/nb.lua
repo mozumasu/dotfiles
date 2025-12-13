@@ -198,6 +198,69 @@ local function import_image()
   end)
 end
 
+-- 現在のノートを別のノートブックに移動
+local function move_note()
+  local nb = require("config.nb")
+  local Snacks = require("snacks")
+  local current_notebook = get_current_notebook()
+
+  if not current_notebook then
+    vim.notify("Not in nb directory", vim.log.levels.WARN)
+    return
+  end
+
+  -- 現在のファイル名からノートIDを取得
+  local current_file = vim.fn.expand("%:p")
+  local filename = vim.fn.fnamemodify(current_file, ":t") -- 拡張子付きのファイル名
+  local current_note_id = current_notebook .. ":" .. filename
+
+  local notebooks = nb.list_notebooks()
+  if not notebooks or #notebooks == 0 then
+    vim.notify("No notebooks found", vim.log.levels.WARN)
+    return
+  end
+
+  -- 現在のノートブックを除外
+  local items = {}
+  for _, name in ipairs(notebooks) do
+    if name ~= current_notebook then
+      table.insert(items, { text = name, notebook = name })
+    end
+  end
+
+  if #items == 0 then
+    vim.notify("No other notebooks available", vim.log.levels.WARN)
+    return
+  end
+
+  Snacks.picker({
+    title = "Move to Notebook",
+    items = items,
+    format = function(item)
+      return { { "📓 " .. item.notebook } }
+    end,
+    confirm = function(picker, item)
+      picker:close()
+      if item then
+        local result = nb.move_note(current_note_id, item.notebook)
+        if result then
+          -- 移動後のパスを直接構築して開く
+          local nb_dir = nb.get_nb_dir()
+          local new_path = nb_dir .. "/" .. item.notebook .. "/" .. filename
+          if vim.fn.filereadable(new_path) == 1 then
+            vim.cmd.edit(new_path)
+            vim.notify("Moved to " .. item.notebook, vim.log.levels.INFO)
+          else
+            vim.notify("Moved but could not open new location", vim.log.levels.WARN)
+          end
+        else
+          vim.notify("Failed to move note", vim.log.levels.ERROR)
+        end
+      end
+    end,
+  })
+end
+
 -- リンクを挿入（全ノートブック対応）
 local function link_item()
   local nb = require("config.nb")
@@ -265,6 +328,7 @@ return {
     { "<leader>nA", add_note_select, desc = "nb add (select notebook)" },
     { "<leader>ni", import_image, desc = "nb import image" },
     { "<leader>nl", link_item, desc = "nb link" },
+    { "<leader>nm", move_note, desc = "nb move to notebook" },
     { "<leader>np", pick_notes, desc = "nb picker" },
     { "<leader>ng", grep_notes, desc = "nb grep" },
   },
