@@ -1,7 +1,7 @@
 local M = {}
 
--- nbコマンドのプレフィックス
-local NB_CMD = "NB_EDITOR=: NO_COLOR=1 nb"
+-- nbコマンドのプレフィックス（TERM=dumbでANSIエスケープを完全無効化）
+local NB_CMD = "TERM=dumb NB_EDITOR=: NO_COLOR=1 nb"
 
 -- nbのノートディレクトリパスを取得
 function M.get_nb_dir()
@@ -171,6 +171,98 @@ end
 function M.delete_note(note_id)
   local output = M.run_cmd("delete --force " .. note_id)
   return output ~= nil
+end
+
+-- ノートブック一覧を取得
+function M.list_notebooks()
+  -- nbディレクトリ内のサブディレクトリを直接読み取る（より確実）
+  local nb_dir = M.get_nb_dir()
+  local handle = vim.loop.fs_scandir(nb_dir)
+  if not handle then
+    return nil
+  end
+
+  local notebooks = {}
+  while true do
+    local name, type = vim.loop.fs_scandir_next(handle)
+    if not name then
+      break
+    end
+    -- ディレクトリで、隠しフォルダでないものがノートブック
+    if type == "directory" and not name:match("^%.") then
+      table.insert(notebooks, name)
+    end
+  end
+  table.sort(notebooks)
+  return notebooks
+end
+
+-- リスト行をパース（ノートブック情報付き）
+-- 例: "[log:22] タイトル" -> { full_id = "log:22", notebook = "log", ... }
+function M.parse_list_item_with_notebook(line, notebook)
+  local full_id = line:match("^%[(.-)%]")
+  if not full_id then
+    return nil
+  end
+
+  local is_image = line:match("🌄") ~= nil
+  local is_folder = line:match("📂") ~= nil
+  local name
+
+  if is_image then
+    name = line:match("%[.-%]%s*🌄%s*(.+)$")
+  elseif is_folder then
+    name = line:match("%[.-%]%s*📂%s*(.+)$")
+  else
+    name = line:match("%[.-%]%s*(.+)$")
+  end
+
+  if not name then
+    return nil
+  end
+
+  return {
+    full_id = full_id,
+    notebook = notebook,
+    name = vim.trim(name),
+    is_image = is_image,
+    is_folder = is_folder,
+    text = line,
+  }
+end
+
+-- 特定ノートブックのアイテム一覧を取得
+function M.list_items_for_notebook(notebook)
+  local output = M.run_cmd(notebook .. ":list --no-color")
+  if not output then
+    return {}
+  end
+
+  local items = {}
+  for _, line in ipairs(output) do
+    local item = M.parse_list_item_with_notebook(line, notebook)
+    if item then
+      table.insert(items, item)
+    end
+  end
+  return items
+end
+
+-- 全ノートブックのアイテムを取得
+function M.list_all_items()
+  local notebooks = M.list_notebooks()
+  if not notebooks then
+    return nil
+  end
+
+  local all_items = {}
+  for _, notebook in ipairs(notebooks) do
+    local items = M.list_items_for_notebook(notebook)
+    for _, item in ipairs(items) do
+      table.insert(all_items, item)
+    end
+  end
+  return all_items
 end
 
 return M

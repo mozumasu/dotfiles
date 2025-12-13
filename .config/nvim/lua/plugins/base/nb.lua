@@ -1,8 +1,8 @@
--- snacks.nvimでノートをタイトル一覧から検索して開く
+-- snacks.nvimでノートをタイトル一覧から検索して開く（全ノートブック対応）
 local function pick_notes()
   local nb = require("config.nb")
   local Snacks = require("snacks")
-  local items = nb.list_items()
+  local items = nb.list_all_items()
 
   if not items or #items == 0 then
     vim.notify("No notes found", vim.log.levels.WARN)
@@ -10,22 +10,32 @@ local function pick_notes()
   end
 
   Snacks.picker({
-    title = "nb Notes",
+    title = "nb Notes (All Notebooks)",
     items = items,
     format = function(item)
-      return { { item.text } }
+      local prefix = string.format("[%s]", item.notebook)
+      local icon = ""
+      if item.is_image then
+        icon = " 🌄"
+      elseif item.is_folder then
+        icon = " 📂"
+      end
+      return { { prefix .. icon .. " " .. item.name } }
     end,
     preview = function(ctx)
       local item = ctx.item
+      if item.is_folder then
+        return nil
+      end
       if not item.file then
-        item.file = nb.get_note_path(item.note_id)
+        item.file = nb.get_note_path(item.full_id)
       end
       return Snacks.picker.preview.file(ctx)
     end,
     confirm = function(picker, item)
       picker:close()
-      if item then
-        vim.cmd.edit(nb.get_note_path(item.note_id))
+      if item and not item.is_folder then
+        vim.cmd.edit(nb.get_note_path(item.full_id))
       end
     end,
     actions = {
@@ -33,10 +43,10 @@ local function pick_notes()
         local item = picker:current()
         if item then
           vim.ui.select({ "Yes", "No" }, {
-            prompt = "Delete: " .. item.name .. "?",
+            prompt = "Delete: [" .. item.notebook .. "] " .. item.name .. "?",
           }, function(choice)
             if choice == "Yes" then
-              if nb.delete_note(item.note_id) then
+              if nb.delete_note(item.full_id) then
                 vim.notify("Deleted: " .. item.name, vim.log.levels.INFO)
                 picker:close()
                 pick_notes()
@@ -106,11 +116,28 @@ local function import_image()
   end)
 end
 
--- リンクを挿入
+-- 現在のファイルが属するノートブックを取得
+local function get_current_notebook()
+  local nb = require("config.nb")
+  local current_file = vim.fn.expand("%:p")
+  local nb_dir = nb.get_nb_dir()
+
+  if not current_file:match("^" .. vim.pesc(nb_dir)) then
+    return nil
+  end
+
+  -- nbディレクトリからの相対パスを取得し、最初のディレクトリ名を返す
+  local relative = current_file:sub(#nb_dir + 2) -- +2 for trailing slash
+  local notebook = relative:match("^([^/]+)/")
+  return notebook
+end
+
+-- リンクを挿入（全ノートブック対応）
 local function link_item()
   local nb = require("config.nb")
   local Snacks = require("snacks")
-  local items = nb.list_items()
+  local items = nb.list_all_items()
+  local current_notebook = get_current_notebook()
 
   if not items or #items == 0 then
     vim.notify("No items found", vim.log.levels.WARN)
@@ -118,15 +145,25 @@ local function link_item()
   end
 
   Snacks.picker({
-    title = "nb Link",
+    title = "nb Link (All Notebooks)",
     items = items,
     format = function(item)
-      return { { item.text } }
+      local prefix = string.format("[%s]", item.notebook)
+      local icon = ""
+      if item.is_image then
+        icon = " 🌄"
+      elseif item.is_folder then
+        icon = " 📂"
+      end
+      return { { prefix .. icon .. " " .. item.name } }
     end,
     preview = function(ctx)
       local item = ctx.item
+      if item.is_folder then
+        return nil
+      end
       if not item.file then
-        item.file = nb.get_note_path(item.note_id)
+        item.file = nb.get_note_path(item.full_id)
       end
       return Snacks.picker.preview.file(ctx)
     end,
@@ -135,9 +172,15 @@ local function link_item()
       if item then
         local link
         if item.is_image then
+          -- 画像は同一ノートブック内でのみ参照可能と仮定
           link = string.format("![%s](%s)", item.name, item.name)
         else
-          link = string.format("[[%s]]", item.name)
+          -- 異なるノートブックの場合は notebook:name 形式
+          if current_notebook and item.notebook ~= current_notebook then
+            link = string.format("[[%s:%s]]", item.notebook, item.name)
+          else
+            link = string.format("[[%s]]", item.name)
+          end
         end
         vim.api.nvim_put({ link }, "c", true, true)
       end
