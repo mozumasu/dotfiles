@@ -253,7 +253,13 @@ function M.parse_list_item_with_notebook(line, notebook)
   end
 
   -- full_id は notebook:note_id 形式で構築
-  local full_id = notebook .. ":" .. note_id
+  -- note_id が既に "notebook:id" 形式の場合はそのまま使用
+  local full_id
+  if note_id:find(":") then
+    full_id = note_id
+  else
+    full_id = notebook .. ":" .. note_id
+  end
 
   return {
     full_id = full_id,
