@@ -43,6 +43,10 @@
     awscli2
     k6
     vhs
+    pre-commit
+
+    # Python ツール
+    uv
 
     # メディア処理
     ffmpeg

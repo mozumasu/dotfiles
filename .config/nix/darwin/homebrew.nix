@@ -67,11 +67,9 @@
       "lima"
       "qemu"
       "oha"
-      "pre-commit"
 
       # Python ツール
       "pipx"
-      "uv"
       "cryptography"
 
       # メディア処理 (ライブラリ)
