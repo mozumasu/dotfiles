@@ -35,7 +35,12 @@ local function pick_notes()
     confirm = function(picker, item)
       picker:close()
       if item and not item.is_folder then
-        vim.cmd.edit(nb.get_note_path(item.full_id))
+        local path = nb.get_note_path(item.full_id)
+        if path and path ~= "" then
+          vim.cmd.edit(path)
+        else
+          vim.notify("Failed to get note path: " .. item.full_id, vim.log.levels.ERROR)
+        end
       end
     end,
     actions = {
@@ -77,20 +82,97 @@ local function grep_notes()
   })
 end
 
--- ノートを追加して開く
-local function add_note()
+-- 現在のファイルが属するノートブックを取得
+local function get_current_notebook()
   local nb = require("config.nb")
+  local current_file = vim.fn.expand("%:p")
+  local nb_dir = nb.get_nb_dir()
+
+  if not current_file:match("^" .. vim.pesc(nb_dir)) then
+    return nil
+  end
+
+  -- nbディレクトリからの相対パスを取得し、最初のディレクトリ名を返す
+  local relative = current_file:sub(#nb_dir + 2) -- +2 for trailing slash
+  local notebook = relative:match("^([^/]+)/")
+  return notebook
+end
+
+-- 指定ノートブックにノートを追加して開く
+local function add_note_to_notebook(notebook)
+  local nb = require("config.nb")
+  vim.schedule(function()
+    vim.cmd.startinsert()
+  end)
   vim.ui.input({ prompt = "Note title (empty for timestamp): " }, function(title)
-    local note_id = nb.add_note(title)
+    if title == nil then
+      return -- cancelled
+    end
+    local note_id = nb.add_note(title, notebook)
     if note_id then
       local path = nb.get_note_path(note_id)
       if path and path ~= "" then
         vim.cmd.edit(path)
+        -- ファイル末尾に移動してインサートモードに入る
+        vim.cmd("normal! G")
+        vim.cmd.startinsert({ bang = true })
       end
     else
       vim.notify("Failed to add note", vim.log.levels.ERROR)
     end
   end)
+end
+
+-- ノートブックを選択してノートを追加
+local function add_note_select()
+  local nb = require("config.nb")
+  local Snacks = require("snacks")
+  local notebooks = nb.list_notebooks()
+  local current_notebook = get_current_notebook()
+
+  if not notebooks or #notebooks == 0 then
+    vim.notify("No notebooks found", vim.log.levels.WARN)
+    return
+  end
+
+  local items = {}
+  local initial_idx = 1
+  for i, name in ipairs(notebooks) do
+    table.insert(items, { text = name, notebook = name })
+    if name == current_notebook then
+      initial_idx = i
+    end
+  end
+
+  Snacks.picker({
+    title = "Select Notebook",
+    items = items,
+    format = function(item)
+      local marker = item.notebook == current_notebook and " (current)" or ""
+      return { { "📓 " .. item.notebook .. marker } }
+    end,
+    on_show = function(picker)
+      picker.list:view(initial_idx)
+    end,
+    confirm = function(picker, item)
+      picker:close()
+      if item then
+        add_note_to_notebook(item.notebook)
+      end
+    end,
+  })
+end
+
+-- ノートを追加して開く（現在のノートブックに追加）
+local function add_note()
+  local current_notebook = get_current_notebook()
+
+  if current_notebook then
+    add_note_to_notebook(current_notebook)
+  else
+    -- nbディレクトリ外の場合はノートブック選択
+    add_note_select()
+  end
 end
 
 -- 画像をインポートしてマークダウンリンクを挿入
@@ -114,22 +196,6 @@ local function import_image()
       end
     end)
   end)
-end
-
--- 現在のファイルが属するノートブックを取得
-local function get_current_notebook()
-  local nb = require("config.nb")
-  local current_file = vim.fn.expand("%:p")
-  local nb_dir = nb.get_nb_dir()
-
-  if not current_file:match("^" .. vim.pesc(nb_dir)) then
-    return nil
-  end
-
-  -- nbディレクトリからの相対パスを取得し、最初のディレクトリ名を返す
-  local relative = current_file:sub(#nb_dir + 2) -- +2 for trailing slash
-  local notebook = relative:match("^([^/]+)/")
-  return notebook
 end
 
 -- リンクを挿入（全ノートブック対応）
@@ -196,6 +262,7 @@ return {
   "folke/snacks.nvim",
   keys = {
     { "<leader>na", add_note, desc = "nb add" },
+    { "<leader>nA", add_note_select, desc = "nb add (select notebook)" },
     { "<leader>ni", import_image, desc = "nb import image" },
     { "<leader>nl", link_item, desc = "nb link" },
     { "<leader>np", pick_notes, desc = "nb picker" },

@@ -96,12 +96,14 @@ function M.get_note_path(note_id)
   return ""
 end
 
--- ノートを追加してIDを返す
-function M.add_note(title)
+-- ノートを追加してIDを返す（notebook指定可能）
+function M.add_note(title, notebook)
   local timestamp = os.date("%Y%m%d%H%M%S")
   local note_title = title and title ~= "" and title or os.date("%Y-%m-%d %H:%M:%S")
   local escaped_title = note_title:gsub('"', '\\"')
-  local args = string.format('add --no-color --filename "%s.md" --title "%s"', timestamp, escaped_title)
+
+  local cmd_prefix = notebook and (notebook .. ":") or ""
+  local args = string.format('%sadd --no-color --filename "%s.md" --title "%s"', cmd_prefix, timestamp, escaped_title)
 
   local output = M.run_cmd(args)
   if not output then
@@ -112,6 +114,10 @@ function M.add_note(title)
   for _, line in ipairs(output) do
     local note_id = line:match("%[(%d+)%]")
     if note_id then
+      -- notebook指定時は notebook:id 形式で返す
+      if notebook then
+        return notebook .. ":" .. note_id
+      end
       return note_id
     end
   end
@@ -199,10 +205,10 @@ function M.list_notebooks()
 end
 
 -- リスト行をパース（ノートブック情報付き）
--- 例: "[log:22] タイトル" -> { full_id = "log:22", notebook = "log", ... }
+-- 例: "[22] タイトル" + notebook="log" -> { full_id = "log:22", notebook = "log", ... }
 function M.parse_list_item_with_notebook(line, notebook)
-  local full_id = line:match("^%[(.-)%]")
-  if not full_id then
+  local note_id = line:match("^%[(.-)%]")
+  if not note_id then
     return nil
   end
 
@@ -221,6 +227,9 @@ function M.parse_list_item_with_notebook(line, notebook)
   if not name then
     return nil
   end
+
+  -- full_id は notebook:note_id 形式で構築
+  local full_id = notebook .. ":" .. note_id
 
   return {
     full_id = full_id,
