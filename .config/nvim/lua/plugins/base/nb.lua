@@ -175,7 +175,7 @@ local function link_item()
         local needs_prefix = current_notebook and item.notebook ~= current_notebook
         if item.is_image then
           if needs_prefix then
-            link = string.format("![%s](%s:%s)", item.name, item.notebook, item.name)
+            link = string.format("![%s](http://localhost:6789/--original/%s/%s)", item.name, item.notebook, item.name)
           else
             link = string.format("![%s](%s)", item.name, item.name)
           end
