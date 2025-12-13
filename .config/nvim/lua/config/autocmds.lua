@@ -79,6 +79,36 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+-- [[notebook:name]] 形式のリンクにジャンプ（LspAttach後に設定してLazyVimのgdを上書き）
+vim.api.nvim_create_autocmd("LspAttach", {
+  pattern = "*.md",
+  callback = function(args)
+    vim.keymap.set("n", "gd", function()
+      local line = vim.api.nvim_get_current_line()
+      local col = vim.api.nvim_win_get_cursor(0)[2] + 1
+
+      -- [[notebook:name]] 形式のリンクを検出（コロンを含むもののみ）
+      local search_start = 1
+      while true do
+        local start_pos, end_pos, link = line:find("%[%[([^%]]+:[^%]]+)%]%]", search_start)
+        if not start_pos then
+          break
+        end
+        if col >= start_pos and col <= end_pos then
+          local path = require("config.nb").get_note_path(link)
+          if path and path ~= "" then
+            vim.cmd.edit(path)
+            return
+          end
+        end
+        search_start = end_pos + 1
+      end
+
+      vim.lsp.buf.definition()
+    end, { buffer = args.buf, desc = "Go to nb link or definition" })
+  end,
+})
+
 -- nb形式のリンク（notebook:note）のMarksman警告を無視
 local original_diagnostics_handler = vim.lsp.handlers["textDocument/publishDiagnostics"]
 vim.lsp.handlers["textDocument/publishDiagnostics"] = function(err, result, ctx, config)

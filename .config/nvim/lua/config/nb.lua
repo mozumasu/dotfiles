@@ -88,7 +88,8 @@ end
 
 -- ノートIDからファイルパスを取得
 function M.get_note_path(note_id)
-  local output = M.run_cmd("show --path " .. note_id)
+  local escaped_id = vim.fn.shellescape(note_id)
+  local output = M.run_cmd("show --path " .. escaped_id)
   if output and output[1] then
     return vim.trim(output[1])
   end

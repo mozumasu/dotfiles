@@ -132,28 +132,6 @@ local function get_current_notebook()
   return notebook
 end
 
--- [[notebook:name]] 形式のリンクにジャンプ
-local function goto_nb_link()
-  local nb = require("config.nb")
-  local line = vim.api.nvim_get_current_line()
-  local col = vim.api.nvim_win_get_cursor(0)[2] + 1 -- 1-indexed
-
-  -- [[notebook:name]] 形式のリンクを検出（コロンを含むもののみ）
-  for link in line:gmatch("%[%[([^%]]+:[^%]]+)%]%]") do
-    local start_pos, end_pos = line:find("%[%[" .. vim.pesc(link) .. "%]%]", 1, true)
-    if start_pos and col >= start_pos and col <= end_pos then
-      local path = nb.get_note_path(link)
-      if path and path ~= "" then
-        vim.cmd.edit(path)
-        return
-      end
-    end
-  end
-
-  -- notebook:name形式でなければデフォルトのgdを実行
-  vim.lsp.buf.definition()
-end
-
 -- リンクを挿入（全ノートブック対応）
 local function link_item()
   local nb = require("config.nb")
@@ -222,6 +200,5 @@ return {
     { "<leader>nl", link_item, desc = "nb link" },
     { "<leader>np", pick_notes, desc = "nb picker" },
     { "<leader>ng", grep_notes, desc = "nb grep" },
-    { "gd", goto_nb_link, ft = "markdown", desc = "Go to nb link" },
   },
 }
