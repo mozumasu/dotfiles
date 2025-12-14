@@ -37,10 +37,12 @@
       # Helper to create app
       mkApp = name: script: {
         type = "app";
-        program = "${pkgs.writeShellApplication {
-          inherit name;
-          text = script;
-        }}/bin/${name}";
+        program = "${
+          pkgs.writeShellApplication {
+            inherit name;
+            text = script;
+          }
+        }/bin/${name}";
       };
     in
     {
