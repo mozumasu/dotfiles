@@ -136,7 +136,7 @@
       "spotify"
       "vagrant"
       "visual-studio-code"
-      "vpnstatus"
+      "timac/vpnstatus/vpnstatus"
       "warp"
       "wezterm@nightly"
       "zoom"
