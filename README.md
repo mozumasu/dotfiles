@@ -82,29 +82,34 @@
 ### Installation
 
 ```bash
-# 1. Install Homebrew
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# 2. Install Nix
+# 1. Install Nix
 sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install)
 
-# 3. Clone dotfiles
+# 2. Clone dotfiles
 git clone https://github.com/mozumasu/dotfiles ~/dotfiles
 
+# 3. Backup existing shell configs (first time only)
+sudo mv /etc/bashrc /etc/bashrc.before-nix-darwin
+sudo mv /etc/zshrc /etc/zshrc.before-nix-darwin
+
 # 4. Apply nix-darwin configuration (first time)
-nix run \
+# Note: sudo is required for system activation, but HOME must be preserved
+sudo env "HOME=$HOME" nix run \
   --extra-experimental-features nix-command \
   --extra-experimental-features flakes \
-  nix-darwin -- switch --flake ~/dotfiles/.config/nix#geisha
+  nix-darwin -- switch --flake "$HOME/dotfiles/.config/nix#geisha"
 
 # After initial setup, use:
 # nix-switch (or darwin-rebuild switch --flake ~/dotfiles/.config/nix#geisha)
 ```
 
+> Homebrew is automatically installed via [nix-homebrew](https://github.com/zhaofengli/nix-homebrew)
+
 ### What's Managed by Nix
 
 | Category | Description |
 |----------|-------------|
+| **Homebrew** | Auto-installed via nix-homebrew |
 | **CLI Tools** | 75+ packages via home-manager |
 | **GUI Apps** | 43 Casks via Homebrew |
 | **Brew Packages** | 99 formulae |
