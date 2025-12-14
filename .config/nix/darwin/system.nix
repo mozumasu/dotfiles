@@ -265,4 +265,24 @@
     # Caps LockをControlに
     remapCapsLockToControl = true;
   };
+
+  # ============================================================================
+  # Activation Scripts
+  # ============================================================================
+  system.activationScripts.extraActivation.text = ''
+    # Xcode Command Line Tools のチェックとインストール
+    if ! /usr/bin/xcrun -f clang >/dev/null 2>&1; then
+      echo "Installing Xcode Command Line Tools..."
+      touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
+      PROD=$(/usr/sbin/softwareupdate -l | grep "\*.*Command Line" | tail -n 1 | sed 's/^[^C]* //')
+      /usr/sbin/softwareupdate -i "$PROD" --verbose
+      rm -f /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
+    fi
+
+    # Rosetta 2 のインストール (Apple Silicon)
+    if [[ "$(uname -m)" == "arm64" ]] && ! /usr/bin/pgrep -q oahd; then
+      echo "Installing Rosetta 2..."
+      /usr/sbin/softwareupdate --install-rosetta --agree-to-license
+    fi
+  '';
 }
