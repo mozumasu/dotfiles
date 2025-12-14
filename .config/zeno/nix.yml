@@ -1,0 +1,36 @@
+snippets:
+  # nix-darwin
+  - name: nix switch
+    keyword: nix-switch
+    snippet: darwin-rebuild switch --flake ~/dotfiles/.config/nix#geisha
+
+  - name: nix build
+    keyword: nix-build
+    snippet: darwin-rebuild build --flake ~/dotfiles/.config/nix#geisha
+
+  - name: nix check
+    keyword: nix-check
+    snippet: darwin-rebuild check --flake ~/dotfiles/.config/nix#geisha
+
+  # nix flake
+  - name: nix flake update
+    keyword: nfu
+    snippet: nix flake update --flake ~/dotfiles/.config/nix
+
+  - name: nix flake show
+    keyword: nfs
+    snippet: nix flake show ~/dotfiles/.config/nix
+
+  # garbage collection
+  - name: nix garbage collect
+    keyword: ngc
+    snippet: nix-collect-garbage -d
+
+completions:
+  # nix run apps (dotfiles の flake apps を補完)
+  - name: nix run apps
+    patterns:
+      - "^nix run \\.#$"
+    sourceCommand: "/nix/var/nix/profiles/default/bin/nix flake show ~/dotfiles/.config/nix --json 2>/dev/null | jq -r '.apps[\"aarch64-darwin\"] // {} | keys[]'"
+    options:
+      --prompt: "'nix run .#> '"
