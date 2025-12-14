@@ -1,16 +1,16 @@
 snippets:
-  # nix-darwin
+  # nix-darwin (hostname is auto-detected)
   - name: nix switch
     keyword: nix-switch
-    snippet: darwin-rebuild switch --flake ~/dotfiles/.config/nix#geisha
+    snippet: darwin-rebuild switch --flake ~/dotfiles/.config/nix#$(scutil --get LocalHostName)
 
   - name: nix build
     keyword: nix-build
-    snippet: darwin-rebuild build --flake ~/dotfiles/.config/nix#geisha
+    snippet: darwin-rebuild build --flake ~/dotfiles/.config/nix#$(scutil --get LocalHostName)
 
   - name: nix check
     keyword: nix-check
-    snippet: darwin-rebuild check --flake ~/dotfiles/.config/nix#geisha
+    snippet: darwin-rebuild check --flake ~/dotfiles/.config/nix#$(scutil --get LocalHostName)
 
   # nix flake
   - name: nix flake update

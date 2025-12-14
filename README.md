@@ -94,16 +94,24 @@ sudo mv /etc/zshrc /etc/zshrc.before-nix-darwin
 
 # 4. Apply nix-darwin configuration (first time)
 # Note: $HOME is expanded before sudo runs, so the path is correct
+# Replace "geisha" with your host name (geisha, geisha-2, etc.)
 sudo -H nix run \
   --extra-experimental-features nix-command \
   --extra-experimental-features flakes \
-  nix-darwin -- switch --flake "$HOME/dotfiles/.config/nix#geisha"
+  nix-darwin -- switch --flake "$HOME/dotfiles/.config/nix#<hostname>"
 
 # After initial setup, use:
-# nix-switch (or darwin-rebuild switch --flake ~/dotfiles/.config/nix#geisha)
+# nix-switch (or darwin-rebuild switch --flake ~/dotfiles/.config/nix#<hostname>)
 ```
 
 > Homebrew is automatically installed via [nix-homebrew](https://github.com/zhaofengli/nix-homebrew)
+
+### Available Hosts
+
+| Host | Description |
+|------|-------------|
+| `geisha` | Main Mac |
+| `bourbon` | Second Mac |
 
 ### What's Managed by Nix
 

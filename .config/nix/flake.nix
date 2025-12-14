@@ -56,6 +56,33 @@
           }
         }/bin/${name}";
       };
+
+      # Common modules shared by all hosts
+      commonModules = [
+        ./darwin
+        home-manager.darwinModules.home-manager
+        {
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            users.mozumasu = import ./home-manager;
+          };
+        }
+        nix-homebrew.darwinModules.nix-homebrew
+        {
+          nix-homebrew = {
+            enable = true;
+            enableRosetta = true;
+            user = "mozumasu";
+            autoMigrate = true;
+            taps = {
+              "homebrew/homebrew-core" = homebrew-core;
+              "homebrew/homebrew-cask" = homebrew-cask;
+            };
+            mutableTaps = true;
+          };
+        }
+      ];
     in
     {
       formatter.${system} = treefmtEval.config.build.wrapper;
@@ -91,32 +118,12 @@
       darwinConfigurations = {
         geisha = darwin.lib.darwinSystem {
           inherit system;
-          modules = [
-            ./hosts/geisha
-            ./darwin
-            home-manager.darwinModules.home-manager
-            {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                users.mozumasu = import ./home-manager;
-              };
-            }
-            nix-homebrew.darwinModules.nix-homebrew
-            {
-              nix-homebrew = {
-                enable = true;
-                enableRosetta = true;
-                user = "mozumasu";
-                autoMigrate = true;
-                taps = {
-                  "homebrew/homebrew-core" = homebrew-core;
-                  "homebrew/homebrew-cask" = homebrew-cask;
-                };
-                mutableTaps = true;
-              };
-            }
-          ];
+          modules = [ ./hosts/geisha ] ++ commonModules;
+        };
+
+        bourbon = darwin.lib.darwinSystem {
+          inherit system;
+          modules = [ ./hosts/bourbon ] ++ commonModules;
         };
       };
     };
