@@ -234,3 +234,11 @@ completions:
       - "^fg $"
     sourceCommand: "jobs"
     callback: "cut -d'[' -f2 | cut -d']' -f1 | sed 's/^/%/'"
+
+  # nix run .# (dotfiles の flake apps を補完)
+  - name: nix run apps
+    patterns:
+      - "^nix run \\.#$"
+    sourceCommand: "/nix/var/nix/profiles/default/bin/nix flake show ~/dotfiles/.config/nix --json 2>/dev/null | jq -r '.apps[\"aarch64-darwin\"] // {} | keys[]'"
+    options:
+      --prompt: "'nix run .#> '"
