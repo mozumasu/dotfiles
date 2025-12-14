@@ -284,5 +284,11 @@
       echo "Installing Rosetta 2..."
       /usr/sbin/softwareupdate --install-rosetta --agree-to-license
     fi
+
+    # Homebrew ディレクトリのパーミッション修正
+    if [[ -d "/opt/homebrew" && -n "$SUDO_USER" ]]; then
+      echo "Fixing Homebrew directory permissions for $SUDO_USER..."
+      /usr/sbin/chown -R "$SUDO_USER":admin /opt/homebrew
+    fi
   '';
 }
