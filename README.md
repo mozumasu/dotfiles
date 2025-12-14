@@ -93,8 +93,8 @@ sudo mv /etc/bashrc /etc/bashrc.before-nix-darwin
 sudo mv /etc/zshrc /etc/zshrc.before-nix-darwin
 
 # 4. Apply nix-darwin configuration (first time)
-# Note: sudo is required for system activation, but HOME must be preserved
-sudo env "HOME=$HOME" nix run \
+# Note: $HOME is expanded before sudo runs, so the path is correct
+sudo -H nix run \
   --extra-experimental-features nix-command \
   --extra-experimental-features flakes \
   nix-darwin -- switch --flake "$HOME/dotfiles/.config/nix#geisha"
