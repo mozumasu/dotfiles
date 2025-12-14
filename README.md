@@ -72,7 +72,71 @@
 
 ---
 
-## setup
+## Setup (New Mac)
+
+### Prerequisites
+
+- macOS (Apple Silicon)
+- Git
+
+### Installation
+
+```bash
+# 1. Install Homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# 2. Install Nix
+sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install)
+
+# 3. Clone dotfiles
+git clone https://github.com/mozumasu/dotfiles ~/dotfiles
+
+# 4. Apply nix-darwin configuration (first time)
+nix run \
+  --extra-experimental-features nix-command \
+  --extra-experimental-features flakes \
+  nix-darwin -- switch --flake ~/dotfiles/.config/nix#geisha
+
+# After initial setup, use:
+# nix-switch (or darwin-rebuild switch --flake ~/dotfiles/.config/nix#geisha)
+```
+
+### What's Managed by Nix
+
+| Category | Description |
+|----------|-------------|
+| **CLI Tools** | 75+ packages via home-manager |
+| **GUI Apps** | 43 Casks via Homebrew |
+| **Brew Packages** | 99 formulae |
+| **Dotfiles** | nvim, zsh, wezterm, karabiner, etc. |
+| **macOS Settings** | Dock, Finder, Keyboard, Trackpad, etc. |
+
+### Manual Setup Required
+
+| Item | Reason |
+|------|--------|
+| Apple ID | Security |
+| App Logins | Authentication |
+| SSH Keys | `~/.ssh/` not managed |
+| AWS/Git Credentials | Sensitive data |
+| Karabiner Permissions | Accessibility permissions |
+
+### Daily Commands
+
+```bash
+# Apply configuration changes
+nix-switch
+
+# Update flake inputs
+nfu
+
+# Garbage collection
+ngc
+```
+
+---
+
+## Commit Message
 
 ```sh
 npx czg --api-key="ghp_xxxxxx" --api-endpoint="https://models.inference.ai.azure.com" --api-model="gpt-4o-mini"
