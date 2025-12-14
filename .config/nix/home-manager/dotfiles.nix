@@ -22,6 +22,7 @@ in
     "yazi".source = mkLink ".config/yazi";
     "zeno".source = mkLink ".config/zeno";
     "gomi".source = mkLink ".config/gomi";
+    "mise".source = mkLink ".config/mise";
   };
 
   # ~/ 配下

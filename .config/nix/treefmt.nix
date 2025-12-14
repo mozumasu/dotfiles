@@ -1,4 +1,11 @@
 { pkgs, ... }:
+let
+  # miseでインストールされたoxfmtを使うラッパー
+  oxfmt-wrapper = pkgs.writeShellScriptBin "oxfmt" ''
+    export PATH="$HOME/.local/share/mise/shims:$PATH"
+    exec oxfmt "$@"
+  '';
+in
 {
   projectRootFile = "flake.nix";
 
@@ -34,5 +41,16 @@
       ".config/zsh/**/*.zsh"
       "scripts/**/*.sh"
     ];
+
+    # JavaScript/TypeScript (oxfmt - mise経由)
+    oxfmt = {
+      command = "${oxfmt-wrapper}/bin/oxfmt";
+      includes = [
+        "*.js"
+        "*.jsx"
+        "*.ts"
+        "*.tsx"
+      ];
+    };
   };
 }

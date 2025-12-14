@@ -64,3 +64,4 @@ zenn-cli.json
 
 # serena
 .serena
+.config/nix/result

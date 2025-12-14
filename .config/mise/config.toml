@@ -1,0 +1,19 @@
+[tools]
+node = "latest"
+pnpm = "latest"
+python = "3.13.3"
+
+# npm packages
+"npm:@aikidosec/safe-chain" = "latest"
+"npm:@anthropic-ai/claude-code" = "latest"
+"npm:@google/gemini-cli" = "latest"
+"npm:@sasazame/ccresume" = "latest"
+"npm:commitizen" = "latest"
+"npm:cz-git" = "latest"
+"npm:czg" = "latest"
+"npm:oxfmt" = "latest"
+"npm:sdd-mcp" = "latest"
+"npm:vde-layout" = "0.0.9"
+
+[settings]
+idiomatic_version_file_enable_tools = ["node"]
