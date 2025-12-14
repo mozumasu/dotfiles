@@ -82,19 +82,22 @@
 ### Installation
 
 ```bash
-# 1. Install Nix
+# 1. Install Xcode Command Line Tools (required for Homebrew)
+xcode-select --install
+
+# 2. Install Nix
 sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install)
 
-# 2. Clone dotfiles
+# 3. Clone dotfiles
 git clone https://github.com/mozumasu/dotfiles ~/dotfiles
 
-# 3. Backup existing shell configs (first time only)
+# 4. Backup existing shell configs (first time only)
 sudo mv /etc/bashrc /etc/bashrc.before-nix-darwin
 sudo mv /etc/zshrc /etc/zshrc.before-nix-darwin
 
-# 4. Apply nix-darwin configuration (first time)
+# 5. Apply nix-darwin configuration (first time)
 # Note: $HOME is expanded before sudo runs, so the path is correct
-# Replace "geisha" with your host name (geisha, geisha-2, etc.)
+# Replace <hostname> with your host name (geisha, bourbon, etc.)
 sudo nix run \
   --extra-experimental-features nix-command \
   --extra-experimental-features flakes \
