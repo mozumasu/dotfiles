@@ -955,3 +955,5 @@ devbox
 asdf
 deno
 awscli
+pkgs
+darwinConfigurations
