@@ -19,6 +19,7 @@
 
   outputs =
     {
+      self,
       nixpkgs,
       home-manager,
       darwin,
@@ -29,11 +30,40 @@
       system = "aarch64-darwin";
       pkgs = nixpkgs.legacyPackages.${system};
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
+
+      # Flake directory path
+      flakeDir = "$HOME/dotfiles/.config/nix";
+
+      # Helper to create app
+      mkApp = name: script: {
+        type = "app";
+        program = "${pkgs.writeShellApplication {
+          inherit name;
+          text = script;
+        }}/bin/${name}";
+      };
     in
     {
       formatter.${system} = treefmtEval.config.build.wrapper;
 
       checks.${system}.formatting = treefmtEval.config.build.check ./.;
+
+      apps.${system} = {
+        # nix run .#switch
+        switch = mkApp "darwin-switch" ''
+          sudo darwin-rebuild switch --flake "${flakeDir}#geisha"
+        '';
+
+        # nix run .#build
+        build = mkApp "darwin-build" ''
+          darwin-rebuild build --flake "${flakeDir}#geisha"
+        '';
+
+        # nix run .#check
+        check = mkApp "darwin-check" ''
+          darwin-rebuild check --flake "${flakeDir}#geisha"
+        '';
+      };
 
       darwinConfigurations = {
         geisha = darwin.lib.darwinSystem {
