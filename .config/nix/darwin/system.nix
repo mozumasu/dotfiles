@@ -194,12 +194,8 @@
     # --------------------------------------------------------------------------
     # Universal Access (アクセシビリティ)
     # --------------------------------------------------------------------------
-    universalaccess = {
-      # コントラストを上げる
-      reduceTransparency = false;
-      # モーションを減らす
-      reduceMotion = false;
-    };
+    # NOTE: universalaccess settings require special permissions and may fail on first setup
+    # Configure manually in System Preferences > Accessibility if needed
 
     # --------------------------------------------------------------------------
     # スペース (Mission Control)
