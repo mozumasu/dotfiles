@@ -22,6 +22,7 @@
     tig
     gibo
     git-secrets
+    lefthook
 
     # エディタ/ターミナル
     neovim
