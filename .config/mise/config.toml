@@ -15,5 +15,8 @@ python = "3.13.3"
 "npm:sdd-mcp" = "latest"
 "npm:vde-layout" = "0.0.9"
 
+# Python tools (via pipx/uvx)
+"pipx:plamo-translate" = { version = "latest", uvx = "true", pipx_args = "--python 3.12" }
+
 [settings]
 idiomatic_version_file_enable_tools = ["node"]
