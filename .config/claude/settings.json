@@ -45,7 +45,6 @@
       "Bash(sudo:*)",
       "Bash(rm -rf:*)",
       "Bash(git push:*)",
-      "Bash(git reset:*)",
       "Bash(git rebase:*)",
       "Read(.env.*)",
       "Read(id_rsa)",
@@ -55,6 +54,9 @@
       "Write(**/secrets/**)",
       "Bash(npm uninstall:*)",
       "Bash(npm remove:*)"
+    ],
+    "ask": [
+      "Bash(git reset:*)"
     ],
     "additionalDirectories": [
       "~/src/github.com/mozumasu/nb",
