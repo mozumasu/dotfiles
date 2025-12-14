@@ -40,7 +40,16 @@
     }:
     let
       system = "aarch64-darwin";
-      pkgs = nixpkgs.legacyPackages.${system};
+
+      # Custom overlay for local packages
+      localOverlay = final: prev: {
+        skanehira-ghost = final.callPackage ./packages/ghost.nix { };
+      };
+
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [ localOverlay ];
+      };
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
 
       # Flake directory path
@@ -60,6 +69,10 @@
       # Common modules shared by all hosts
       commonModules = [
         ./darwin
+        # Apply custom overlay to nixpkgs
+        {
+          nixpkgs.overlays = [ localOverlay ];
+        }
         home-manager.darwinModules.home-manager
         {
           home-manager = {

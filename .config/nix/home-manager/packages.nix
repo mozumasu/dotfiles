@@ -60,6 +60,7 @@
     glow
     yazi
     lazydocker
+    skanehira-ghost # Background process manager
 
     # ネタ系
     cowsay
