@@ -63,6 +63,15 @@
         check = mkApp "darwin-check" ''
           darwin-rebuild check --flake "${flakeDir}#geisha"
         '';
+
+        # nix run .#update
+        update = mkApp "darwin-update" ''
+          echo "Updating flake..."
+          nix flake update --flake "${flakeDir}"
+          echo "Rebuilding nix-darwin (includes home-manager)..."
+          sudo darwin-rebuild switch --flake "${flakeDir}#geisha"
+          echo "Update complete!"
+        '';
       };
 
       darwinConfigurations = {
