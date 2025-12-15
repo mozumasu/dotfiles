@@ -12,18 +12,17 @@ config.automatically_reload_config = true
 ---@diagnostic disable-next-line: assign-type-mismatch
 config.macos_forward_to_ime_modifier_mask = "SHIFT|CTRL"
 
+-- Claude Codeで改行できるようにする
+config.keys = { { key = "Enter", mods = "SHIFT", action = wezterm.action.SendString("\n") } }
+
+-- font
+config.font_size = 13.0
+config.font = wezterm.font("HackGen Console NF")
+
 -- 背景の透過度とぼかし
 config.window_background_opacity = 0.7
 config.macos_window_background_blur = 13
 
--- font
-config.font_size = 14.0
-config.font = wezterm.font("HackGen Console NF")
+require("keymaps").apply_to_config(config)
 
--- config.colors = {
---   background = "#f8d7e8",
--- }
---
-
--- 最後に、weztermに設定を戻す
 return config
