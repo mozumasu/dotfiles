@@ -12,9 +12,6 @@ config.automatically_reload_config = true
 ---@diagnostic disable-next-line: assign-type-mismatch
 config.macos_forward_to_ime_modifier_mask = "SHIFT|CTRL"
 
--- Claude Codeで改行できるようにする
-config.keys = { { key = "Enter", mods = "SHIFT", action = wezterm.action.SendString("\n") } }
-
 -- font
 config.font_size = 13.0
 config.font = wezterm.font("HackGen Console NF")

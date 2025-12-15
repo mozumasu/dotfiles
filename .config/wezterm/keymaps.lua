@@ -3,6 +3,8 @@ local act = wezterm.action
 
 local module = {}
 
+local leader = { key = "q", mods = "CTRL", timeout_milliseconds = 2000 }
+
 local keys = {
   { key = "t", mods = "CTRL|SHIFT|ALT", action = act.SendString("keymaps module loaded!") },
   { key = "Tab", mods = "CTRL", action = act.ActivateTabRelative(1) },
@@ -109,8 +111,7 @@ local keys = {
   { key = "_", mods = "SHIFT|CTRL", action = act.DecreaseFontSize },
   { key = "c", mods = "SHIFT|CTRL", action = act.CopyTo("Clipboard") },
   { key = "c", mods = "SUPER", action = act.CopyTo("Clipboard") },
-  { key = "f", mods = "SHIFT|CTRL", action = act.Search("CurrentSelectionOrEmptyString") },
-  { key = "f", mods = "SUPER", action = act.Search("CurrentSelectionOrEmptyString") },
+  -- { key = "f", mods = "SHIFT|CTRL", action = act.Search("CurrentSelectionOrEmptyString") },
   { key = "h", mods = "SHIFT|CTRL", action = act.HideApplication },
   { key = "h", mods = "SUPER", action = act.HideApplication },
   { key = "k", mods = "SHIFT|CTRL", action = act.ClearScrollback("ScrollbackOnly") },
@@ -159,6 +160,30 @@ local keys = {
   { key = "DownArrow", mods = "SHIFT|ALT|CTRL", action = act.AdjustPaneSize({ "Down", 1 }) },
   { key = "Copy", mods = "NONE", action = act.CopyTo("Clipboard") },
   { key = "Paste", mods = "NONE", action = act.PasteFrom("Clipboard") },
+  -- Claude Codeで改行できるようにする
+  { key = "Enter", mods = "SHIFT", action = wezterm.action.SendString("\n") },
+  -- ScrollToPrompt
+  { key = "[", mods = "ALT", action = act.ScrollToPrompt(-1) },
+  { key = "]", mods = "ALT", action = act.ScrollToPrompt(1) },
+  -- Pane
+  { key = "r", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) }, -- Control+q → r 横分割
+  { key = "d", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) }, -- Control+q → d 縦分割
+  { key = "x", mods = "LEADER", action = act({ CloseCurrentPane = { confirm = true } }) }, -- Control+q → d ペインを閉じる
+  -- Search mode
+  {
+    key = "f",
+    mods = "SUPER",
+    action = wezterm.action_callback(function(window, pane)
+      window:perform_action(act.Search("CurrentSelectionOrEmptyString"), pane)
+      window:perform_action(
+        act.Multiple({
+          act.CopyMode("ClearPattern"),
+          act.CopyMode("ClearSelectionMode"),
+        }),
+        pane
+      )
+    end),
+  },
 }
 
 local key_tables = {
