@@ -1,3 +1,4 @@
+---@type Wezterm
 local wezterm = require("wezterm")
 
 -- ここに設定内容を記述していく

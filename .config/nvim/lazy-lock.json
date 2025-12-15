@@ -80,6 +80,7 @@
   "vimdoc-ja": { "branch": "master", "commit": "4fd3ae0d71c9de34225743a1654f5a3e16080d28" },
   "vinsert.vim": { "branch": "main", "commit": "24d55cdfda08b77eaf12fc5da380a7a1109f7e5b" },
   "volt": { "branch": "main", "commit": "620de1321f275ec9d80028c68d1b88b409c0c8b1" },
+  "wezterm-types": { "branch": "main", "commit": "2d69365764b7a71b78d1301f99df3f88fd206060" },
   "which-key.nvim": { "branch": "main", "commit": "3aab2147e74890957785941f0c1ad87d0a44c15a" },
   "winresizer": { "branch": "master", "commit": "9bd559a03ccec98a458e60c705547119eb5350f3" },
   "yazi.nvim": { "branch": "main", "commit": "09e5058c689b665ec9c991f50b119e6639e183f3" },
