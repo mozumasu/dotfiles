@@ -170,7 +170,7 @@ local key_tables = {
       mods = "NONE",
       action = act.Multiple({
         { CopyTo = "ClipboardAndPrimarySelection" },
-        -- { Multiple = { "ScrollToBottom", { CopyMode = "Close" } } },
+        -- { Multiple = { "ScrollToBottom", { CopyMode = "Close" } } }, 連続でコピーしたいこともあるのでコメントアウト
       }),
     },
 
@@ -195,6 +195,7 @@ local key_tables = {
 
   search_mode = {
     { key = "Escape", mods = "NONE", action = act.CopyMode("Close") },
+    -- 検索結果にジャンプしたらコピーモードへ
     {
       key = "n",
       mods = "CTRL",
