@@ -11,6 +11,13 @@
 
   programs.home-manager.enable = true;
 
+  # direnv + nix-direnv
+  programs.direnv = {
+    enable = true;
+    enableZshIntegration = true;
+    nix-direnv.enable = true;
+  };
+
   # スクリーンショット保存先ディレクトリを作成
   home.activation.createScreenshotsDir = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     mkdir -p ~/Pictures/Screenshots
