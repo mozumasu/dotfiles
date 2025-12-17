@@ -123,8 +123,9 @@ local keys = {
     key = "X",
     mods = "CTRL",
     action = wezterm.action_callback(function(window, pane)
-      window:perform_action(act.CopyMode("ClearPattern"), pane)
       window:perform_action(act.ActivateCopyMode, pane)
+      window:perform_action(act.CopyMode("ClearPattern"), pane)
+      window:perform_action(act.CopyMode("ClearSelectionMode"), pane)
       window:perform_action(act.CopyMode("MoveToViewportMiddle"), pane)
     end),
   },
@@ -174,7 +175,7 @@ local key_tables = {
       mods = "NONE",
       action = act.Multiple({
         { CopyTo = "ClipboardAndPrimarySelection" },
-        { Multiple = { "ScrollToBottom", { CopyMode = "Close" } } },
+        -- { Multiple = { "ScrollToBottom", { CopyMode = "Close" } } },
       }),
     },
 
@@ -192,14 +193,29 @@ local key_tables = {
     -- 検索結果へジャンプ
     { key = "n", mods = "CTRL", action = act.CopyMode("NextMatch") },
     { key = "p", mods = "CTRL", action = act.CopyMode("PriorMatch") },
+
     -- 検索モードへ
     { key = "/", mods = "NONE", action = act.Search("CurrentSelectionOrEmptyString") },
   },
 
   search_mode = {
     { key = "Escape", mods = "NONE", action = act.CopyMode("Close") },
-    { key = "n", mods = "CTRL", action = act.CopyMode("NextMatch") },
-    { key = "p", mods = "CTRL", action = act.CopyMode("PriorMatch") },
+    {
+      key = "n",
+      mods = "CTRL",
+      action = act.Multiple({
+        act.CopyMode("NextMatch"),
+        act.ActivateCopyMode,
+      }),
+    },
+    {
+      key = "p",
+      mods = "CTRL",
+      action = act.Multiple({
+        act.CopyMode("PriorMatch"),
+        act.ActivateCopyMode,
+      }),
+    },
     { key = "r", mods = "CTRL", action = act.CopyMode("CycleMatchType") },
     { key = "u", mods = "CTRL", action = act.CopyMode("ClearPattern") },
     -- 検索パターンを維持したままコピーモードへ
