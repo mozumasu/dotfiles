@@ -113,6 +113,7 @@ local keys = {
       act.CopyMode("MoveToViewportMiddle"),
     }),
   },
+  { key = "s", mods = "LEADER", action = act.ActivateKeyTable({ name = "setting_mode", one_shot = false }) },
 }
 
 local key_tables = {
@@ -196,6 +197,18 @@ local key_tables = {
     { key = "u", mods = "CTRL", action = act.CopyMode("ClearPattern") },
     -- 検索パターンを維持したままコピーモードへ
     { key = "X", mods = "CTRL", action = act.ActivateCopyMode },
+  },
+  setting_mode = {
+    -- Paneサイズの調整
+    { key = "h", action = act.AdjustPaneSize({ "Left", 1 }) },
+    { key = "l", action = act.AdjustPaneSize({ "Right", 1 }) },
+    { key = "k", action = act.AdjustPaneSize({ "Up", 1 }) },
+    { key = "j", action = act.AdjustPaneSize({ "Down", 1 }) },
+
+    -- 自作モードから抜けるキーバインド設定
+    { key = "Escape", action = "PopKeyTable" },
+    { key = "q", action = "PopKeyTable" },
+    { key = "c", mod = "CTRL", action = "PopKeyTable" },
   },
 }
 
