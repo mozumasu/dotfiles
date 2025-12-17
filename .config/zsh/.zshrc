@@ -35,6 +35,7 @@ fi
 source "$_brew_cache"
 unset _brew_cache
 
+export MANPAGER='nvim +Man!'
 # Prioritize Japanese man pages
 export MANPATH="/usr/local/share/man/ja_JP.UTF-8:$(manpath)"
 
