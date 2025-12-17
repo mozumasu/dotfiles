@@ -6,6 +6,8 @@ local module = {}
 local leader = { key = "q", mods = "CTRL", timeout_milliseconds = 2000 }
 
 local keys = {
+  -- AltキーをMetaキーとして扱いつつ、バックスラッシュ機能（Alt+¥）は維持する
+  { key = "¥", mods = "ALT", action = wezterm.action.SendString("\\") },
   -- 終了
   { key = "q", mods = "SUPER", action = act.QuitApplication },
   -- ウィンドウ操作
@@ -26,16 +28,11 @@ local keys = {
   { key = "t", mods = "SUPER", action = act.SpawnTab("CurrentPaneDomain") },
   { key = "w", mods = "SUPER", action = act.CloseCurrentTab({ confirm = true }) },
   -- Pane操作
-  { key = '"', mods = "ALT|CTRL", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
-  { key = "%", mods = "ALT|CTRL", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
-  { key = "LeftArrow", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Left") },
-  { key = "LeftArrow", mods = "SHIFT|ALT|CTRL", action = act.AdjustPaneSize({ "Left", 1 }) },
-  { key = "RightArrow", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Right") },
-  { key = "RightArrow", mods = "SHIFT|ALT|CTRL", action = act.AdjustPaneSize({ "Right", 1 }) },
-  { key = "UpArrow", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Up") },
-  { key = "UpArrow", mods = "SHIFT|ALT|CTRL", action = act.AdjustPaneSize({ "Up", 1 }) },
-  { key = "DownArrow", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Down") },
-  { key = "DownArrow", mods = "SHIFT|ALT|CTRL", action = act.AdjustPaneSize({ "Down", 1 }) },
+  -- <C-h> has been remapped to Backspace, so Backspace must be specified here
+  { key = "Backspace", mods = "SHIFT", action = act.ActivatePaneDirection("Left") },
+  { key = "l", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Right") },
+  { key = "k", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Up") },
+  { key = "j", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Down") },
 
   -- フォントサイズ変更
   { key = "+", mods = "SUPER", action = act.IncreaseFontSize },
@@ -45,10 +42,6 @@ local keys = {
   { key = "c", mods = "SUPER", action = act.CopyTo("Clipboard") },
   { key = "v", mods = "SUPER", action = act.PasteFrom("Clipboard") },
   { key = "C", mods = "CTRL", action = act.CopyTo("Clipboard") },
-
-  -- 検索
-  { key = "F", mods = "CTRL", action = act.Search("CurrentSelectionOrEmptyString") },
-  { key = "F", mods = "SHIFT|CTRL", action = act.Search("CurrentSelectionOrEmptyString") },
 
   -- Debug
   { key = "l", mods = "SUPER", action = act.ShowDebugOverlay },
@@ -66,14 +59,13 @@ local keys = {
   },
 
   -- モード切替
-  -- { key = "X", mods = "CTRL", action = act.ActivateCopyMode },
   -- アクティブペインのズーム切替
   { key = "Z", mods = "CTRL", action = act.TogglePaneZoomState },
 
   -- 誤爆するので非有効にしがち
-  { key = "k", mods = "SUPER", action = act.ClearScrollback("ScrollbackOnly") },
-  { key = "m", mods = "SUPER", action = act.Hide },
-  { key = "H", mods = "CTRL", action = act.HideApplication },
+  -- { key = "k", mods = "SUPER", action = act.ClearScrollback("ScrollbackOnly") },
+  -- { key = "m", mods = "SUPER", action = act.Hide },
+  -- { key = "H", mods = "CTRL", action = act.HideApplication },
 
   -- control + space がMaccOSのIME切り替えに使われるので、別のキーに割り当て
   -- { key = "phys:Space", mods = "SHIFT|CTRL", action = act.QuickSelect },
@@ -82,6 +74,8 @@ local keys = {
   -- スクロール
   { key = "PageUp", mods = "SHIFT", action = act.ScrollByPage(-1) },
   { key = "PageDown", mods = "SHIFT", action = act.ScrollByPage(1) },
+  { key = "p", mods = "ALT|CTRL", action = act.ScrollByPage(-0.5) },
+  { key = "n", mods = "ALT|CTRL", action = act.ScrollByPage(0.5) },
 
   -- コピー・ペースト
   { key = "Copy", mods = "NONE", action = act.CopyTo("Clipboard") },
@@ -109,11 +103,6 @@ local keys = {
       act.CopyMode("ClearSelectionMode"),
     }),
   },
-  -- <C-h> has been remapped to Backspace, so Backspace must be specified here
-  { key = "Backspace", mods = "SHIFT", action = act.ActivatePaneDirection("Left") },
-  { key = "l", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Right") },
-  { key = "k", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Up") },
-  { key = "j", mods = "SHIFT|CTRL", action = act.ActivatePaneDirection("Down") },
   {
     key = "X",
     mods = "CTRL",
@@ -174,21 +163,12 @@ local key_tables = {
       }),
     },
 
-    { key = "PageUp", mods = "NONE", action = act.CopyMode("PageUp") },
-    { key = "PageDown", mods = "NONE", action = act.CopyMode("PageDown") },
-    { key = "End", mods = "NONE", action = act.CopyMode("MoveToEndOfLineContent") },
-    { key = "Home", mods = "NONE", action = act.CopyMode("MoveToStartOfLine") },
-    { key = "LeftArrow", mods = "NONE", action = act.CopyMode("MoveLeft") },
-    { key = "LeftArrow", mods = "ALT", action = act.CopyMode("MoveBackwardWord") },
-    { key = "RightArrow", mods = "NONE", action = act.CopyMode("MoveRight") },
-    { key = "RightArrow", mods = "ALT", action = act.CopyMode("MoveForwardWord") },
-    { key = "UpArrow", mods = "NONE", action = act.CopyMode("MoveUp") },
-    { key = "DownArrow", mods = "NONE", action = act.CopyMode("MoveDown") },
+    { key = "p", mods = "ALT|CTRL", action = act.CopyMode("PageUp") },
+    { key = "n", mods = "ALT|CTRL", action = act.CopyMode("PageDown") },
 
     -- 検索結果へジャンプ
     { key = "n", mods = "CTRL", action = act.CopyMode("NextMatch") },
     { key = "p", mods = "CTRL", action = act.CopyMode("PriorMatch") },
-
     -- 検索モードへ
     { key = "/", mods = "NONE", action = act.Search("CurrentSelectionOrEmptyString") },
   },
