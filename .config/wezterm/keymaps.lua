@@ -103,16 +103,11 @@ local keys = {
   {
     key = "f",
     mods = "SUPER",
-    action = wezterm.action_callback(function(window, pane)
-      window:perform_action(act.Search("CurrentSelectionOrEmptyString"), pane)
-      window:perform_action(
-        act.Multiple({
-          act.CopyMode("ClearPattern"),
-          act.CopyMode("ClearSelectionMode"),
-        }),
-        pane
-      )
-    end),
+    action = act.Multiple({
+      act.Search("CurrentSelectionOrEmptyString"),
+      act.CopyMode("ClearPattern"),
+      act.CopyMode("ClearSelectionMode"),
+    }),
   },
   -- <C-h> has been remapped to Backspace, so Backspace must be specified here
   { key = "Backspace", mods = "SHIFT", action = act.ActivatePaneDirection("Left") },
@@ -122,12 +117,12 @@ local keys = {
   {
     key = "X",
     mods = "CTRL",
-    action = wezterm.action_callback(function(window, pane)
-      window:perform_action(act.ActivateCopyMode, pane)
-      window:perform_action(act.CopyMode("ClearPattern"), pane)
-      window:perform_action(act.CopyMode("ClearSelectionMode"), pane)
-      window:perform_action(act.CopyMode("MoveToViewportMiddle"), pane)
-    end),
+    action = act.Multiple({
+      act.ActivateCopyMode,
+      act.CopyMode("ClearPattern"),
+      act.CopyMode("ClearSelectionMode"),
+      act.CopyMode("MoveToViewportMiddle"),
+    }),
   },
 }
 
@@ -219,7 +214,7 @@ local key_tables = {
     { key = "r", mods = "CTRL", action = act.CopyMode("CycleMatchType") },
     { key = "u", mods = "CTRL", action = act.CopyMode("ClearPattern") },
     -- 検索パターンを維持したままコピーモードへ
-    { key = "x", mods = "SHIFT|CTRL", action = act.ActivateCopyMode },
+    { key = "X", mods = "CTRL", action = act.ActivateCopyMode },
   },
 }
 
