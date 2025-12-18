@@ -113,7 +113,6 @@
   "enabledPlugins": {
     "example-skills@anthropic-agent-skills": true
   },
-  "alwaysThinkingEnabled": false,
   "maxTokens": 8192,
   "temperature": 0,
   "preferences": {
