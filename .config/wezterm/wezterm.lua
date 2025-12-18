@@ -21,6 +21,12 @@ config.window_background_opacity = 0.7
 config.macos_window_background_blur = 13
 
 require("keymaps").apply_to_config(config)
-require("functions").apply_to_config(config) -- setting_modeにキーを追加するためkeymapsの後に読み込む
+require("workspace").apply_to_config(config)
+require("appearance").apply_to_config(config)
+require("tab").apply_to_config(config)
+require("statusbar").apply_to_config(config)
+
+-- オプショナルモジュール（keymapsの後に読み込む）
+require("modules.opacity").apply_to_config(config)
 
 return config
