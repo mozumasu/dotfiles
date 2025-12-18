@@ -107,6 +107,24 @@ keymap("n", "gh", function()
   end
 end, { desc = "link open" })
 
+-- gx: open URL or AWS ARN in browser
+keymap("n", "gx", function()
+  local cword = vim.fn.expand("<cWORD>")
+  local cfile = vim.fn.expand("<cfile>")
+  -- Extract ARN from quoted string (e.g., "arn:...", `arn:...`)
+  local arn = cword:match('["`\']?(arn:aws[a-z-]*:[^"`\'%s]+)')
+  if arn then
+    -- AWS ARN: open in AWS Console
+    local url = "https://console.aws.amazon.com/go/view?arn=" .. arn
+    os.execute("open '" .. url .. "'")
+  elseif cfile:match("^https?://") then
+    os.execute("open '" .. cfile .. "'")
+  else
+    -- fallback to default gx behavior
+    vim.ui.open(cfile)
+  end
+end, { desc = "Open URL or AWS ARN" })
+
 -- browse github repogitory
 keymap("n", "<leader>gR", function()
   local github_repogitory_name = vim.fn.expand("<cfile>")
