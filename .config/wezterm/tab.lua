@@ -175,7 +175,7 @@ function module.apply_to_config(config)
 
     -- タブの色
     local background, foreground = get_tab_colors(tab.is_active, is_ssh)
-    local edge_background = TAB_COLORS.background_inactive
+    local edge_background = "transparent"
     local edge_foreground = background
 
     -- タイトルテキスト

@@ -208,7 +208,7 @@ local key_tables = {
     -- 自作モードから抜けるキーバインド設定
     { key = "Escape", action = "PopKeyTable" },
     { key = "q", action = "PopKeyTable" },
-    { key = "c", mod = "CTRL", action = "PopKeyTable" },
+    { key = "c", mods = "CTRL", action = "PopKeyTable" },
   },
 }
 
