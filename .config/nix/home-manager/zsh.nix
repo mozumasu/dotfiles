@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   # dotfiles のパス
   dotfilesDir = "${config.home.homeDirectory}/dotfiles";
@@ -9,7 +14,8 @@ in
     enable = true;
 
     # ZDOTDIR の設定 (.config/zsh を使用)
-    dotDir = ".config/zsh";
+    # 相対パスは非推奨のため、ホームディレクトリからの相対パスとして指定
+    dotDir = "${config.xdg.configHome}/zsh";
 
     # ヒストリー設定
     history = {
@@ -146,42 +152,44 @@ in
       export PATH="/opt/homebrew/opt/mysql@8.0/bin:$PATH"
     '';
 
-    # .zshrc の最初に追加する内容
-    initExtraFirst = ''
-      # ----------------------------------------------------
-      # zcompile - Compile zsh files for faster loading
-      # ----------------------------------------------------
-      function ensure_zcompiled {
-        local src=$1
-        local zwc="$src.zwc"
-        if [[ ! -r "$zwc" || "$src" -nt "$zwc" ]]; then
-          zcompile "$src"
+    # .zshrc の内容 (initContent を使用)
+    initContent = lib.mkMerge [
+      # 最初に実行される部分 (mkBefore)
+      (lib.mkBefore ''
+        # ----------------------------------------------------
+        # zcompile - Compile zsh files for faster loading
+        # ----------------------------------------------------
+        function ensure_zcompiled {
+          local src=$1
+          local zwc="$src.zwc"
+          if [[ ! -r "$zwc" || "$src" -nt "$zwc" ]]; then
+            zcompile "$src"
+          fi
+        }
+
+        # Override source to auto-compile
+        function source {
+          ensure_zcompiled "$1"
+          builtin source "$1"
+        }
+
+        # ----------------------------------------------------
+        # homebrew (cached)
+        # ----------------------------------------------------
+        _brew_cache="''${XDG_CACHE_HOME:-$HOME/.cache}/zsh/brew-shellenv.zsh"
+        if [[ ! -f "$_brew_cache" ]]; then
+          mkdir -p "''${_brew_cache:h}"
+          /opt/homebrew/bin/brew shellenv > "$_brew_cache"
         fi
-      }
+        source "$_brew_cache"
+        unset _brew_cache
 
-      # Override source to auto-compile
-      function source {
-        ensure_zcompiled "$1"
-        builtin source "$1"
-      }
+        # Prioritize Japanese man pages
+        export MANPATH="/usr/local/share/man/ja_JP.UTF-8:$(manpath)"
+      '')
 
-      # ----------------------------------------------------
-      # homebrew (cached)
-      # ----------------------------------------------------
-      _brew_cache="''${XDG_CACHE_HOME:-$HOME/.cache}/zsh/brew-shellenv.zsh"
-      if [[ ! -f "$_brew_cache" ]]; then
-        mkdir -p "''${_brew_cache:h}"
-        /opt/homebrew/bin/brew shellenv > "$_brew_cache"
-      fi
-      source "$_brew_cache"
-      unset _brew_cache
-
-      # Prioritize Japanese man pages
-      export MANPATH="/usr/local/share/man/ja_JP.UTF-8:$(manpath)"
-    '';
-
-    # .zshrc のメイン部分
-    initExtra = ''
+      # メイン部分
+      ''
       # ----------------------------------------------------
       # mise
       # ----------------------------------------------------
@@ -343,7 +351,8 @@ in
       unset _zoxide_cache
 
       source ~/.safe-chain/scripts/init-posix.sh # Safe-chain Zsh initialization script
-    '';
+    ''
+    ];
   };
 
   # starship - キャッシュロジックを initExtra で使用するため統合は無効
