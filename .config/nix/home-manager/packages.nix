@@ -6,6 +6,7 @@
     eza
     fd
     fzf
+    hyperfine
     ripgrep
     zoxide
     tree

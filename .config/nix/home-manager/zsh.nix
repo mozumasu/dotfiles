@@ -190,168 +190,168 @@ in
 
       # メイン部分
       ''
-      # ----------------------------------------------------
-      # mise
-      # ----------------------------------------------------
-      if type mise &>/dev/null; then
-        _mise_cache="''${XDG_CACHE_HOME:-$HOME/.cache}/mise.zsh"
-        if [[ ! -r "$_mise_cache" || "$(command -v mise)" -nt "$_mise_cache" ]]; then
-          mise activate zsh > "$_mise_cache"
-          mise activate --shims >> "$_mise_cache"
-          zcompile "$_mise_cache"
+        # ----------------------------------------------------
+        # mise
+        # ----------------------------------------------------
+        if type mise &>/dev/null; then
+          _mise_cache="''${XDG_CACHE_HOME:-$HOME/.cache}/mise.zsh"
+          if [[ ! -r "$_mise_cache" || "$(command -v mise)" -nt "$_mise_cache" ]]; then
+            mise activate zsh > "$_mise_cache"
+            mise activate --shims >> "$_mise_cache"
+            zcompile "$_mise_cache"
+          fi
+          source "$_mise_cache"
+          unset _mise_cache
         fi
-        source "$_mise_cache"
-        unset _mise_cache
-      fi
 
-      # ----------------------------------------------------
-      # Function
-      # ----------------------------------------------------
-      fpath=($ZRCDIR/functions $ZRCDIR/functions/*(/N) $fpath)
-      autoload -Uz $ZRCDIR/functions/*(-.N:t) $ZRCDIR/functions/**/*(-.N:t)
+        # ----------------------------------------------------
+        # Function
+        # ----------------------------------------------------
+        fpath=($ZRCDIR/functions $ZRCDIR/functions/*(/N) $fpath)
+        autoload -Uz $ZRCDIR/functions/*(-.N:t) $ZRCDIR/functions/**/*(-.N:t)
 
-      # ----------------------------------------------------
-      # Keybind
-      # ----------------------------------------------------
-      source "$ZRCDIR/bindkey.zsh"
+        # ----------------------------------------------------
+        # Keybind
+        # ----------------------------------------------------
+        source "$ZRCDIR/bindkey.zsh"
 
-      # ----------------------------------------------------
-      # sheldon
-      # ----------------------------------------------------
-      cache_dir=''${XDG_CACHE_HOME:-$HOME/.cache}
-      sheldon_cache="$cache_dir/sheldon.zsh"
-      sheldon_toml="$HOME/.config/sheldon/plugins.toml"
-      if [[ ! -r "$sheldon_cache" || "$sheldon_toml" -nt "$sheldon_cache" ]]; then
-        mkdir -p $cache_dir
-        sheldon source > "$sheldon_cache"
-        zcompile "$sheldon_cache"
-      fi
-      source "$sheldon_cache"
-      unset cache_dir sheldon_cache sheldon_toml
-
-      # ----------------------------------------------------
-      # Alias (additional)
-      # ----------------------------------------------------
-      # ls with eza
-      if command -v eza >/dev/null 2>&1; then
-        alias ls='eza'
-      else
-        alias ls='ls -F --color=auto'
-      fi
-
-      # run-help
-      alias run-help >/dev/null 2>&1 && unalias run-help
-      autoload -Uz run-help run-help-git run-help-openssl run-help-sudo
-
-      # Hash
-      hash -d xdata=$XDG_DATA_HOME
-      hash -d nvim=$XDG_DATA_HOME/nvim
-      hash -d nvimplugins=$XDG_DATA_HOME/nvim/lua
-
-      # Homebrew wrapper
-      function brew() {
-        command brew "$@"
-        if [[ "$1" == "install" || "$1" == "uninstall" ]]; then
-          echo "Refreshing completions..."
-          rm -f ''${ZDOTDIR:-~}/.zcompdump*
-          compinit
+        # ----------------------------------------------------
+        # sheldon
+        # ----------------------------------------------------
+        cache_dir=''${XDG_CACHE_HOME:-$HOME/.cache}
+        sheldon_cache="$cache_dir/sheldon.zsh"
+        sheldon_toml="$HOME/.config/sheldon/plugins.toml"
+        if [[ ! -r "$sheldon_cache" || "$sheldon_toml" -nt "$sheldon_cache" ]]; then
+          mkdir -p $cache_dir
+          sheldon source > "$sheldon_cache"
+          zcompile "$sheldon_cache"
         fi
-      }
+        source "$sheldon_cache"
+        unset cache_dir sheldon_cache sheldon_toml
 
-      # ----------------------------------------------------
-      # Options
-      # ----------------------------------------------------
-      setopt correct
-      setopt EXTENDED_HISTORY
-      setopt hist_verify
-      setopt hist_ignore_dups
-      setopt hist_ignore_all_dups
-      setopt hist_ignore_space
-      setopt hist_no_store
-      setopt hist_reduce_blanks
-      setopt hist_save_no_dups
-      setopt hist_expand
-      setopt inc_append_history
-      setopt auto_cd
-      setopt auto_pushd
-      setopt pushd_ignore_dups
-      unsetopt bg_nice
-      setopt list_packed
-      setopt no_beep
-      unsetopt list_types
+        # ----------------------------------------------------
+        # Alias (additional)
+        # ----------------------------------------------------
+        # ls with eza
+        if command -v eza >/dev/null 2>&1; then
+          alias ls='eza'
+        else
+          alias ls='ls -F --color=auto'
+        fi
 
-      # tty
-      if [[ -t 0 ]]; then
-        stty -ixon
-      fi
+        # run-help
+        alias run-help >/dev/null 2>&1 && unalias run-help
+        autoload -Uz run-help run-help-git run-help-openssl run-help-sudo
 
-      # ----------------------------------------------------
-      # other
-      # ----------------------------------------------------
-      umask 022
-      autoload -U zmv
+        # Hash
+        hash -d xdata=$XDG_DATA_HOME
+        hash -d nvim=$XDG_DATA_HOME/nvim
+        hash -d nvimplugins=$XDG_DATA_HOME/nvim/lua
 
-      # ----------------------------------------------------
-      # completion
-      # ----------------------------------------------------
-      autoload -Uz compinit && compinit -C
-      zstyle ':completion:*' matcher-list "" 'm:{[:lower:]}={[:upper:]}' '+m:{[:upper:]}={[:lower:]}'
-      zstyle ':completion:*' format '%B%F{blue}%d%f%b'
-      zstyle ':completion:*' group-name ""
-      zstyle ':completion:*:default' menu select=2
+        # Homebrew wrapper
+        function brew() {
+          command brew "$@"
+          if [[ "$1" == "install" || "$1" == "uninstall" ]]; then
+            echo "Refreshing completions..."
+            rm -f ''${ZDOTDIR:-~}/.zcompdump*
+            compinit
+          fi
+        }
 
-      # ----------------------------------------------------
-      # zsh local settings
-      # ----------------------------------------------------
-      if [[ -d "$LOCAL_ZSH_DIR" ]]; then
-        for file in "$LOCAL_ZSH_DIR"/*.zsh; do
-          [ -r "$file" ] && source "$file"
-        done
-      fi
+        # ----------------------------------------------------
+        # Options
+        # ----------------------------------------------------
+        setopt correct
+        setopt EXTENDED_HISTORY
+        setopt hist_verify
+        setopt hist_ignore_dups
+        setopt hist_ignore_all_dups
+        setopt hist_ignore_space
+        setopt hist_no_store
+        setopt hist_reduce_blanks
+        setopt hist_save_no_dups
+        setopt hist_expand
+        setopt inc_append_history
+        setopt auto_cd
+        setopt auto_pushd
+        setopt pushd_ignore_dups
+        unsetopt bg_nice
+        setopt list_packed
+        setopt no_beep
+        unsetopt list_types
 
-      # ----------------------------------------------------
-      # wezterm
-      # ----------------------------------------------------
-      zsh-defer -a source "$HOME/.config/zsh/rc/pluginconfig/wezterm.zsh"
+        # tty
+        if [[ -t 0 ]]; then
+          stty -ixon
+        fi
 
-      # ----------------------------------------------------
-      # zeno.zsh
-      # ----------------------------------------------------
-      source "$HOME/.config/zsh/rc/pluginconfig/zeno.zsh"
+        # ----------------------------------------------------
+        # other
+        # ----------------------------------------------------
+        umask 022
+        autoload -U zmv
 
-      # ----------------------------------------------------
-      # fzf
-      # ----------------------------------------------------
-      if [[ ! "$PATH" == */opt/homebrew/opt/fzf/bin* ]]; then
-        PATH="''${PATH:+''${PATH}:}/opt/homebrew/opt/fzf/bin"
-      fi
-      zsh-defer source "$HOME/dotfiles/.config/zsh/rc/pluginconfig/fzf.key-bindings.zsh"
+        # ----------------------------------------------------
+        # completion
+        # ----------------------------------------------------
+        autoload -Uz compinit && compinit -C
+        zstyle ':completion:*' matcher-list "" 'm:{[:lower:]}={[:upper:]}' '+m:{[:upper:]}={[:lower:]}'
+        zstyle ':completion:*' format '%B%F{blue}%d%f%b'
+        zstyle ':completion:*' group-name ""
+        zstyle ':completion:*:default' menu select=2
 
-      # ----------------------------------------------------
-      # starship
-      # ----------------------------------------------------
-      _starship_cache="''${XDG_CACHE_HOME:-$HOME/.cache}/starship.zsh"
-      _starship_config="''${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
-      if [[ ! -r "$_starship_cache" || "$_starship_config" -nt "$_starship_cache" || "$(command -v starship)" -nt "$_starship_cache" ]]; then
-        starship init zsh > "$_starship_cache"
-        zcompile "$_starship_cache"
-      fi
-      source "$_starship_cache"
-      unset _starship_cache _starship_config
+        # ----------------------------------------------------
+        # zsh local settings
+        # ----------------------------------------------------
+        if [[ -d "$LOCAL_ZSH_DIR" ]]; then
+          for file in "$LOCAL_ZSH_DIR"/*.zsh; do
+            [ -r "$file" ] && source "$file"
+          done
+        fi
 
-      # ----------------------------------------------------
-      # zoxide (Must be at the end of the file)
-      # ----------------------------------------------------
-      _zoxide_cache="''${XDG_CACHE_HOME:-$HOME/.cache}/zoxide.zsh"
-      if [[ ! -r "$_zoxide_cache" || "$(command -v zoxide)" -nt "$_zoxide_cache" ]]; then
-        zoxide init zsh > "$_zoxide_cache"
-        zcompile "$_zoxide_cache"
-      fi
-      source "$_zoxide_cache"
-      unset _zoxide_cache
+        # ----------------------------------------------------
+        # wezterm
+        # ----------------------------------------------------
+        zsh-defer -a source "$HOME/.config/zsh/rc/pluginconfig/wezterm.zsh"
 
-      source ~/.safe-chain/scripts/init-posix.sh # Safe-chain Zsh initialization script
-    ''
+        # ----------------------------------------------------
+        # zeno.zsh
+        # ----------------------------------------------------
+        source "$HOME/.config/zsh/rc/pluginconfig/zeno.zsh"
+
+        # ----------------------------------------------------
+        # fzf
+        # ----------------------------------------------------
+        if [[ ! "$PATH" == */opt/homebrew/opt/fzf/bin* ]]; then
+          PATH="''${PATH:+''${PATH}:}/opt/homebrew/opt/fzf/bin"
+        fi
+        zsh-defer source "$HOME/dotfiles/.config/zsh/rc/pluginconfig/fzf.key-bindings.zsh"
+
+        # ----------------------------------------------------
+        # starship
+        # ----------------------------------------------------
+        _starship_cache="''${XDG_CACHE_HOME:-$HOME/.cache}/starship.zsh"
+        _starship_config="''${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
+        if [[ ! -r "$_starship_cache" || "$_starship_config" -nt "$_starship_cache" || "$(command -v starship)" -nt "$_starship_cache" ]]; then
+          starship init zsh > "$_starship_cache"
+          zcompile "$_starship_cache"
+        fi
+        source "$_starship_cache"
+        unset _starship_cache _starship_config
+
+        # ----------------------------------------------------
+        # zoxide (Must be at the end of the file)
+        # ----------------------------------------------------
+        _zoxide_cache="''${XDG_CACHE_HOME:-$HOME/.cache}/zoxide.zsh"
+        if [[ ! -r "$_zoxide_cache" || "$(command -v zoxide)" -nt "$_zoxide_cache" ]]; then
+          zoxide init zsh > "$_zoxide_cache"
+          zcompile "$_zoxide_cache"
+        fi
+        source "$_zoxide_cache"
+        unset _zoxide_cache
+
+        source ~/.safe-chain/scripts/init-posix.sh # Safe-chain Zsh initialization script
+      ''
     ];
   };
 
