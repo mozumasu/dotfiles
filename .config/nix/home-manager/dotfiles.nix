@@ -8,7 +8,8 @@ in
   xdg.configFile = {
     "nvim".source = mkLink ".config/nvim";
     "wezterm".source = mkLink ".config/wezterm";
-    "zsh".source = mkLink ".config/zsh";
+    # zsh は programs.zsh で管理するため、サブディレクトリのみリンク
+    "zsh/rc".source = mkLink ".config/zsh/rc";
     "aerospace".source = mkLink ".config/aerospace";
     "borders".source = mkLink ".config/borders";
     "ghostty".source = mkLink ".config/ghostty";

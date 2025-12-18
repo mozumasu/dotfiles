@@ -3,6 +3,7 @@
   imports = [
     ./dotfiles.nix
     ./packages.nix
+    ./zsh.nix
   ];
 
   home.username = "mozumasu";
