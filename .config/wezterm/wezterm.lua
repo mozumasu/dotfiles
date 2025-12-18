@@ -20,6 +20,12 @@ config.font = wezterm.font("HackGen Console NF")
 config.window_background_opacity = 0.7
 config.macos_window_background_blur = 13
 
+-- QuickSelect patterns (SUPER + Space)
+config.quick_select_patterns = {
+  -- AWS ARN
+  '\\barn:[\\w\\-]+:[\\w\\-]+:[\\w\\-]*:[0-9]*:[\\w\\-/:]+',
+}
+
 require("keymaps").apply_to_config(config)
 require("workspace").apply_to_config(config)
 require("appearance").apply_to_config(config)
