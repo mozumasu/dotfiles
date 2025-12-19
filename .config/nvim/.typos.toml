@@ -5,6 +5,7 @@ iterm = "iterm"
 args = "args"
 cose = "cose"
 ue = "ue"
+ANC = "ANC"
 
 [default]
 detect = ["en", "ja"]
