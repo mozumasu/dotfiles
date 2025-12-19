@@ -975,3 +975,4 @@ JDBC
 InnoDB
 PrePatchCompatibility
 statusbar
+stopCode
