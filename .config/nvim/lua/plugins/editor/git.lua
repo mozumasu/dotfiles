@@ -522,6 +522,7 @@ return {
   },
   {
     "choplin/code-review.nvim",
+    enabled = false,
     config = function()
       require("code-review").setup({
         comment = {
@@ -575,7 +576,7 @@ return {
         },
         -- Output settings
         output = {
-          format = "markdown", -- 'markdown' or 'json'
+          format = "detailed", -- 'detailed' or 'minimal'
           date_format = "%Y-%m-%d %H:%M:%S",
           save_dir = nil, -- nil = current directory
         },
