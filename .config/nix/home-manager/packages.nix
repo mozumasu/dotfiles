@@ -59,6 +59,7 @@
     bottom
     fastfetch
     glow
+    presenterm # Terminal slideshow
     yazi
     lazydocker
     skanehira-ghost # Background process manager
