@@ -23,7 +23,7 @@ config.macos_window_background_blur = 13
 -- QuickSelect patterns (SUPER + Space)
 config.quick_select_patterns = {
   -- AWS ARN
-  '\\barn:[\\w\\-]+:[\\w\\-]+:[\\w\\-]*:[0-9]*:[\\w\\-/:]+',
+  "\\barn:[\\w\\-]+:[\\w\\-]+:[\\w\\-]*:[0-9]*:[\\w\\-/:]+",
 }
 
 require("keymaps").apply_to_config(config)

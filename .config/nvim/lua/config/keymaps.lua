@@ -116,7 +116,7 @@ keymap("n", "gx", function()
   local cword = vim.fn.expand("<cWORD>")
   local cfile = vim.fn.expand("<cfile>")
   -- Extract ARN from quoted string (e.g., "arn:...", `arn:...`)
-  local arn = cword:match('["`\']?(arn:aws[a-z-]*:[^"`\'%s]+)')
+  local arn = cword:match("[\"`']?(arn:aws[a-z-]*:[^\"`'%s]+)")
   if arn then
     -- AWS ARN: open in AWS Console
     local url = "https://console.aws.amazon.com/go/view?arn=" .. arn

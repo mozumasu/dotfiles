@@ -1,7 +1,14 @@
 return {
   dir = "~/src/github.com/mozumasu/plamo-translate.nvim",
   name = "plamo-translate.nvim",
-  cmd = { "PlamoTranslate", "PlamoTranslateReplace", "PlamoTranslateLine", "PlamoTranslateWord", "PlamoTranslateBuffer", "PlamoTranslateBufferReplace" },
+  cmd = {
+    "PlamoTranslate",
+    "PlamoTranslateReplace",
+    "PlamoTranslateLine",
+    "PlamoTranslateWord",
+    "PlamoTranslateBuffer",
+    "PlamoTranslateBufferReplace",
+  },
   keys = {
     -- Normal mode: interactive window
     { "<leader>tt", "<cmd>PlamoTranslate<cr>", mode = "n", desc = "Translate text (interactive)" },

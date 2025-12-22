@@ -65,8 +65,7 @@ local function is_ssh_process(process_name, cmdline, user_vars)
 end
 
 local function is_claude_process(process_name, pane_title)
-  return process_name == "claude"
-    or (pane_title and (pane_title:find("^✳") or pane_title:lower():find("claude")))
+  return process_name == "claude" or (pane_title and (pane_title:find("^✳") or pane_title:lower():find("claude")))
 end
 
 local function extract_project_name(cwd)
@@ -195,9 +194,7 @@ function module.apply_to_config(config)
     end
 
     -- アイコン
-    local icon, icon_color = get_icon_and_color(
-      process_name, pane_title, cmdline, cached_cwd, is_ssh, tab.is_active
-    )
+    local icon, icon_color = get_icon_and_color(process_name, pane_title, cmdline, cached_cwd, is_ssh, tab.is_active)
 
     -- ズームインジケーター
     local zoom_indicator = has_zoomed_pane(tab.panes) and (ICONS.zoom .. " ") or ""

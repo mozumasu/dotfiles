@@ -246,7 +246,7 @@ return {
     vim.api.nvim_create_autocmd("StdinReadPost", {
       callback = function()
         local bufnr = vim.api.nvim_get_current_buf()
-        
+
         -- filetypeが設定されるのを待つ（man関数の -c 'set ft=man' を考慮）
         vim.defer_fn(function()
           -- man ページの場合はスキップ（col -bx で処理済みのため）
@@ -254,23 +254,23 @@ return {
           if ft == "man" then
             return
           end
-          
+
           -- 元のバッファがまだ有効か確認
           if not vim.api.nvim_buf_is_valid(bufnr) then
             return
           end
-          
+
           -- 現在のバッファを一時保存して処理対象のバッファに切り替え
           local current = vim.api.nvim_get_current_buf()
           vim.api.nvim_set_current_buf(bufnr)
-          
+
           render_ansi_current_buf()
           local b = ensure_baleia()
           if b then
             ---@diagnostic disable-next-line:param-type-mismatch
             b.automatically(bufnr)
           end
-          
+
           -- 元のバッファに戻す（異なる場合のみ）
           if current ~= bufnr and vim.api.nvim_buf_is_valid(current) then
             vim.api.nvim_set_current_buf(current)
