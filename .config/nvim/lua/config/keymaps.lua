@@ -150,3 +150,34 @@ keymap("n", "<leader>say", function()
   local current_word = vim.fn.expand("<cword>")
   vim.api.nvim_feedkeys(":!say -v Ava " .. current_word .. "\n", "n", false)
 end, { desc = "say command" })
+
+-- zz -> z -> z cycle: center -> top -> bottom -> center ...
+-- ref: https://zenn.dev/vim_jp/articles/67ec77641af3f2
+local zz_state = { pos = 0, last_time = 0 }
+
+keymap("n", "zz", function()
+  zz_state.pos = 1
+  zz_state.last_time = vim.loop.now()
+  vim.cmd("normal! zz")
+end, { desc = "Scroll center (then z to cycle)" })
+
+keymap("n", "z", function()
+  local now = vim.loop.now()
+  -- 1秒以内かつzzの後なら次の位置へ
+  if zz_state.pos > 0 and (now - zz_state.last_time) < 1000 then
+    zz_state.last_time = now
+    zz_state.pos = (zz_state.pos % 3) + 1
+    if zz_state.pos == 1 then
+      vim.cmd("normal! zz")
+    elseif zz_state.pos == 2 then
+      vim.cmd("normal! zt")
+    else
+      vim.cmd("normal! zb")
+    end
+  else
+    -- 通常のz（次のキーを待つ）
+    zz_state.pos = 0
+    local char = vim.fn.getcharstr()
+    vim.cmd("normal! z" .. char)
+  end
+end, { desc = "Cycle scroll after zz / normal z commands" })
