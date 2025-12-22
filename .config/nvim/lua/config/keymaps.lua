@@ -20,6 +20,10 @@ vim.api.nvim_set_keymap("i", "<C-i>", "<C-i>", { noremap = true })
 keymap("n", "+", "<C-a>", opts)
 keymap("n", "-", "<C-x>", opts)
 
+-- Paste from clipboard (since clipboard="" is set)
+keymap({ "n", "v" }, "p", '"+p', opts)
+keymap({ "n", "v" }, "P", '"+P', opts)
+
 -- Tab
 keymap("n", "<tab>", ":tabnext<Return>", opts)
 keymap("n", "<s-tab>", ":tabprev<Return>", opts)
