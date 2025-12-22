@@ -5,7 +5,9 @@ iterm = "iterm"
 args = "args"
 cose = "cose"
 ue = "ue"
+# Active Noise Cancelling の略称
 ANC = "ANC"
+Ba = "Ba"
 
 [default]
 detect = ["en", "ja"]
