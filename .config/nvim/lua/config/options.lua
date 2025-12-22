@@ -2,6 +2,10 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 
+-- クリップボード連携を無効化（TextYankPostでヤンク時のみ連携する）
+-- LazyVimのデフォルト: vim.opt.clipboard = "unnamedplus"
+vim.opt.clipboard = ""
+
 -- 編集中のファイルパスを右上に表示
 -- vim.opt.winbar = "%=%m %f"
 -- vim標準スペルチェックから日本語を除外
