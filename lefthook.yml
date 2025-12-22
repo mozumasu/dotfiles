@@ -5,3 +5,6 @@ pre-commit:
       glob: "*.nix"
       root: ".config/nix/"
       run: nix fmt
+    stylua:
+      glob: "*.lua"
+      run: stylua {staged_files}
