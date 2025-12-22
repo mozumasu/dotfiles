@@ -46,7 +46,6 @@
       "Bash(> /dev:*)",
       "Bash(mkfs:*)",
       "Bash(dd:*)",
-      "Bash(:(){ :|:&};:)",
       "Bash(gh repo delete:*)",
       "Bash(gh auth logout:*)",
       "Bash(gh secret delete:*)",
@@ -124,6 +123,10 @@
           {
             "type": "command",
             "command": "jq -r '.tool_input.file_path | select(endswith(\".md\"))' | xargs -r rumdl fmt"
+          },
+          {
+            "type": "command",
+            "command": "~/.config/claude/scripts/format-nix.sh"
           }
         ]
       }
