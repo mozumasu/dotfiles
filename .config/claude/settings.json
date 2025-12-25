@@ -19,24 +19,6 @@
       "mcp__playwright",
       "mcp__mcp-google-sheets"
     ],
-    "ask": [
-      "Bash(git push:*)",
-      "Bash(git rebase:*)",
-      "Bash(git reset:*)",
-      "Bash(gh pr create:*)",
-      "Bash(gh issue create:*)",
-      "Bash(gh release create:*)",
-      "Bash(aws s3 cp:*)",
-      "Bash(aws s3 sync:*)",
-      "Bash(aws s3 mv:*)",
-      "Bash(aws ec2 run-instances:*)",
-      "Bash(aws ec2 start-instances:*)",
-      "Bash(aws ec2 stop-instances:*)",
-      "Bash(aws lambda create-function:*)",
-      "Bash(aws lambda update-function-code:*)",
-      "Bash(aws cloudformation create-stack:*)",
-      "Bash(aws cloudformation update-stack:*)"
-    ],
     "deny": [
       "Bash(rm -rf:*)",
       "Bash(sudo:*)",
@@ -79,6 +61,24 @@
       "Edit(~/.aws/**)",
       "Write(.env*)",
       "Write(**/secrets/**)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(git rebase:*)",
+      "Bash(git reset:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh issue create:*)",
+      "Bash(gh release create:*)",
+      "Bash(aws s3 cp:*)",
+      "Bash(aws s3 sync:*)",
+      "Bash(aws s3 mv:*)",
+      "Bash(aws ec2 run-instances:*)",
+      "Bash(aws ec2 start-instances:*)",
+      "Bash(aws ec2 stop-instances:*)",
+      "Bash(aws lambda create-function:*)",
+      "Bash(aws lambda update-function-code:*)",
+      "Bash(aws cloudformation create-stack:*)",
+      "Bash(aws cloudformation update-stack:*)"
     ],
     "additionalDirectories": [
       "~/src/github.com/mozumasu/nb",
@@ -139,6 +139,7 @@
   "enabledPlugins": {
     "example-skills@anthropic-agent-skills": true
   },
+  "alwaysThinkingEnabled": false,
   "maxTokens": 8192,
   "temperature": 0,
   "preferences": {
