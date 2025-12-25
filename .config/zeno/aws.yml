@@ -38,6 +38,9 @@ snippets:
         --query 'Roles[?starts_with(RoleName, `{{prefix}}`)].RoleName'
         --output table
 
+  - keyword: ssm;
+    snippet: aws ssm start-session --target {{InstanceId}} --profile {{aws-profile}}
+
 completions:
   - name: instance-id
     patterns:
