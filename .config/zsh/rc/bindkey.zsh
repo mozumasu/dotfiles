@@ -42,3 +42,10 @@ bindkey "^[e" edit-command-line
 # redo
 bindkey '^X^R' redo
 bindkey '^Xr' redo
+
+# Debug: Show LBUFFER and RBUFFER
+function show-buffer() {
+  zle -M "LBUFFER: '$LBUFFER' | RBUFFER: '$RBUFFER'"
+}
+zle -N show-buffer
+bindkey '^X^X' show-buffer
