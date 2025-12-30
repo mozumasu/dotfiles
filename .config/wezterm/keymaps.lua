@@ -59,8 +59,17 @@ local keys = {
   },
 
   -- モード切替
-  -- アクティブペインのズーム切替
-  { key = "Z", mods = "CTRL", action = act.TogglePaneZoomState },
+  -- アクティブペインのズーム切替（ペインが2つ以上の場合のみ）
+  {
+    key = "Z",
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, pane)
+      local tab = pane:tab()
+      if #tab:panes() > 1 then
+        window:perform_action(act.TogglePaneZoomState, pane)
+      end
+    end),
+  },
 
   -- 誤爆するので非有効にしがち
   -- { key = "k", mods = "SUPER", action = act.ClearScrollback("ScrollbackOnly") },
