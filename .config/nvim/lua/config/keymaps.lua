@@ -115,16 +115,10 @@ end, { desc = "link open" })
 keymap("n", "gx", function()
   local cword = vim.fn.expand("<cWORD>")
   local cfile = vim.fn.expand("<cfile>")
-  -- Extract ARN from quoted string (e.g., "arn:...", `arn:...`)
-  local arn = cword:match("[\"`']?(arn:aws[a-z-]*:[^\"`'%s]+)")
+  local arn = cword:match("[\"`']?(arn:aws[a-z%-]*:[^\"`'%s]+)[\"`']?")
   if arn then
-    -- AWS ARN: open in AWS Console
-    local url = "https://console.aws.amazon.com/go/view?arn=" .. arn
-    os.execute("open '" .. url .. "'")
-  elseif cfile:match("^https?://") then
-    os.execute("open '" .. cfile .. "'")
+    vim.ui.open("https://console.aws.amazon.com/go/view?arn=" .. arn)
   else
-    -- fallback to default gx behavior
     vim.ui.open(cfile)
   end
 end, { desc = "Open URL or AWS ARN" })

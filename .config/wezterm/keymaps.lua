@@ -100,7 +100,8 @@ local keys = {
     action = wezterm.action.QuickSelectArgs({
       label = "open aws console",
       patterns = {
-        "\\barn:[\\w\\-]+:[\\w\\-]+:[\\w\\-]*:[0-9]*:[\\w\\-/:]+",
+        -- ARNパターン: arn:partition:service:region:account-id:resource
+        "\\barn:[\\w\\-]+:[\\w\\-]+:[\\w\\-]*:[0-9]*:[\\w\\-/:=.]+",
       },
       action = wezterm.action_callback(function(window, pane)
         local arn = window:get_selection_text_for_pane(pane)
