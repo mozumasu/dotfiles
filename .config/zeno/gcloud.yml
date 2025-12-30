@@ -1,0 +1,3 @@
+snippets:
+  - keyword: ga;
+    snippet: gcloud auth application-default login --impersonate-service-account {{SERVICE_ACCOUNT_EMAIL}}
