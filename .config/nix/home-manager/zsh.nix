@@ -83,6 +83,10 @@ in
 
     # .zshenv に追加する内容
     envExtra = ''
+      # /etc/zprofile, /etc/zshrc, /etc/zlogin をスキップ
+      # (/etc/zshenv は既に読み込み済み)
+      setopt no_global_rcs
+
       # XDG
       export XDG_CONFIG_HOME=''${HOME}/.config
       export XDG_CACHE_HOME=''${HOME}/.cache
