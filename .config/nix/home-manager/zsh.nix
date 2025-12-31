@@ -305,13 +305,18 @@ in
         function _deferred_compinit() {
           autoload -Uz compinit
           _comp_dump="''${ZDOTDIR:-$HOME}/.zcompdump"
-          # .zcompdump が存在すれば直接読み込み、なければ生成
-          if [[ -r "$_comp_dump" ]]; then
+          _comp_zwc="$_comp_dump.zwc"
+          # .zcompdump.zwc が最新なら source、なければ compinit して zcompile
+          if [[ -r "$_comp_zwc" && "$_comp_zwc" -nt "$_comp_dump" ]]; then
             source "$_comp_dump"
+          elif [[ -r "$_comp_dump" ]]; then
+            source "$_comp_dump"
+            zcompile "$_comp_dump"
           else
             compinit -d "$_comp_dump"
+            zcompile "$_comp_dump"
           fi
-          unset _comp_dump
+          unset _comp_dump _comp_zwc
         }
         zsh-defer _deferred_compinit
 
