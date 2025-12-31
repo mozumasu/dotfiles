@@ -296,13 +296,24 @@ in
         autoload -U zmv
 
         # ----------------------------------------------------
-        # completion
+        # completion (zsh-defer で遅延実行)
         # ----------------------------------------------------
-        autoload -Uz compinit && compinit -C
         zstyle ':completion:*' matcher-list "" 'm:{[:lower:]}={[:upper:]}' '+m:{[:upper:]}={[:lower:]}'
         zstyle ':completion:*' format '%B%F{blue}%d%f%b'
         zstyle ':completion:*' group-name ""
         zstyle ':completion:*:default' menu select=2
+        function _deferred_compinit() {
+          autoload -Uz compinit
+          _comp_dump="''${ZDOTDIR:-$HOME}/.zcompdump"
+          # .zcompdump が存在すれば直接読み込み、なければ生成
+          if [[ -r "$_comp_dump" ]]; then
+            source "$_comp_dump"
+          else
+            compinit -d "$_comp_dump"
+          fi
+          unset _comp_dump
+        }
+        zsh-defer _deferred_compinit
 
         # ----------------------------------------------------
         # zsh local settings
