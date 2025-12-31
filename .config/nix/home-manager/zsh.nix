@@ -195,20 +195,6 @@ in
       # メイン部分
       ''
         # ----------------------------------------------------
-        # mise
-        # ----------------------------------------------------
-        if type mise &>/dev/null; then
-          _mise_cache="''${XDG_CACHE_HOME:-$HOME/.cache}/mise.zsh"
-          if [[ ! -r "$_mise_cache" || "$(command -v mise)" -nt "$_mise_cache" ]]; then
-            mise activate zsh > "$_mise_cache"
-            mise activate --shims >> "$_mise_cache"
-            zcompile "$_mise_cache"
-          fi
-          source "$_mise_cache"
-          unset _mise_cache
-        fi
-
-        # ----------------------------------------------------
         # Function
         # ----------------------------------------------------
         fpath=($ZRCDIR/functions $ZRCDIR/functions/*(/N) $fpath)
@@ -232,6 +218,20 @@ in
         fi
         source "$sheldon_cache"
         unset cache_dir sheldon_cache sheldon_toml
+
+        # ----------------------------------------------------
+        # mise (zsh-defer で遅延実行)
+        # ----------------------------------------------------
+        if type mise &>/dev/null; then
+          _mise_cache="''${XDG_CACHE_HOME:-$HOME/.cache}/mise.zsh"
+          if [[ ! -r "$_mise_cache" || "$(command -v mise)" -nt "$_mise_cache" ]]; then
+            mise activate zsh > "$_mise_cache"
+            mise activate --shims >> "$_mise_cache"
+            zcompile "$_mise_cache"
+          fi
+          zsh-defer source "$_mise_cache"
+          unset _mise_cache
+        fi
 
         # ----------------------------------------------------
         # Alias (additional)
