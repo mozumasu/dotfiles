@@ -1,0 +1,14 @@
+snippets:
+  # Terraform CLI version check
+  - keyword: tfv
+    snippet: curl -s https://releases.hashicorp.com/terraform/index.json | jq -r '.versions | keys[]' | sort -V | tail -10
+
+  # Provider version check
+  - keyword: tfpv
+    snippet: curl -s https://registry.terraform.io/v1/providers/{{provider}}/versions | jq '.versions[].version' | sort | tail -10
+
+completions:
+  - name: terraform provider
+    patterns:
+      - 'registry\.terraform\.io/v1/providers/$'
+    sourceCommand: "printf '%s\\n' hashicorp/aws hashicorp/google hashicorp/google-beta hashicorp/azurerm hashicorp/kubernetes hashicorp/helm hashicorp/vault hashicorp/consul hashicorp/nomad hashicorp/random hashicorp/null hashicorp/local hashicorp/time hashicorp/tls hashicorp/http hashicorp/archive hashicorp/external hashicorp/dns hashicorp/cloudinit integrations/github cloudflare/cloudflare datadog/datadog mongodb/mongodbatlas grafana/grafana"
