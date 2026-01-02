@@ -2,6 +2,7 @@ local wezterm = require("wezterm")
 local module = {}
 
 local appearance = {
+  color_scheme = "Solarized Dark Higher Contrast",
 
   -- window title
   -- タイトルバーを非表示
@@ -9,8 +10,11 @@ local appearance = {
   window_close_confirmation = "NeverPrompt", -- AlwaysPrompt or NeverPrompt
 
   -- Pane
+  -- 非アクティブPaneを暗くして視認性を向上
+  -- アクティブPaneは青みがかった背景、非アクティブは暗くする
   inactive_pane_hsb = {
-    saturation = 0.5,
+    hue = 0.9, -- 色相を少しシフト（青みを抑える）
+    saturation = 1.0,
     brightness = 1.0,
   },
 
@@ -29,6 +33,8 @@ local appearance = {
   },
   -- Hide borders between tabs
   colors = {
+    -- 青みがかった背景色（アクティブPaneで青く見える）
+    background = "#1a1a2e",
     -- use_fancy_tab_bar = falseの場合のタブバー透過設定
     tab_bar = {
       background = "none",
