@@ -14,7 +14,7 @@ local appearance = {
   -- アクティブPaneは青みがかった背景、非アクティブは暗くする
   inactive_pane_hsb = {
     hue = 0.9, -- 色相を少しシフト（青みを抑える）
-    saturation = 1.0,
+    saturation = 0.9,
     brightness = 1.0,
   },
 
