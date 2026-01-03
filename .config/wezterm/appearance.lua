@@ -40,6 +40,12 @@ local appearance = {
       background = "none",
       inactive_tab_edge = "none",
     },
+    -- カーソルとコピーモード選択色（WezTermデフォルト）
+    cursor_bg = "#80EBDF",
+    cursor_fg = "#000000",
+    cursor_border = "#80EBDF",
+    selection_bg = "#ffdd00",
+    selection_fg = "#000000",
   },
 }
 
