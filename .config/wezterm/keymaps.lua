@@ -141,6 +141,44 @@ local keys = {
     }),
   },
   { key = "s", mods = "LEADER", action = act.ActivateKeyTable({ name = "setting_mode", one_shot = false }) },
+  -- 直前のコマンドと出力をコピー
+  {
+    key = "z",
+    mods = "LEADER",
+    action = wezterm.action_callback(function(window, pane)
+      -- コピーモードに入る
+      window:perform_action(act.ActivateCopyMode, pane)
+
+      -- 直前のInputゾーン（最後のコマンド）に移動
+      window:perform_action(act.CopyMode({ MoveBackwardZoneOfType = "Input" }), pane)
+
+      -- セル選択モードを開始
+      window:perform_action(act.CopyMode({ SetSelectionMode = "Cell" }), pane)
+
+      -- 次のPromptゾーンまで選択（コマンドと出力を含む）
+      window:perform_action(act.CopyMode({ MoveForwardZoneOfType = "Prompt" }), pane)
+
+      -- 1行上に移動して行末へ（現在のプロンプト行を除外）
+      window:perform_action(act.CopyMode("MoveUp"), pane)
+      window:perform_action(act.CopyMode("MoveToEndOfLineContent"), pane)
+
+      -- クリップボードにコピー
+      window:perform_action(
+        act.Multiple({
+          { CopyTo = "ClipboardAndPrimarySelection" },
+          { Multiple = { "ScrollToBottom", { CopyMode = "Close" } } },
+        }),
+        pane
+      )
+
+      -- ステータスバーに一時的なステータスを表示
+      window:set_right_status("📋 Copied!")
+      -- 3秒後にクリア
+      wezterm.time.call_after(3, function()
+        window:set_right_status("")
+      end)
+    end),
+  },
 }
 
 local key_tables = {
@@ -199,6 +237,14 @@ local key_tables = {
     { key = "p", mods = "CTRL", action = act.CopyMode("PriorMatch") },
     -- 検索モードへ
     { key = "/", mods = "NONE", action = act.Search("CurrentSelectionOrEmptyString") },
+    -- ScrollToPrompt
+    { key = "[", mods = "ALT", action = act.ScrollToPrompt(-1) },
+    { key = "]", mods = "ALT", action = act.ScrollToPrompt(1) },
+    -- コマンドの入力領域（Inputゾーン）単位でカーソル移動
+    { key = "]", mods = "NONE", action = act.CopyMode({ MoveForwardZoneOfType = "Input" }) }, -- Input, Output, Promptから選択可能
+    { key = "[", mods = "NONE", action = act.CopyMode({ MoveBackwardZoneOfType = "Input" }) }, -- Input, Output, Promptから選択可能
+    -- セマンティックゾーン選択モード開始（現在位置のゾーン全体を選択）
+    { key = "z", mods = "NONE", action = act.CopyMode({ SetSelectionMode = "SemanticZone" }) },
   },
 
   search_mode = {
