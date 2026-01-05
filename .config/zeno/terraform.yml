@@ -8,6 +8,14 @@ snippets:
     snippet: curl -s https://registry.terraform.io/v1/providers/{{provider}}/versions | jq '.versions[].version' | sort | tail -10
 
 completions:
+  - name: terraform state resources
+    patterns:
+      - '^terraform state (rm|show|mv)( .*)? $'
+    sourceCommand: "terraform state list 2>/dev/null"
+    options:
+      --prompt: "'Terraform Resource> '"
+      --preview: "terraform state show {}"
+
   - name: terraform provider
     patterns:
       - 'registry\.terraform\.io/v1/providers/$'
