@@ -42,6 +42,45 @@ local function set_pane_height_percent(percent)
   end)
 end
 
+-- ペインの幅を指定したパーセンテージに設定するヘルパー関数
+local function set_pane_width_percent(percent)
+  return wezterm.action_callback(function(window, pane)
+    local tab = pane:tab()
+    local tab_size = tab:get_size()
+    local pane_dims = pane:get_dimensions()
+    local pane_id = pane:pane_id()
+
+    -- ペインの位置を取得（leftが0なら左のペイン）
+    local is_left_pane = false
+    for _, info in ipairs(tab:panes_with_info()) do
+      if info.pane:pane_id() == pane_id then
+        is_left_pane = (info.left == 0)
+        break
+      end
+    end
+
+    local target_cols = math.floor(tab_size.cols * percent)
+    local current_cols = pane_dims.cols
+    local diff = current_cols - target_cols
+
+    if is_left_pane then
+      -- 左ペイン: 縮小はLeft、拡大はRight
+      if diff > 0 then
+        window:perform_action(act.AdjustPaneSize({ "Left", diff }), pane)
+      elseif diff < 0 then
+        window:perform_action(act.AdjustPaneSize({ "Right", -diff }), pane)
+      end
+    else
+      -- 右ペイン: 縮小はRight、拡大はLeft
+      if diff > 0 then
+        window:perform_action(act.AdjustPaneSize({ "Right", diff }), pane)
+      elseif diff < 0 then
+        window:perform_action(act.AdjustPaneSize({ "Left", -diff }), pane)
+      end
+    end
+  end)
+end
+
 local leader = { key = "q", mods = "CTRL", timeout_milliseconds = 2000 }
 
 local keys = {
@@ -348,6 +387,17 @@ local key_tables = {
     { key = "7", action = set_pane_height_percent(0.7) },
     { key = "8", action = set_pane_height_percent(0.8) },
     { key = "9", action = set_pane_height_percent(0.9) },
+
+    -- ペインの幅をパーセンテージで設定
+    { key = "1", mods = "CTRL", action = set_pane_width_percent(0.1) },
+    { key = "2", mods = "CTRL", action = set_pane_width_percent(0.2) },
+    { key = "3", mods = "CTRL", action = set_pane_width_percent(0.3) },
+    { key = "4", mods = "CTRL", action = set_pane_width_percent(0.4) },
+    { key = "5", mods = "CTRL", action = set_pane_width_percent(0.5) },
+    { key = "6", mods = "CTRL", action = set_pane_width_percent(0.6) },
+    { key = "7", mods = "CTRL", action = set_pane_width_percent(0.7) },
+    { key = "8", mods = "CTRL", action = set_pane_width_percent(0.8) },
+    { key = "9", mods = "CTRL", action = set_pane_width_percent(0.9) },
 
     -- 自作モードから抜けるキーバインド設定
     { key = "Escape", action = "PopKeyTable" },
