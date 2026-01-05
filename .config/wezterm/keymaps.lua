@@ -299,6 +299,46 @@ local key_tables = {
     { key = "k", action = act.AdjustPaneSize({ "Up", 1 }) },
     { key = "j", action = act.AdjustPaneSize({ "Down", 1 }) },
 
+    -- ペインの高さを30%に設定
+    {
+      key = "3",
+      action = wezterm.action_callback(function(window, pane)
+        local tab = pane:tab()
+        local tab_size = tab:get_size()
+        local pane_dims = pane:get_dimensions()
+        local pane_id = pane:pane_id()
+
+        -- ペインの位置を取得（topが0なら上のペイン）
+        local is_top_pane = false
+        for _, info in ipairs(tab:panes_with_info()) do
+          if info.pane:pane_id() == pane_id then
+            is_top_pane = (info.top == 0)
+            break
+          end
+        end
+
+        local target_rows = math.floor(tab_size.rows * 0.3)
+        local current_rows = pane_dims.viewport_rows
+        local diff = current_rows - target_rows
+
+        if is_top_pane then
+          -- 上ペイン: 縮小はUp、拡大はDown
+          if diff > 0 then
+            window:perform_action(act.AdjustPaneSize({ "Up", diff }), pane)
+          elseif diff < 0 then
+            window:perform_action(act.AdjustPaneSize({ "Down", -diff }), pane)
+          end
+        else
+          -- 下ペイン: 縮小はDown、拡大はUp
+          if diff > 0 then
+            window:perform_action(act.AdjustPaneSize({ "Down", diff }), pane)
+          elseif diff < 0 then
+            window:perform_action(act.AdjustPaneSize({ "Up", -diff }), pane)
+          end
+        end
+      end),
+    },
+
     -- 自作モードから抜けるキーバインド設定
     { key = "Escape", action = "PopKeyTable" },
     { key = "q", action = "PopKeyTable" },
