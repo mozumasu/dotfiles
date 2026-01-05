@@ -160,6 +160,10 @@ snippets:
     keyword: nbg
     snippet: rg "{{keyword}}" "$(nb notebooks current --path)"
 
+  - name: markdownlint config
+    keyword: mdlint
+    snippet: curl -O https://raw.githubusercontent.com/mozumasu/dotfiles/main/.markdownlint.yml
+
 completions:
   # simple sourceCommand, no callback
   - name: kill signal
