@@ -41,6 +41,15 @@ snippets:
   - keyword: ssm;
     snippet: aws ssm start-session --target {{InstanceId}} --profile {{aws-profile}}
 
+  - keyword: iamlra
+    snippet:
+      aws iam list-roles
+        --query "Roles[?Path!='/aws-service-role/'].[RoleName, Arn]"
+        --output table
+
+  - keyword: iamrt
+    snippet: aws iam list-role-tags --role-name {{RoleName}} --output table
+
 completions:
   - name: instance-id
     patterns:
@@ -159,6 +168,13 @@ completions:
       - '^.*--load-balancer-arns?(?:=|\s+)(?=[^\s\\-])[^\\]*$'
     sourceCommand: "aws elbv2 describe-load-balancers --query 'LoadBalancers[].[LoadBalancerArn, LoadBalancerName]' --output text | perl -pe 's/\\t/ : /g'"
     callback: "awk '{ print $1 }'"
+
+  # IAM Role
+  - name: RoleName
+    patterns:
+      - '^.*--role-name\s+$'
+      - '^.*--role-name(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+    sourceCommand: "aws iam list-roles --query \"Roles[?Path!='/aws-service-role/'].[RoleName]\" --output text"
 
   - name: cloudformation stack name
     patterns:
