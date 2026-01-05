@@ -154,6 +154,9 @@ in
 
       # mysql
       export PATH="/opt/homebrew/opt/mysql@8.0/bin:$PATH"
+
+      # mise shims (for subprocesses like nvim)
+      export PATH="$HOME/.local/share/mise/shims:$PATH"
     '';
 
     # .zshrc の内容 (initContent を使用)
