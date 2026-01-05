@@ -422,7 +422,8 @@ return {
       if wezterm_path == "" then
         wezterm_path = "/opt/homebrew/bin/wezterm"
       end
-      local cmd = wezterm_path .. " cli get-text --escapes"
+      -- スクロールバック全体を取得（-100000 から開始）
+      local cmd = wezterm_path .. " cli get-text --escapes --start-line -100000"
       if pane_id then
         cmd = cmd .. " --pane-id=" .. pane_id
       end
@@ -448,27 +449,7 @@ return {
       vim.api.nvim_buf_set_lines(0, 0, -1, false, empty_lines)
       -- 独自のハイライト処理（UTF-8対応）
       apply_ansi_highlights(vim.api.nvim_get_current_buf(), lines)
-    end, { nargs = "?", desc = "Capture WezTerm pane with ANSI colors" })
-
-    -- WezTerm ペインをキャプチャして表示（:terminal 版、色が正確）
-    vim.api.nvim_create_user_command("WezCaptureTerminal", function(opts)
-      local pane_id = opts.args ~= "" and opts.args or nil
-      local wezterm_path = vim.fn.exepath("wezterm")
-      if wezterm_path == "" then
-        wezterm_path = "/opt/homebrew/bin/wezterm"
-      end
-      local wez_cmd = wezterm_path .. " cli get-text --escapes"
-      if pane_id then
-        wez_cmd = wez_cmd .. " --pane-id=" .. pane_id
-      end
-      -- ISO-8613-6 形式を標準形式に変換する perl コマンド
-      local perl_convert =
-        [[perl -pe 's/\e\[([0-9:;]+)m/my $p=$1; $p=~s!:!;!g; $p=~s!;2;;!;2;!g; "\e[${p}m"/gex; s/\e[\(\)][A-Z0-9]//g']]
-      local full_cmd = wez_cmd .. " | " .. perl_convert
-      vim.cmd("enew")
-      vim.cmd("terminal sh -c " .. vim.fn.shellescape(full_cmd))
-      vim.cmd("normal! G")
-    end, { nargs = "?", desc = "Capture WezTerm pane (terminal mode)" })
+    end, { nargs = "?", desc = "Capture WezTerm pane with ANSI colors", force = true })
 
     vim.api.nvim_create_user_command("BaleiaColorize", function()
       local bufnr = vim.api.nvim_get_current_buf()

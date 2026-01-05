@@ -264,14 +264,14 @@ local keys = {
     action = wezterm.action_callback(function(window, pane)
       local pane_id = tostring(pane:pane_id())
 
-      -- Neovimのターミナルモードで色付き表示
+      -- Neovimの WezCapture コマンドで色付き表示
       local new_pane = pane:split({
         direction = "Right",
         size = 1.0,
         args = {
           os.getenv("SHELL"),
           "-lc",
-          "nvim -c 'terminal /opt/homebrew/bin/wezterm cli get-text --pane-id=" .. pane_id .. " --escapes'",
+          "nvim -c 'WezCapture " .. pane_id .. "'",
         },
       })
       new_pane:activate()
