@@ -49,6 +49,7 @@
 
     # Python ツール
     uv
+    mise # Runtime version manager
 
     # メディア処理
     ffmpeg
