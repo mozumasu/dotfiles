@@ -1,6 +1,6 @@
 return {
   "yuki-yano/vinsert.vim",
-  lazy = false,
+  event = "User DenopsReady",
   cmd = { "VinsertToggle" },
   keys = {
     { "<C-.>", mode = { "i" } },
