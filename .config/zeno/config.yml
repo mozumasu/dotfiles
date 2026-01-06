@@ -233,6 +233,15 @@ completions:
     options:
       --prompt: "'make> '"
 
+  - name: just
+    patterns:
+      - "^just( .*)? $"
+    sourceCommand: "just --list --unsorted 2>/dev/null | tail -n +2"
+    callback: "awk '{print $1}'"
+    options:
+      --prompt: "'just> '"
+      --preview: "just --show {1} 2>/dev/null"
+
   - name: suspend
     patterns:
       - "^fg $"
