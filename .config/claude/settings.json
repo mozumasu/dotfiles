@@ -138,7 +138,8 @@
     "command": "npx ccusage@latest statusline"
   },
   "enabledPlugins": {
-    "example-skills@anthropic-agent-skills": true
+    "example-skills@anthropic-agent-skills": true,
+    "pyright-lsp@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": false,
   "maxTokens": 8192,
