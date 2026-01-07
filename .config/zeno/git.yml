@@ -49,6 +49,12 @@ snippets:
   - keyword: lg
     snippet: lazygit
 
+  - keyword: gln
+    snippet: git log {{branch}}..HEAD --name-only
+
+  - keyword: gds
+    snippet: git diff --stat {{branch}}..HEAD
+
 completions:
   - name: gh browse
     patterns:
