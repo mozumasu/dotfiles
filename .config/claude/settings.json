@@ -57,14 +57,12 @@
       "Read(~/.gnupg/**)",
       "Read(./secrets/**)",
       "Read(**/credentials.json)",
-      "Read(**/*secret*)",
       "Read(**/*token*)",
       "Edit(.env)",
       "Edit(.env.*)",
       "Edit(~/.ssh/**)",
       "Edit(~/.aws/**)",
-      "Write(.env*)",
-      "Write(**/secrets/**)"
+      "Write(.env*)"
     ],
     "ask": [
       "Bash(git push:*)",
