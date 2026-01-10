@@ -78,6 +78,7 @@
           home-manager = {
             useGlobalPkgs = true;
             useUserPackages = true;
+            backupFileExtension = "backup";
             users.mozumasu = import ./home-manager;
           };
         }

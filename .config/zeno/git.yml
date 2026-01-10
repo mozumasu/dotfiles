@@ -49,6 +49,12 @@ snippets:
   - keyword: lg
     snippet: lazygit
 
+  - keyword: gln
+    snippet: git log {{branch}}..HEAD --name-only
+
+  - keyword: gds
+    snippet: git diff --stat {{branch}}..HEAD
+
 completions:
   - name: gh browse
     patterns:
@@ -61,9 +67,9 @@ completions:
     patterns:
       - "^ghqg"
       - "^ghq get( .*)? $"
-    sourceCommand: "gh repo list | awk '{print $1}'"
+    sourceCommand: "gh api user/repos --paginate -q '.[].full_name'"
     options:
-      --prompt: "'browse repo >'"
+      --prompt: "'ghq get > '"
     callback: "ghq get ${1}"
 
   - name: gh run ID

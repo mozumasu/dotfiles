@@ -1,0 +1,32 @@
+snippets:
+  # Terraform CLI version check
+  - keyword: tfv
+    snippet: curl -s https://releases.hashicorp.com/terraform/index.json | jq -r '.versions | keys[]' | sort -V | tail -10
+
+  # Provider version check
+  - keyword: tfpv
+    snippet: curl -s https://registry.terraform.io/v1/providers/{{provider}}/versions | jq '.versions[].version' | sort | tail -10
+
+completions:
+  - name: terraform state resources
+    patterns:
+      - '^terraform state (rm|show|mv)( .*)? $'
+    sourceCommand: "terraform state list 2>/dev/null"
+    options:
+      --prompt: "'Terraform Resource> '"
+      --preview: "terraform state show {}"
+
+  - name: terraform provider
+    patterns:
+      - 'registry\.terraform\.io/v1/providers/$'
+    sourceCommand: "printf '%s\\n' hashicorp/aws hashicorp/google hashicorp/google-beta hashicorp/azurerm hashicorp/kubernetes hashicorp/helm hashicorp/vault hashicorp/consul hashicorp/nomad hashicorp/random hashicorp/null hashicorp/local hashicorp/time hashicorp/tls hashicorp/http hashicorp/archive hashicorp/external hashicorp/dns hashicorp/cloudinit integrations/github cloudflare/cloudflare datadog/datadog mongodb/mongodbatlas grafana/grafana"
+
+  - name: terraform target module
+    patterns:
+      - '^just plan \w+ -target=$'
+      - '^terraform (plan|apply)( .*)? -target=$'
+      - '^terragrunt (plan|apply)( .*)? -target=$'
+    sourceCommand: "env=$(echo \"$LBUFFER\" | perl -ne 'print $1 if /just plan (\\w+)/'); if [ -n \"$env\" ] && [ -d \"environments/$env\" ]; then (cd \"environments/$env\" && terragrunt state list 2>/dev/null); else terragrunt state list 2>/dev/null || terraform state list 2>/dev/null; fi | grep '^module\\.' | perl -pe 's/^(module\\.[^.]+).*/$1/' | sort -u"
+    options:
+      --prompt: "'Module> '"
+      --preview: "env=$(echo \"$LBUFFER\" | perl -ne 'print $1 if /just plan (\\w+)/'); if [ -n \"$env\" ] && [ -d \"environments/$env\" ]; then (cd \"environments/$env\" && terragrunt state list 2>/dev/null); else terragrunt state list 2>/dev/null || terraform state list 2>/dev/null; fi | grep '^{}'"

@@ -6,6 +6,7 @@
     eza
     fd
     fzf
+    hyperfine
     ripgrep
     zoxide
     tree
@@ -48,6 +49,7 @@
 
     # Python ツール
     uv
+    mise # Runtime version manager
 
     # メディア処理
     ffmpeg
@@ -58,6 +60,7 @@
     bottom
     fastfetch
     glow
+    presenterm # Terminal slideshow
     yazi
     lazydocker
     skanehira-ghost # Background process manager

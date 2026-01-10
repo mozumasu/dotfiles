@@ -1,0 +1,36 @@
+#!/usr/bin/env zsh
+
+# Select IAM role with fzf and display its tags
+# Excludes AWS service-linked roles
+
+print -P "%F{cyan}Fetching IAM roles...%f"
+
+local roles
+roles=$(aws iam list-roles \
+  --query "Roles[?Path!='/aws-service-role/'].[RoleName, Arn]" \
+  --output text | perl -pe 's/\t/ : /g')
+
+if [[ -z "$roles" ]]; then
+  print -P "%F{yellow}No roles found.%f"
+  return 0
+fi
+
+local selected
+selected=$(echo "$roles" | fzf \
+  --prompt "Select Role: " \
+  --header "RoleName : Arn" \
+  --preview "aws iam list-role-tags --role-name {1} --output table 2>/dev/null || echo 'Loading...'" \
+  --preview-window "right:50%:wrap")
+
+if [[ -z "$selected" ]]; then
+  return 0
+fi
+
+local role_name
+role_name=$(echo "$selected" | awk '{print $1}')
+
+echo ""
+print -P "%F{green}%B📋 Role: $role_name%b%f"
+echo ""
+
+aws iam list-role-tags --role-name "$role_name" --output table

@@ -111,9 +111,15 @@ function M.add_note(title, notebook)
   end
 
   -- 追加されたノートのIDを取得
+  -- 出力形式: "Added: [85] file.md" または "Added: [log:41] log:file.md"
   for _, line in ipairs(output) do
-    local note_id = line:match("%[(%d+)%]")
+    -- [notebook:数字] または [数字] 形式をサポート
+    local note_id = line:match("%[([%w]+:%d+)%]") or line:match("%[(%d+)%]")
     if note_id then
+      -- 既に notebook:id 形式ならそのまま返す
+      if note_id:find(":") then
+        return note_id
+      end
       -- notebook指定時は notebook:id 形式で返す
       if notebook then
         return notebook .. ":" .. note_id

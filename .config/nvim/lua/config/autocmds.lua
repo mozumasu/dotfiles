@@ -151,3 +151,30 @@ vim.api.nvim_create_user_command("InsertDatetime", function()
 
   vim.api.nvim_buf_set_text(0, row, col, row, col, { result })
 end, {})
+
+-- ヤンク時のみクリップボード連携（削除などは除外）
+vim.api.nvim_create_autocmd("TextYankPost", {
+  group = vim.api.nvim_create_augroup("yank_to_clipboard", { clear = true }),
+  callback = function()
+    if vim.v.event.operator == "y" then
+      vim.fn.setreg("+", vim.fn.getreg('"'))
+    end
+  end,
+})
+
+-- :quit時に特殊ウィンドウ(quickfix, help等)のみが残っている場合は自動で閉じる
+-- ref: https://zenn.dev/vim_jp/articles/ff6cd224fab0c7
+vim.api.nvim_create_autocmd("QuitPre", {
+  callback = function()
+    local current_win = vim.api.nvim_get_current_win()
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+      if win ~= current_win then
+        local buf = vim.api.nvim_win_get_buf(win)
+        if vim.bo[buf].buftype == "" then
+          return
+        end
+      end
+    end
+    vim.cmd.only({ bang = true })
+  end,
+})

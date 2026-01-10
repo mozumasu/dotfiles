@@ -5,7 +5,10 @@ iterm = "iterm"
 args = "args"
 cose = "cose"
 ue = "ue"
-
+# Active Noise Cancelling の略称
+ANC = "ANC"
+Ba = "Ba"
+Hashi = "Hashi"
 [default]
 detect = ["en", "ja"]
 extend-ignore-re = ["<cmd>.+<cr>", "<leader>.+\"", "<leader>.+`"]

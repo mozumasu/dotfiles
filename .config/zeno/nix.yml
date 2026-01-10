@@ -2,7 +2,7 @@ snippets:
   # nix-darwin (hostname is auto-detected)
   - name: nix switch
     keyword: nix-switch
-    snippet: darwin-rebuild switch --flake ~/dotfiles/.config/nix#$(scutil --get LocalHostName)
+    snippet: sudo darwin-rebuild switch --flake ~/dotfiles/.config/nix#$(scutil --get LocalHostName)
 
   - name: nix build
     keyword: nix-build

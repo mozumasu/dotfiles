@@ -1,4 +1,7 @@
 snippets:
+  - keyword: AP;
+    snippet: AWS_PROFILE=
+
   - keyword: awsl
     snippet: aws configure list
 
@@ -35,6 +38,18 @@ snippets:
         --query 'Roles[?starts_with(RoleName, `{{prefix}}`)].RoleName'
         --output table
 
+  - keyword: ssm;
+    snippet: aws ssm start-session --target {{InstanceId}} --profile {{aws-profile}}
+
+  - keyword: iamlra
+    snippet:
+      aws iam list-roles
+        --query "Roles[?Path!='/aws-service-role/'].[RoleName, Arn]"
+        --output table
+
+  - keyword: iamrt
+    snippet: aws iam list-role-tags --role-name {{RoleName}} --output table
+
 completions:
   - name: instance-id
     patterns:
@@ -46,6 +61,7 @@ completions:
     patterns:
       - "aws-vault login( .*)? $"
       - '^aws\b.*--profile(?:(?:=|\s+)([A-Za-z0-9._-]*))?\s*$'
+      - '^\s*AWS_PROFILE=[A-Za-z0-9._-]*$'
     sourceCommand: "aws configure list-profiles"
   # ECS
   - name: EcsCluster
@@ -69,16 +85,96 @@ completions:
   - name: SubnetId
     patterns:
       - '^.*\bsubnets=\[[^\]]*$'
-      # - '^.*subnets=\[(.*)?$'
       - '^.*\bsubnet-[0-9a-f]*$'
-    sourceCommand: aws ec2 describe-subnets --query 'Subnets[].SubnetId' --output text | tr '\t' '\n'
+      - '^.*--subnet-ids?\s+$'
+      - '^.*--subnet-ids?(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+    sourceCommand: "aws ec2 describe-subnets --query 'Subnets[].[SubnetId, Tags[?Key==`Name`].Value | [0] || `(no name)`, AvailabilityZone]' --output text | perl -pe 's/\\t/ : /g'"
+    callback: "awk '{ print $1 }'"
 
   - name: SecurityGroupId
     patterns:
       - '^.*securityGroups=\[[^\]]*$'
-      # - '^.*securityGroups=\[(.*)?$'
       - '^.*\bsg-[0-9a-f]*$'
-    sourceCommand: aws ec2 describe-security-groups --query 'SecurityGroups[].GroupId' --output text | tr '\t' '\n'
+      - '^.*--security-group-ids?\s+$'
+      - '^.*--security-group-ids?(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+    sourceCommand: "aws ec2 describe-security-groups --query 'SecurityGroups[].[GroupId, GroupName]' --output text | perl -pe 's/\\t/ : /g'"
+    callback: "awk '{ print $1 }'"
+
+  # VPC ID
+  - name: VpcId
+    patterns:
+      - '^.*--vpc-ids?\s+$'
+      - '^.*--vpc-ids?(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+      - '^.*\bvpc-[0-9a-f]*$'
+    sourceCommand: "aws ec2 describe-vpcs --query 'Vpcs[].[VpcId, Tags[?Key==`Name`].Value | [0] || `(no name)`]' --output text | perl -pe 's/\\t/ : /g'"
+    callback: "awk '{ print $1 }'"
+
+  # EC2 Instance ID (汎用)
+  - name: InstanceId
+    patterns:
+      - '^.*--instance-ids?\s+$'
+      - '^.*--instance-ids?(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+      - '^.*\bi-[0-9a-f]+$'
+      # SSM start-session --target
+      - '^.*ssm\s+start-session\s+--target\s+$'
+      - '^.*ssm\s+start-session\s+--target(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+    sourceCommand: "LINE=\"${LBUFFER}${RBUFFER}\"; OPTS=\"\"; P=$(echo \"$LINE\" | awk -F'--profile ' '{print $2}' | awk '{print $1}'); [ -n \"$P\" ] && OPTS=\"$OPTS --profile $P\"; R=$(echo \"$LINE\" | awk -F'--region ' '{print $2}' | awk '{print $1}'); [ -n \"$R\" ] && OPTS=\"$OPTS --region $R\"; [ -z \"$P\" ] && { P=$(echo \"$LINE\" | awk -F'AWS_PROFILE=' '{print $2}' | awk '{print $1}'); [ -n \"$P\" ] && OPTS=\"$OPTS --profile $P\"; }; eval \"aws ec2 describe-instances $OPTS --query 'Reservations[].Instances[].[InstanceId, Tags[?Key==\\`Name\\`].Value | [0] || \\`(no name)\\`, State.Name]' --output text\" | tr '\\t' ' : '"
+    callback: "awk '{ print $1 }'"
+
+  # Key Pair
+  - name: KeyName
+    patterns:
+      - '^.*--key-name\s+$'
+      - '^.*--key-name(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+    sourceCommand: aws ec2 describe-key-pairs --query 'KeyPairs[].KeyName' --output text | tr '\t' '\n'
+
+  # EBS Volume
+  - name: VolumeId
+    patterns:
+      - '^.*--volume-ids?\s+$'
+      - '^.*--volume-ids?(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+      - '^.*\bvol-[0-9a-f]+$'
+    sourceCommand: "aws ec2 describe-volumes --query 'Volumes[].[VolumeId, Tags[?Key==`Name`].Value | [0] || `(no name)`, State]' --output text | perl -pe 's/\\t/ : /g'"
+    callback: "awk '{ print $1 }'"
+
+  # AMI (自分のイメージのみ)
+  - name: ImageId
+    patterns:
+      - '^.*--image-id\s+$'
+      - '^.*--image-id(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+    sourceCommand: "aws ec2 describe-images --owners self --query 'Images[].[ImageId, Name]' --output text | perl -pe 's/\\t/ : /g'"
+    callback: "awk '{ print $1 }'"
+
+  # Launch Template
+  - name: LaunchTemplateId
+    patterns:
+      - '^.*--launch-template-id\s+$'
+      - '^.*--launch-template-id(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+    sourceCommand: "aws ec2 describe-launch-templates --query 'LaunchTemplates[].[LaunchTemplateId, LaunchTemplateName]' --output text | perl -pe 's/\\t/ : /g'"
+    callback: "awk '{ print $1 }'"
+
+  # Target Group ARN
+  - name: TargetGroupArn
+    patterns:
+      - '^.*--target-group-arns?\s+$'
+      - '^.*--target-group-arns?(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+    sourceCommand: "aws elbv2 describe-target-groups --query 'TargetGroups[].[TargetGroupArn, TargetGroupName]' --output text | perl -pe 's/\\t/ : /g'"
+    callback: "awk '{ print $1 }'"
+
+  # Load Balancer ARN
+  - name: LoadBalancerArn
+    patterns:
+      - '^.*--load-balancer-arns?\s+$'
+      - '^.*--load-balancer-arns?(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+    sourceCommand: "aws elbv2 describe-load-balancers --query 'LoadBalancers[].[LoadBalancerArn, LoadBalancerName]' --output text | perl -pe 's/\\t/ : /g'"
+    callback: "awk '{ print $1 }'"
+
+  # IAM Role
+  - name: RoleName
+    patterns:
+      - '^.*--role-name\s+$'
+      - '^.*--role-name(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+    sourceCommand: "aws iam list-roles --query \"Roles[?Path!='/aws-service-role/'].[RoleName]\" --output text"
 
   - name: cloudformation stack name
     patterns:
@@ -87,7 +183,7 @@ completions:
 
   - name: aws cli completer
     patterns:
-      - '^\s*aws(?:$|\s.*)$'
-    sourceCommand: 'COMP_LINE="${LBUFFER}${RBUFFER}" COMP_POINT=${#LBUFFER} aws_completer 2>/dev/null'
+      - '^\s*(?:[A-Z_]+=\S+\s+)*aws(?:$|\s.*)$'
+    sourceCommand: 'LINE="${LBUFFER}${RBUFFER}"; CLEAN=$(perl -pe "s/^\s*(?:[A-Z_]+=\S+\s+)+//" <<< "$LINE"); OFF=$((${#LINE}-${#CLEAN})); COMP_LINE="$CLEAN" COMP_POINT=$((${#LBUFFER}-OFF)) aws_completer 2>/dev/null'
     options:
       --prompt: "'aws > '"

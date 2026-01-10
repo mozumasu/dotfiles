@@ -1,7 +1,16 @@
-{ ... }:
+{ lib, ... }:
 {
   system.stateVersion = 5;
-  programs.zsh.enable = true;
+  programs.zsh = {
+    enable = true;
+    # /etc/zshrc で compinit を無効化 (ユーザー .zshrc で一度だけ実行)
+    enableCompletion = false;
+    enableBashCompletion = false;
+    # promptinit も無効化 (starship を使用)
+    promptInit = "";
+    # brew shellenv を無効化 (ユーザー .zshrc でキャッシュ経由で実行)
+    interactiveShellInit = lib.mkForce "";
+  };
   security.pam.services.sudo_local.touchIdAuth = true;
 
   # ============================================================================

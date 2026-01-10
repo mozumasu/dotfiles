@@ -1,26 +1,27 @@
 return {
   "yuki-yano/vinsert.vim",
-  lazy = false,
-  cmd = { "VinsertToggle" },
-  keys = {
-    { "<C-.>", mode = { "i" } },
-  },
+  -- cmd/keysでのみロードし、denopsのdispatcher初期化を待つ
+  lazy = true,
+  cmd = { "VinsertToggle", "VinsertStart", "VinsertStop", "VinsertCancel" },
   dependencies = { "vim-denops/denops.vim" },
-  config = function()
+  init = function()
+    -- プラグインロード前に設定を定義
     vim.g.vinsert_openai_api_key = os.getenv("OPENAI_API_KEY") or ""
     -- ffmpeg -f avfoundation -list_devices true -i ""
     vim.g.vinsert_ffmpeg_args = { "-f", "avfoundation", "-i", ":0" }
-
     vim.g.vinsert_stt_streaming_mode = "progressive"
     vim.g.vinsert_indicator = "virt" -- virt | statusline | cmdline | none
     vim.g.vinsert_always_yank = true
-
     vim.g.vinsert_debug = true
     vim.g.vinsert_text_stream = false
 
+    -- プラグインロード前にキーマップを設定（VinsertToggleコマンドをトリガーする）
     vim.keymap.set("i", "<C-.>", function()
       vim.cmd("VinsertToggle insert")
-    end, { silent = true })
+    end, { silent = true, desc = "Vinsert Toggle" })
+  end,
+  config = function()
+    -- <C-w>はプラグインロード後に設定（vinsert#statusを使うため）
     vim.keymap.set("i", "<C-w>", function()
       local status = vim.fn["vinsert#status"]()
       if status.active then

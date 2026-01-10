@@ -15,9 +15,12 @@ return {
     mappings = vim.tbl_filter(function(m)
       return m[1] and #m[1] > 0
     end, mappings)
-    return vim.list_extend(mappings, vim.list_extend(keys, {
-      { "s", [[:<C-u>lua MiniSurround.add('visual')<CR>]], mode = "x", desc = "Add Surrounding" },
-    }))
+    return vim.list_extend(
+      mappings,
+      vim.list_extend(keys, {
+        { "s", [[:<C-u>lua MiniSurround.add('visual')<CR>]], mode = "x", desc = "Add Surrounding" },
+      })
+    )
   end,
   opts = {
     mappings = {

@@ -160,6 +160,10 @@ snippets:
     keyword: nbg
     snippet: rg "{{keyword}}" "$(nb notebooks current --path)"
 
+  - name: markdownlint config
+    keyword: mdlint
+    snippet: curl -O https://raw.githubusercontent.com/mozumasu/dotfiles/main/.markdownlint.yml
+
 completions:
   # simple sourceCommand, no callback
   - name: kill signal
@@ -228,6 +232,15 @@ completions:
     callback: "awk '{printf $2}'"
     options:
       --prompt: "'make> '"
+
+  - name: just
+    patterns:
+      - "^just( .*)? $"
+    sourceCommand: "just --list --unsorted 2>/dev/null | tail -n +2"
+    callback: "awk '{print $1}'"
+    options:
+      --prompt: "'just> '"
+      --preview: "just --show {1} 2>/dev/null"
 
   - name: suspend
     patterns:
