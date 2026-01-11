@@ -3,7 +3,7 @@
 # Enhanced version with better handling for different file types
 
 # Extract ID from fzf input
-id=$(echo "$1" | sed -E 's/^\[([0-9]+)\].*/\1/')
+id=$(echo "$1" | sed -E 's/^\[([^]]+)\].*/\1/')
 
 # Check if it's an image file using nb's built-in type detection
 if nb show "$id" --type image 2>/dev/null; then
