@@ -68,6 +68,11 @@
 
       # Common modules shared by all hosts
       commonModules = [
+        # Import hostSpec module
+        ./modules/hostSpec.nix
+        # Common settings for all hosts
+        ./hosts/common
+        # Darwin-specific settings
         ./darwin
         # Apply custom overlay to nixpkgs
         {
