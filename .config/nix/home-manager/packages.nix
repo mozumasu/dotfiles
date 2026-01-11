@@ -36,6 +36,7 @@
     actionlint
     tree-sitter
     deno
+    rumdl # Markdown linter
 
     # ビルドツール
     cmake
