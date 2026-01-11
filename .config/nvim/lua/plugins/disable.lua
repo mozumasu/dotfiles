@@ -1,5 +1,6 @@
 return {
   "pwntester/octo.nvim",
+  dir = "/Users/mozumasu/src/github.com/mozumasu/octo.nvim", -- 開発版を使用
   keys = {
     { "<leader>gS", false }, -- { "<leader>gS", "<cmd>Octo search<CR>", desc = "Search (Octo)", false },
     { "<leader>a", false }, -- { "<leader>a", "", desc = "+assignee (Octo)", ft = "octo", false },
