@@ -22,13 +22,13 @@ export default defineConfig(async () => {
       "^nb (e|edit|delete|show|open|peek|copy|move|mv|rename|export|do|pin|unpin|history|browse)( .*)? $",
       "^nb (s|view)( .*)? $", // Add shortcuts
     ],
-    sourceCommand: "nb ls --all --no-color | grep -E '^\\[[0-9]+\\]'",
+    sourceCommand: "nb ls --tree --all --no-color | grep -E '^\\[[^]]+\\]'",
     options: {
       "--prompt": "'nb >'",
       "--preview": "$ZENO_HOME/nb-preview.sh {}",
       "--preview-window": "'right:60%:wrap'",
     },
-    callback: "sed -E 's/^\\[([0-9]+)\\].*/\\1/'",
+    callback: "sed -E 's/^\\[([^]]+)\\].*/\\1/'",
   };
 
   // nb notebook:notes completion (e.g., nb e log:)
@@ -37,14 +37,13 @@ export default defineConfig(async () => {
     patterns: [
       "^nb (e|edit|delete|show|open|peek|copy|move|mv|rename|export|do|pin|unpin|history|browse) log:$",
     ],
-    sourceCommand:
-      "nb log:ls --all --no-color | grep -E '^\\[[a-zA-Z0-9_-]+:[0-9]+\\]'",
+    sourceCommand: "nb log:ls --tree --all --no-color | grep -E '^\\[[^]]+\\]'",
     options: {
       "--prompt": "'nb log: >'",
       "--preview": "$ZENO_HOME/nb-preview.sh {}",
       "--preview-window": "'right:60%:wrap'",
     },
-    callback: "sed -E 's/^\\[[a-zA-Z0-9_-]+:([0-9]+)\\].*/\\1/'",
+    callback: "sed -E 's/^\\[[a-zA-Z0-9_-]+:([^]]+)\\].*/\\1/'",
   };
 
   // nb add file type completion
@@ -128,7 +127,7 @@ export default defineConfig(async () => {
       "--prompt": "'TODO >'",
       "--preview": "$ZENO_HOME/nb-preview.sh {}",
     },
-    callback: "sed -E 's/^\\[([0-9]+)\\].*/\\1/'",
+    callback: "sed -E 's/^\\[([^]]+)\\].*/\\1/'",
   };
 
   // nb git operations
