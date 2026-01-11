@@ -1,5 +1,11 @@
 { pkgs, ... }:
 {
+  imports = [
+    ./homebrew.nix
+    ./homebrew-work.nix
+    ./homebrew-personal.nix
+  ];
+
   # Common packages for all hosts
   environment.systemPackages = with pkgs; [
     # Basic tools
@@ -14,6 +20,10 @@
 
     # Utilities
     jq
+
+    # Terminal and editor
+    neovim
+    wezterm
   ];
 
   # Automatic garbage collection
