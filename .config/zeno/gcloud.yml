@@ -4,3 +4,11 @@ snippets:
 
   - keyword: gcl;
     snippet: gcloud config configurations list
+
+completions:
+  - name: gcloud project
+    patterns:
+      - '^gcloud\b.*--project(?:=|\s+)[A-Za-z0-9._-]*$'
+    sourceCommand: "gcloud projects list --format='value(projectId)' 2>/dev/null"
+    options:
+      --prompt: "'GCP Project> '"
