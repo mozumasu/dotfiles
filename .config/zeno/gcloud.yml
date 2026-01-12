@@ -5,6 +5,12 @@ snippets:
   - keyword: gcl;
     snippet: gcloud config configurations list
 
+  - keyword: gao;
+    snippet: gcloud app open-console --project {{PROJECT_ID}}
+
+  - keyword: gaos;
+    snippet: gcloud app open-console --project {{PROJECT_ID}} --service {{SERVICE}}
+
 completions:
   - name: gcloud project
     patterns:
@@ -12,3 +18,10 @@ completions:
     sourceCommand: "gcloud projects list --format='value(projectId)' 2>/dev/null"
     options:
       --prompt: "'GCP Project> '"
+
+  - name: gcloud app service
+    patterns:
+      - '^gcloud\b.*--service(?:=|\s+)[A-Za-z0-9._-]*$'
+    sourceCommand: "PROJECT=$(echo \"${LBUFFER}${RBUFFER}\" | perl -ne 'print $1 if /--project[=\\s]+(\\S+)/'); [ -n \"$PROJECT\" ] && gcloud app services list --format='value(id)' --project=\"$PROJECT\" 2>/dev/null"
+    options:
+      --prompt: "'App Service> '"
