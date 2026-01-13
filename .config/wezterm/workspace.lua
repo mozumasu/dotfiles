@@ -96,6 +96,9 @@ end
 local keys = {
   -- Toggle scratch workspace with CTRL+CMD+s
   { key = "s", mods = "CTRL|CMD", action = toggle_scratch_workspace() },
+  -- Skip scratch workspace when switching workspaces
+  { key = "n", mods = "CTRL|CMD", action = switch_to_next_workspace_skip_scratch() },
+  { key = "p", mods = "CTRL|CMD", action = switch_to_prev_workspace_skip_scratch() },
 
   {
     mods = "LEADER",
