@@ -178,3 +178,34 @@ vim.api.nvim_create_autocmd("QuitPre", {
     vim.cmd.only({ bang = true })
   end,
 })
+
+-- Generate Co-Authored-By trailer and insert at cursor position
+-- Usage: :CoAuthoredBy <github-username>
+vim.api.nvim_create_user_command("CoAuthoredBy", function(opts)
+  local username = opts.args
+  if username == "" then
+    vim.notify("Usage: :CoAuthoredBy <github-username>", vim.log.levels.ERROR)
+    return
+  end
+
+  local cmd = string.format(
+    [[gh api /users/%s -q '"Co-Authored-By: \(.name) <\(.id)+\(.login)@users.noreply.github.com>"']],
+    username
+  )
+  local result = vim.fn.system(cmd)
+
+  if vim.v.shell_error ~= 0 then
+    vim.notify("Failed to get user info: " .. result, vim.log.levels.ERROR)
+    return
+  end
+
+  -- Remove trailing newline
+  result = result:gsub("\n$", "")
+
+  -- Insert at cursor position
+  vim.api.nvim_put({ result }, "l", true, true)
+  vim.notify("Inserted: " .. result, vim.log.levels.INFO)
+end, {
+  nargs = 1,
+  desc = "Generate Co-Authored-By trailer from GitHub username",
+})
