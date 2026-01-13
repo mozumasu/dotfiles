@@ -26,7 +26,7 @@ completions:
       - '^just plan \w+ -target=$'
       - '^terraform (plan|apply)( .*)? -target=$'
       - '^terragrunt (plan|apply)( .*)? -target=$'
-    sourceCommand: "env=$(echo \"$LBUFFER\" | perl -ne 'print $1 if /just plan (\\w+)/'); if [ -n \"$env\" ] && [ -d \"environments/$env\" ]; then (cd \"environments/$env\" && terragrunt state list 2>/dev/null); else terragrunt state list 2>/dev/null || terraform state list 2>/dev/null; fi | grep '^module\\.' | perl -pe 's/^(module\\.[^.]+).*/$1/' | sort -u"
+    sourceCommand: "env=$(echo \"$LBUFFER\" | perl -ne 'print $1 if /just plan (\\w+)/'); if [ -n \"$env\" ] && [ -d \"environments/$env\" ]; then (cd \"environments/$env\" && { terragrunt state list 2>/dev/null | grep '^module\\.' | perl -pe 's/^(module\\.[^.]+).*/$1/'; grep -E '^module\\s+\"[^\"]+\"' main.tf 2>/dev/null | perl -pe 's/^module\\s+\"([^\"]+)\".*/module.$1/'; }); else { terragrunt state list 2>/dev/null || terraform state list 2>/dev/null; } | grep '^module\\.' | perl -pe 's/^(module\\.[^.]+).*/$1/'; grep -E '^module\\s+\"[^\"]+\"' main.tf 2>/dev/null | perl -pe 's/^module\\s+\"([^\"]+)\".*/module.$1/'; fi | sort -u"
     options:
       --prompt: "'Module> '"
       --preview: "env=$(echo \"$LBUFFER\" | perl -ne 'print $1 if /just plan (\\w+)/'); if [ -n \"$env\" ] && [ -d \"environments/$env\" ]; then (cd \"environments/$env\" && terragrunt state list 2>/dev/null); else terragrunt state list 2>/dev/null || terraform state list 2>/dev/null; fi | grep '^{}'"
