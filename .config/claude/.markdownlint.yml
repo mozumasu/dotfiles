@@ -1,0 +1,6 @@
+# Claude commands use frontmatter, so disable first-line-heading rule
+extends: ../../.markdownlint.yml
+
+# MD041/first-line-heading/first-line-h1 : First line in a file should be a top-level heading
+# Claude command files start with YAML frontmatter (---), not headings
+MD041: false
