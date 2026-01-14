@@ -1,4 +1,13 @@
 return {
+  -- Disable markdownlint (use rumdl instead via CLI)
+  {
+    "mfussenegger/nvim-lint",
+    opts = {
+      linters_by_ft = {
+        markdown = {},
+      },
+    },
+  },
   {
     "neovim/nvim-lspconfig",
     opts = {
