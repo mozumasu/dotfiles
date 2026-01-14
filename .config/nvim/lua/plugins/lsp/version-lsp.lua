@@ -1,6 +1,14 @@
 -- version-lsp: パッケージバージョンチェックLSP
 -- https://github.com/skanehira/version-lsp
 
+-- バッファ番号またはファイル名からパスを取得
+local function get_path(fname_or_bufnr)
+  if type(fname_or_bufnr) == "number" then
+    return vim.api.nvim_buf_get_name(fname_or_bufnr)
+  end
+  return fname_or_bufnr
+end
+
 -- カスタムLSPサーバーの登録（lspconfig読み込み時に実行）
 local function setup_version_lsp()
   local lspconfig = require("lspconfig")
@@ -12,7 +20,8 @@ local function setup_version_lsp()
         cmd = { "version-lsp" },
         filetypes = { "json", "toml", "gomod", "yaml" },
         root_dir = function(fname)
-          return lspconfig.util.find_git_ancestor(fname)
+          local path = get_path(fname)
+          return lspconfig.util.find_git_ancestor(path)
         end,
         settings = {},
       },
@@ -33,7 +42,8 @@ return {
         cmd = { "version-lsp" },
         filetypes = { "json", "toml", "gomod", "yaml" },
         root_dir = function(fname)
-          return require("lspconfig").util.find_git_ancestor(fname)
+          local path = get_path(fname)
+          return require("lspconfig").util.find_git_ancestor(path)
         end,
         settings = {
           ["version-lsp"] = {
