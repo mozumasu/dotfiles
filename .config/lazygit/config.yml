@@ -9,6 +9,20 @@ customCommands:
     context: files
     key: C
     output: terminal
+  - key: '<c-f>'
+    description: 'Search commit messages (all branches)'
+    context: 'commits'
+    prompts:
+      - type: 'input'
+        title: 'Search pattern:'
+      - type: 'menuFromCommand'
+        title: 'Matching commits:'
+        command: "git log --all --oneline --grep='{{index .PromptResponses 0}}'"
+        filter: '(?P<hash>[a-zA-Z0-9]+) (?P<message>.*)'
+        valueFormat: '{{.hash}}'
+        labelFormat: '{{.hash | green}} {{.message | yellow}}'
+    command: "git show {{index .PromptResponses 1}}"
+    output: popup
 gui:
   language: "ja"
   showIcons: true
