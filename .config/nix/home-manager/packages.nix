@@ -65,6 +65,7 @@
     yazi
     lazydocker
     skanehira-ghost # Background process manager
+    version-lsp # Package version checker LSP
 
     # ネタ系
     cowsay

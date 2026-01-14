@@ -24,6 +24,10 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
+    version-lsp = {
+      url = "github:skanehira/version-lsp";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -36,6 +40,7 @@
       nix-homebrew,
       homebrew-core,
       homebrew-cask,
+      version-lsp,
       ...
     }:
     let
@@ -44,6 +49,7 @@
       # Custom overlay for local packages
       localOverlay = final: prev: {
         skanehira-ghost = final.callPackage ./packages/ghost.nix { };
+        version-lsp = version-lsp.packages.${system}.default;
       };
 
       pkgs = import nixpkgs {
