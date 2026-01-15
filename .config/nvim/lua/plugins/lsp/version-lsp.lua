@@ -1,62 +1,37 @@
 -- version-lsp: パッケージバージョンチェックLSP
 -- https://github.com/skanehira/version-lsp
 
--- バッファ番号またはファイル名からパスを取得
-local function get_path(fname_or_bufnr)
-  if type(fname_or_bufnr) == "number" then
-    return vim.api.nvim_buf_get_name(fname_or_bufnr)
-  end
-  return fname_or_bufnr
-end
-
--- カスタムLSPサーバーの登録（lspconfig読み込み時に実行）
-local function setup_version_lsp()
-  local lspconfig = require("lspconfig")
-  local configs = require("lspconfig.configs")
-
-  if not configs.version_lsp then
-    configs.version_lsp = {
-      default_config = {
-        cmd = { "version-lsp" },
-        filetypes = { "json", "toml", "gomod", "yaml" },
-        root_dir = function(fname)
-          local path = get_path(fname)
-          return lspconfig.util.find_git_ancestor(path)
-        end,
-        settings = {},
-      },
-    }
-  end
-end
-
 return {
   {
     "neovim/nvim-lspconfig",
-    opts = function(_, opts)
-      -- カスタムLSPを登録
-      setup_version_lsp()
+    opts = function()
+      -- autocmdでversion-lspを起動
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "json", "toml", "gomod", "yaml" },
+        callback = function(args)
+          local root_dir = vim.fs.root(args.buf, { ".git" })
+          if not root_dir then
+            return
+          end
 
-      -- serversに追加
-      opts.servers = opts.servers or {}
-      opts.servers.version_lsp = {
-        cmd = { "version-lsp" },
-        filetypes = { "json", "toml", "gomod", "yaml" },
-        root_dir = function(fname)
-          local path = get_path(fname)
-          return require("lspconfig").util.find_git_ancestor(path)
-        end,
-        settings = {
-          ["version-lsp"] = {
-            cache = { refreshInterval = 86400000 }, -- 24時間
-            registries = {
-              npm = { enabled = true },
-              crates = { enabled = true },
-              goProxy = { enabled = true },
-              github = { enabled = true },
+          vim.lsp.start({
+            name = "version_lsp",
+            cmd = { "version-lsp" },
+            root_dir = root_dir,
+            settings = {
+              ["version-lsp"] = {
+                cache = { refreshInterval = 86400000 }, -- 24時間
+                registries = {
+                  npm = { enabled = true },
+                  crates = { enabled = true },
+                  goProxy = { enabled = true },
+                  github = { enabled = true },
+                },
+              },
             },
-          },
-        },
-      }
+          })
+        end,
+      })
     end,
   },
 }
