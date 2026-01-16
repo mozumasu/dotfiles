@@ -15,11 +15,16 @@
     wget
     tree
 
-    # Development tools
+    # Git tools
     gh
+    ghq
+    gibo
+    lazygit
 
     # Utilities
     jq
+    tlrc
+    starship
 
     # Terminal and editor
     neovim

@@ -86,6 +86,7 @@
       "aerospace"
       "alt-tab"
       "dockdoor"
+      "homerow"
       "jordanbaird-ice"
       "shortcat"
 
