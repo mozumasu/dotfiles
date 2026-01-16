@@ -25,6 +25,7 @@
     jq
     tlrc
     starship
+    plamo-translate
 
     # Terminal and editor
     neovim

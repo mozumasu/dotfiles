@@ -28,6 +28,10 @@
       url = "github:skanehira/version-lsp";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    kawarimidoll-nur = {
+      url = "github:kawarimidoll/nur-packages";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -41,6 +45,7 @@
       homebrew-core,
       homebrew-cask,
       version-lsp,
+      kawarimidoll-nur,
       ...
     }:
     let
@@ -50,6 +55,7 @@
       localOverlay = final: prev: {
         skanehira-ghost = final.callPackage ./packages/ghost.nix { };
         version-lsp = version-lsp.packages.${system}.default;
+        plamo-translate = kawarimidoll-nur.packages.${system}.plamo-translate;
       };
 
       pkgs = import nixpkgs {
