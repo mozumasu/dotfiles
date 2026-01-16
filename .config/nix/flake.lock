@@ -122,6 +122,26 @@
         "type": "github"
       }
     },
+    "kawarimidoll-nur": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1768283475,
+        "narHash": "sha256-+DWTfabTA+M5wm68dLDL00+VlTuEKKbrtcsc1Mo1+S0=",
+        "owner": "kawarimidoll",
+        "repo": "nur-packages",
+        "rev": "6532ccc1ba50a5ddd07f9127bbcdfb2804b3f4d2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kawarimidoll",
+        "repo": "nur-packages",
+        "type": "github"
+      }
+    },
     "nix-homebrew": {
       "inputs": {
         "brew-src": "brew-src"
@@ -177,6 +197,7 @@
         "home-manager": "home-manager",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
+        "kawarimidoll-nur": "kawarimidoll-nur",
         "nix-homebrew": "nix-homebrew",
         "nixpkgs": "nixpkgs",
         "treefmt-nix": "treefmt-nix",
