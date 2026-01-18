@@ -91,20 +91,21 @@
           nixpkgs.overlays = [ localOverlay ];
         }
         home-manager.darwinModules.home-manager
-        {
+        ({ config, ... }: {
           home-manager = {
             useGlobalPkgs = true;
             useUserPackages = true;
             backupFileExtension = "backup";
-            users.mozumasu = import ./home-manager;
+            extraSpecialArgs = { hostSpec = config.hostSpec; };
+            users.${config.hostSpec.username} = import ./home-manager;
           };
-        }
+        })
         nix-homebrew.darwinModules.nix-homebrew
-        {
+        ({ config, ... }: {
           nix-homebrew = {
             enable = true;
             enableRosetta = true;
-            user = "mozumasu";
+            user = config.hostSpec.username;
             autoMigrate = true;
             taps = {
               "homebrew/homebrew-core" = homebrew-core;
@@ -112,7 +113,7 @@
             };
             mutableTaps = true;
           };
-        }
+        })
       ];
     in
     {
@@ -155,6 +156,11 @@
         bourbon = darwin.lib.darwinSystem {
           inherit system;
           modules = [ ./hosts/bourbon ] ++ commonModules;
+        };
+
+        mocha = darwin.lib.darwinSystem {
+          inherit system;
+          modules = [ ./hosts/mocha ] ++ commonModules;
         };
       };
     };
