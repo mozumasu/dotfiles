@@ -140,10 +140,10 @@ in
       export CPPFLAGS="-I/opt/homebrew/opt/openjdk@11/include"
 
       # TiDB
-      export PATH=/Users/mozumasu/.tiup/bin:$PATH
+      export PATH=$HOME/.tiup/bin:$PATH
 
       # pnpm
-      export PNPM_HOME="/Users/mozumasu/.local/share/pnpm"
+      export PNPM_HOME="$HOME/.local/share/pnpm"
       case ":$PATH:" in
         *":$PNPM_HOME:"*) ;;
         *) export PATH="$PNPM_HOME:$PATH" ;;

@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, config, ... }:
 {
   system.stateVersion = 5;
   programs.zsh = {
@@ -278,7 +278,34 @@
   # ============================================================================
   # Activation Scripts
   # ============================================================================
+
   system.activationScripts.extraActivation.text = ''
+    echo "=== extraActivation: Starting ==="
+
+    # Homebrew ディレクトリの作成とパーミッション修正
+    # ユーザー名をNix設定から直接取得（SUDO_USERはnix run経由では空になるため）
+    BREW_USER="${config.hostSpec.username}"
+    echo "BREW_USER=$BREW_USER"
+
+    if [[ -n "$BREW_USER" ]]; then
+      # ARM Homebrew
+      if [[ ! -d "/opt/homebrew" ]]; then
+        echo "Creating Homebrew directory for $BREW_USER..."
+        /bin/mkdir -p /opt/homebrew
+      fi
+      echo "Fixing Homebrew directory permissions for $BREW_USER..."
+      /usr/sbin/chown -R "$BREW_USER":admin /opt/homebrew
+
+      # Intel Homebrew (Rosetta)
+      if [[ -d "/usr/local/Homebrew" ]]; then
+        echo "Fixing Intel Homebrew directory permissions for $BREW_USER..."
+        /usr/sbin/chown -R "$BREW_USER":admin /usr/local/Homebrew
+        /usr/sbin/chown -R "$BREW_USER":admin /usr/local/bin 2>/dev/null || true
+      fi
+    else
+      echo "WARNING: BREW_USER is not set (config.hostSpec.username is empty)"
+    fi
+
     # Xcode Command Line Tools のチェックとインストール
     if ! /usr/bin/xcrun -f clang >/dev/null 2>&1; then
       echo "Installing Xcode Command Line Tools..."
@@ -294,10 +321,6 @@
       /usr/sbin/softwareupdate --install-rosetta --agree-to-license
     fi
 
-    # Homebrew ディレクトリのパーミッション修正
-    if [[ -d "/opt/homebrew" && -n "$SUDO_USER" ]]; then
-      echo "Fixing Homebrew directory permissions for $SUDO_USER..."
-      /usr/sbin/chown -R "$SUDO_USER":admin /opt/homebrew
-    fi
+    echo "=== extraActivation: Done ==="
   '';
 }
