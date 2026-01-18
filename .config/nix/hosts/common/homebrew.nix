@@ -36,6 +36,13 @@
 
       # Input methods
       "macskk"
+
+      # Productivity
+      "raycast"
+
+      # Fonts (needed for terminals)
+      "font-hackgen"
+      "font-hackgen-nerd"
     ];
   };
 }

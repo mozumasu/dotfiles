@@ -91,11 +91,10 @@
       "postman"
       "visual-studio-code"
 
-      # Productivity
+      # Productivity (raycast is in common homebrew.nix)
       "anki"
       "claude"
       "figma"
-      "raycast"
 
       # Communication
       "chatwork"
@@ -108,10 +107,8 @@
       "sf-symbols"
       "timac/vpnstatus/vpnstatus"
 
-      # Fonts
+      # Fonts (hackgen fonts are in common homebrew.nix)
       "font-hack-nerd-font"
-      "font-hackgen"
-      "font-hackgen-nerd"
       "font-sf-mono"
       "font-sf-pro"
       "font-udev-gothic-nf"
