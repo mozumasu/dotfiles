@@ -50,7 +50,6 @@
 
     # Python ツール
     uv
-    mise # Runtime version manager
 
     # メディア処理
     ffmpeg
@@ -66,6 +65,7 @@
     lazydocker
     skanehira-ghost # Background process manager
     version-lsp # Package version checker LSP
+    yaskkserv2 # SKK server
 
     # ネタ系
     cowsay

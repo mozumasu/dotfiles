@@ -12,7 +12,6 @@
 
       # Version managers
       "tfenv"
-      "mise"
 
       # Languages/Runtimes (managed by mise)
       "go"
