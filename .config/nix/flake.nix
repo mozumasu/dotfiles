@@ -54,6 +54,7 @@
       # Custom overlay for local packages
       localOverlay = final: prev: {
         skanehira-ghost = final.callPackage ./packages/ghost.nix { };
+        yaskkserv2 = final.callPackage ./packages/yaskkserv2.nix { };
         version-lsp = version-lsp.packages.${system}.default;
         plamo-translate = kawarimidoll-nur.packages.${system}.plamo-translate;
       };
