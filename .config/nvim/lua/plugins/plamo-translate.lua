@@ -1,6 +1,5 @@
 return {
-  dir = "~/src/github.com/mozumasu/plamo-translate.nvim",
-  name = "plamo-translate.nvim",
+  "mozumasu/plamo-translate.nvim",
   cmd = {
     "PlamoTranslate",
     "PlamoTranslateReplace",
