@@ -157,7 +157,7 @@
     # --------------------------------------------------------------------------
     screencapture = {
       # 保存先
-      location = "~/Documents/screenshot";
+      location = "~/Pictures/Screenshots";
       # ファイル形式 ("png", "jpg", "pdf", "psd", "gif", "tga", "tiff", "bmp")
       type = "png";
       # 影を含めない
