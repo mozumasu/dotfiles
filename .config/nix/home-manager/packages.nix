@@ -37,6 +37,8 @@
     tree-sitter
     deno
     rumdl # Markdown linter
+    nodejs # for Mason LSP servers
+    go # for gopls etc.
 
     # ビルドツール
     cmake
