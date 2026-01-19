@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 let
   dotfilesPath = "${config.home.homeDirectory}/dotfiles";
   mkLink = path: config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/${path}";
@@ -31,5 +31,17 @@ in
     ".gitconfig".source = mkLink ".gitconfig";
     ".tmux.conf".source = mkLink ".tmux.conf";
     ".nbrc".source = mkLink ".nbrc";
+
   };
+
+  # macSKK dictionaries - copy instead of symlink due to sandbox restrictions
+  home.activation.macSKKDictionaries = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+    DICT_DIR="$HOME/Library/Containers/net.mtgto.inputmethod.macSKK/Data/Documents/Dictionaries"
+    mkdir -p "$DICT_DIR"
+    cp -f "${pkgs.skkDictionaries.l}/share/skk/SKK-JISYO.L" "$DICT_DIR/"
+    cp -f "${pkgs.skkDictionaries.jinmei}/share/skk/SKK-JISYO.jinmei" "$DICT_DIR/"
+    cp -f "${pkgs.skkDictionaries.geo}/share/skk/SKK-JISYO.geo" "$DICT_DIR/"
+    cp -f "${pkgs.skkDictionaries.emoji}/share/skk/SKK-JISYO.emoji" "$DICT_DIR/"
+    chmod 644 "$DICT_DIR"/SKK-JISYO.*
+  '';
 }
