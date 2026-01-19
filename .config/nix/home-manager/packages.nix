@@ -68,6 +68,7 @@
     skanehira-ghost # Background process manager
     version-lsp # Package version checker LSP
     yaskkserv2 # SKK server
+    safe-chain # Block malicious packages
 
     # ネタ系
     cowsay
