@@ -6,7 +6,6 @@
       # macOS specific
       "switchaudio-osx"
       "nowplaying-cli"
-      "terminal-notifier"
       "iproute2mac"
       "timac/vpnstatus/vpnutil"
 
