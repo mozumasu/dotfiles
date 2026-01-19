@@ -33,6 +33,7 @@
       # System utilities
       "aws-vault-binary"
       "karabiner-elements"
+      "shottr"
 
       # Input methods
       "macskk"
