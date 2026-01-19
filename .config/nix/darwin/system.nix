@@ -148,6 +148,8 @@
       TrackpadRightClick = true;
       # 3本指ドラッグ
       TrackpadThreeFingerDrag = true;
+      # 静音クリック (0=静音, 1=通常)
+      ActuationStrength = 0;
     };
 
     # --------------------------------------------------------------------------
