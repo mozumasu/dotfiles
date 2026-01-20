@@ -156,7 +156,8 @@
     # スクリーンキャプチャ
     # --------------------------------------------------------------------------
     screencapture = {
-      # 保存先
+      # 保存先 ("clipboard"でクリップボードに保存)
+      target = "clipboard";
       location = "~/Pictures/Screenshots";
       # ファイル形式 ("png", "jpg", "pdf", "psd", "gif", "tga", "tiff", "bmp")
       type = "png";
