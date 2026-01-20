@@ -23,4 +23,9 @@
   environment.systemPackages = with pkgs; [
     # Add mocha-specific tools here
   ];
+
+  # mocha-specific casks
+  homebrew.casks = [
+    "docker"
+  ];
 }
