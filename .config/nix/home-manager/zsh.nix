@@ -373,7 +373,8 @@ in
         source "$_zoxide_cache"
         unset _zoxide_cache
 
-        source ~/.safe-chain/scripts/init-posix.sh # Safe-chain Zsh initialization script
+        # Safe-chain (only if installed)
+        [[ -f ~/.safe-chain/scripts/init-posix.sh ]] && source ~/.safe-chain/scripts/init-posix.sh
       ''
     ];
   };
