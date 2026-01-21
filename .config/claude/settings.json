@@ -142,7 +142,6 @@
     "example-skills@anthropic-agent-skills": true,
     "pyright-lsp@claude-plugins-official": true
   },
-  "alwaysThinkingEnabled": false,
   "maxTokens": 8192,
   "temperature": 0,
   "preferences": {

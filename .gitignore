@@ -65,3 +65,16 @@ zenn-cli.json
 # serena
 .serena
 .config/nix/result
+
+# claude
+.config/claude/.claude.json
+.config/claude/.claude.json.backup
+.config/claude/cache/
+.config/claude/debug/
+.config/claude/plugins/
+.config/claude/projects/
+.config/claude/statsig/
+.config/claude/todos/
+.config/claude/file-history/
+.config/claude/history.jsonl
+.config/claude/shell-snapshots/
