@@ -56,6 +56,7 @@
         skanehira-ghost = final.callPackage ./packages/ghost.nix { };
         yaskkserv2 = final.callPackage ./packages/yaskkserv2.nix { };
         safe-chain = final.callPackage ./packages/safe-chain.nix { };
+        kiro-cli = final.callPackage ./packages/kiro.nix { };
         version-lsp = version-lsp.packages.${system}.default;
         plamo-translate = kawarimidoll-nur.packages.${system}.plamo-translate;
       };
@@ -122,6 +123,10 @@
       formatter.${system} = treefmtEval.config.build.wrapper;
 
       checks.${system}.formatting = treefmtEval.config.build.check ./.;
+
+      packages.${system} = {
+        inherit (pkgs) kiro-cli safe-chain yaskkserv2 skanehira-ghost;
+      };
 
       apps.${system} = {
         # nix run .#switch

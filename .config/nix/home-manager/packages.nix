@@ -69,6 +69,7 @@
     version-lsp # Package version checker LSP
     yaskkserv2 # SKK server
     safe-chain # Block malicious packages
+    kiro-cli # Terminal AI assistant
 
     # ネタ系
     cowsay
