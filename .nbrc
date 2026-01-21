@@ -14,7 +14,7 @@
 ###############################################################################
 
 export EDITOR="nvim"                                                  # Set by `nb` • Thu Jan  9 12:52:05 JST 2025
-export NB_DIR="${NB_DIR:-/Users/mozumasu/src/github.com/mozumasu/nb}" # Set by `nb` • Sat Jan 11 20:09:06 JST 2025
+export NB_DIR="${NB_DIR:-$HOME/src/github.com/mozumasu/nb}"
 
 export NB_INDICATOR_AUDIO="🔉"
 export NB_INDICATOR_BOOKMARK="🔖"

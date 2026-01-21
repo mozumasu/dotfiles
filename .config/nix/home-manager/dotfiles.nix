@@ -24,6 +24,7 @@ in
     "zeno".source = mkLink ".config/zeno";
     "gomi".source = mkLink ".config/gomi";
     "mise".source = mkLink ".config/mise";
+    "claude".source = mkLink ".config/claude";
   };
 
   # ~/ 配下
@@ -32,6 +33,10 @@ in
     ".tmux.conf".source = mkLink ".tmux.conf";
     ".nbrc".source = mkLink ".nbrc";
 
+    # Claude Code skills directory
+    # Claude Codeはスキルを ~/.claude/skills/ から読み込むため、
+    # .config/claude/skills をここにシンボリックリンク
+    ".claude/skills".source = mkLink ".config/claude/skills";
   };
 
   # macSKK dictionaries - copy instead of symlink due to sandbox restrictions
@@ -43,5 +48,16 @@ in
     cp -f "${pkgs.skkDictionaries.geo}/share/skk/SKK-JISYO.geo" "$DICT_DIR/"
     cp -f "${pkgs.skkDictionaries.emoji}/share/skk/SKK-JISYO.emoji" "$DICT_DIR/"
     chmod 644 "$DICT_DIR"/SKK-JISYO.*
+  '';
+
+  # nb repository - clone if not exists
+  home.activation.cloneNbRepository = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+    NB_DIR="$HOME/src/github.com/mozumasu/nb"
+    mkdir -p "$NB_DIR"
+
+    if [ ! -d "$NB_DIR/home/.git" ]; then
+      rm -rf "$NB_DIR/home"
+      ${pkgs.git}/bin/git clone https://github.com/mozumasu/nb-home.git "$NB_DIR/home"
+    fi
   '';
 }
