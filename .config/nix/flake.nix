@@ -57,6 +57,7 @@
         yaskkserv2 = final.callPackage ./packages/yaskkserv2.nix { };
         safe-chain = final.callPackage ./packages/safe-chain.nix { };
         kiro-cli = final.callPackage ./packages/kiro.nix { };
+        czg = final.callPackage ./packages/czg.nix { };
         version-lsp = version-lsp.packages.${system}.default;
         plamo-translate = kawarimidoll-nur.packages.${system}.plamo-translate;
       };
@@ -94,29 +95,37 @@
           nixpkgs.overlays = [ localOverlay ];
         }
         home-manager.darwinModules.home-manager
-        ({ config, ... }: {
-          home-manager = {
-            useGlobalPkgs = true;
-            useUserPackages = true;
-            backupFileExtension = "backup";
-            extraSpecialArgs = { hostSpec = config.hostSpec; };
-            users.${config.hostSpec.username} = import ./home-manager;
-          };
-        })
-        nix-homebrew.darwinModules.nix-homebrew
-        ({ config, ... }: {
-          nix-homebrew = {
-            enable = true;
-            enableRosetta = true;
-            user = config.hostSpec.username;
-            autoMigrate = true;
-            taps = {
-              "homebrew/homebrew-core" = homebrew-core;
-              "homebrew/homebrew-cask" = homebrew-cask;
+        (
+          { config, ... }:
+          {
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              backupFileExtension = "backup";
+              extraSpecialArgs = {
+                hostSpec = config.hostSpec;
+              };
+              users.${config.hostSpec.username} = import ./home-manager;
             };
-            mutableTaps = true;
-          };
-        })
+          }
+        )
+        nix-homebrew.darwinModules.nix-homebrew
+        (
+          { config, ... }:
+          {
+            nix-homebrew = {
+              enable = true;
+              enableRosetta = true;
+              user = config.hostSpec.username;
+              autoMigrate = true;
+              taps = {
+                "homebrew/homebrew-core" = homebrew-core;
+                "homebrew/homebrew-cask" = homebrew-cask;
+              };
+              mutableTaps = true;
+            };
+          }
+        )
       ];
     in
     {
@@ -125,7 +134,13 @@
       checks.${system}.formatting = treefmtEval.config.build.check ./.;
 
       packages.${system} = {
-        inherit (pkgs) kiro-cli safe-chain yaskkserv2 skanehira-ghost;
+        inherit (pkgs)
+          kiro-cli
+          safe-chain
+          yaskkserv2
+          skanehira-ghost
+          czg
+          ;
       };
 
       apps.${system} = {

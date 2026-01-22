@@ -24,6 +24,7 @@
     gibo
     git-secrets
     lefthook
+    czg
 
     # エディタ/ターミナル
     neovim
