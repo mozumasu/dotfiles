@@ -81,3 +81,4 @@ zenn-cli.json
 .config/claude/plans/
 .config/claude/stats-cache.json
 .config/claude/paste-cache/
+plans/
