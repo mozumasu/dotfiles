@@ -70,6 +70,7 @@ completions:
     sourceCommand: "gh api user/repos --paginate -q '.[].full_name'"
     options:
       --prompt: "'ghq get > '"
+      --preview: "gh repo view {}"
     callback: "ghq get ${1}"
 
   - name: gh run ID
