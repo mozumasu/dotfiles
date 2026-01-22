@@ -20,6 +20,7 @@
       "mcp__mcp-google-sheets"
     ],
     "deny": [
+      "Bash(git push:*)",
       "Bash(rm -rf:*)",
       "Bash(sudo:*)",
       "Bash(curl:*)",
@@ -65,7 +66,6 @@
       "Write(.env*)"
     ],
     "ask": [
-      "Bash(git push:*)",
       "Bash(git rebase:*)",
       "Bash(git reset:*)",
       "Bash(gh pr create:*)",
@@ -150,5 +150,6 @@
       "concise": false,
       "includeExplanations": false
     }
-  }
+  },
+  "plansDirectory": "./plans"
 }
