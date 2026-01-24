@@ -1,9 +1,15 @@
-{ lib, pkgs, hostSpec, ... }:
+{
+  lib,
+  pkgs,
+  hostSpec,
+  ...
+}:
 {
   imports = [
     ./dotfiles.nix
     ./packages.nix
     ./zsh.nix
+    ./karabiner.nix
   ];
 
   home.username = hostSpec.username;
