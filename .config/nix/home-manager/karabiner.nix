@@ -368,4 +368,24 @@ in
     source = ../../karabiner/assets/complex_modifications;
     recursive = true;
   };
+
+  # プロファイル自動切り替えスクリプトをシンボリックリンク
+  xdg.configFile."karabiner/scripts/auto-switch-profile.sh" = {
+    source = ../../karabiner/scripts/auto-switch-profile.sh;
+    executable = true;
+  };
+
+  # launchdエージェント - プロファイル自動切り替え
+  launchd.agents.karabiner-auto-switch-profile = {
+    enable = true;
+    config = {
+      ProgramArguments = [
+        "${config.home.homeDirectory}/dotfiles/.config/karabiner/scripts/auto-switch-profile.sh"
+      ];
+      RunAtLoad = true;
+      StartInterval = 5;
+      StandardOutPath = "${config.home.homeDirectory}/.config/karabiner/scripts/auto-switch-profile.log";
+      StandardErrorPath = "${config.home.homeDirectory}/.config/karabiner/scripts/auto-switch-profile.error.log";
+    };
+  };
 }
