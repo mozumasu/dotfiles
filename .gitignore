@@ -82,3 +82,6 @@ zenn-cli.json
 .config/claude/stats-cache.json
 .config/claude/paste-cache/
 plans/
+.config/karabiner/scripts/*.log
+.config/karabiner/scripts/.last_process_time
+.config/karabiner/scripts/.profile_state

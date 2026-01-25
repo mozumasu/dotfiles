@@ -1,1 +1,0 @@
-/nix/store/ih1i9lgwsq8zjhaw3m28l48rghinfjr7-home-manager-files/.config/karabiner/scripts/auto-switch-profile.sh
