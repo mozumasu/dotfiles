@@ -68,7 +68,7 @@ zenn-cli.json
 
 # claude
 .config/claude/.claude.json
-.config/claude/.claude.json.backup
+.config/claude/.claude.json.backup*
 .config/claude/cache/
 .config/claude/debug/
 .config/claude/plugins/
