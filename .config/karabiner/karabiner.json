@@ -319,7 +319,7 @@
         }
       ],
       "name": "Mac Built-in (US)",
-      "selected": false,
+      "selected": true,
       "virtual_hid_keyboard": {
         "keyboard_type_v2": "ansi"
       }
@@ -638,7 +638,7 @@
         }
       ],
       "name": "External Keyboard (JIS)",
-      "selected": true,
+      "selected": false,
       "virtual_hid_keyboard": {
         "keyboard_type_v2": "jis"
       }
