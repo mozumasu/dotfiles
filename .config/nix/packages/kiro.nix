@@ -11,7 +11,7 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "https://desktop-release.q.us-east-1.amazonaws.com/latest/Kiro%20CLI.dmg";
-    hash = "sha256-V/akA/fcQZFULlBgGNibQRrhiBpGOr2s+jdPrAGOtnY=";
+    hash = "sha256-1jCw2Ae53FVLJb8RpGX7GlSNybtkLqZ6plAy+zGJMSQ=";
   };
 
   nativeBuildInputs = [ undmg ];
@@ -29,6 +29,9 @@ stdenv.mkDerivation rec {
     homepage = "https://kiro.dev";
     license = lib.licenses.unfree;
     maintainers = [ ];
-    platforms = [ "aarch64-darwin" "x86_64-darwin" ];
+    platforms = [
+      "aarch64-darwin"
+      "x86_64-darwin"
+    ];
   };
 }

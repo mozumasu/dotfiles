@@ -363,20 +363,9 @@ in
     text = builtins.toJSON karabinerConfig;
   };
 
-  # 既存のカスタム complex_modifications をシンボリックリンク
-  xdg.configFile."karabiner/assets/complex_modifications" = {
-    source = ../../karabiner/assets/complex_modifications;
-    recursive = true;
-  };
-
   # プロファイル自動切り替えスクリプトv3（イベント駆動型・改善版）
   xdg.configFile."karabiner/scripts/auto-switch-profile-v3.sh" = {
     source = ../../karabiner/scripts/auto-switch-profile-v3.sh;
     executable = true;
-  };
-
-  # デバイス設定ファイル
-  xdg.configFile."karabiner/scripts/device-config.json" = {
-    source = ../../karabiner/scripts/device-config.json;
   };
 }

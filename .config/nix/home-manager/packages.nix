@@ -49,7 +49,7 @@
     awscli2
     k6
     vhs
-    pre-commit
+    # pre-commit # 一時的に無効化（swiftビルドエラー回避）
 
     # Python ツール
     uv
