@@ -65,11 +65,12 @@
       pkgs = import nixpkgs {
         inherit system;
         overlays = [ localOverlay ];
+        config.allowUnfree = true;
       };
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
 
-      # Flake directory path
-      flakeDir = "$HOME/dotfiles/.config/nix";
+      # Flake directory path (using self to get the flake's own path)
+      flakeDir = "${self}";
 
       # Helper to create app
       mkApp = name: script: {
@@ -93,6 +94,7 @@
         # Apply custom overlay to nixpkgs
         {
           nixpkgs.overlays = [ localOverlay ];
+          nixpkgs.config.allowUnfree = true;
         }
         home-manager.darwinModules.home-manager
         (

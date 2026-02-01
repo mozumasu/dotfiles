@@ -6,6 +6,8 @@
 }:
 
 let
+  dotfilesPath = "${config.home.homeDirectory}/dotfiles";
+  mkLink = path: config.lib.file.mkOutOfStoreSymlink "${dotfilesPath}/${path}";
   # Karabinerのmanipulatorを生成するヘルパー関数
   mkManipulator =
     {
@@ -364,8 +366,6 @@ in
   };
 
   # プロファイル自動切り替えスクリプトv3（イベント駆動型・改善版）
-  xdg.configFile."karabiner/scripts/auto-switch-profile-v3.sh" = {
-    source = ../../karabiner/scripts/auto-switch-profile-v3.sh;
-    executable = true;
-  };
+  xdg.configFile."karabiner/scripts/auto-switch-profile-v3.sh".source =
+    mkLink ".config/karabiner/scripts/auto-switch-profile-v3.sh";
 }
