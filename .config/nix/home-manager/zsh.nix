@@ -169,6 +169,10 @@ in
         function ensure_zcompiled {
           local src=$1
           local zwc="$src.zwc"
+          local dir="${src:h}"
+          if [[ ! -w "$dir" ]]; then
+            return
+          fi
           if [[ ! -r "$zwc" || "$src" -nt "$zwc" ]]; then
             zcompile "$src"
           fi
