@@ -74,6 +74,7 @@ zenn-cli.json
 .config/claude/plugins/
 .config/claude/projects/
 .config/claude/statsig/
+.config/claude/tasks/
 .config/claude/todos/
 .config/claude/file-history/
 .config/claude/history.jsonl
