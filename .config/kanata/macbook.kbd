@@ -1,0 +1,45 @@
+;; Kanata configuration for MacBook (US layout)
+;; Replicates Karabiner key mappings
+
+(defcfg
+  process-unmapped-keys yes
+)
+
+;; Define source keys (physical keyboard layout)
+(defsrc
+  esc  f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12
+  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+  tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
+  caps a    s    d    f    g    h    j    k    l    ;    '    ret
+  lsft z    x    c    v    b    n    m    ,    .    /    rsft
+  fn   lctl lalt lmet           spc            rmet ralt
+)
+
+;; Base layer with custom mappings
+(deflayer base
+  esc  f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12
+  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+  tab  q    w    e    r    t    y    u    i    o    p    @[-fork    ]    \
+  caps a    s    d    @f-fork    g    @h-fork    j    k    l    ;    '    ret
+  lsft z    x    c    v    @b-fork    n    @m-fork    ,    .    /    rsft
+  fn   lctl lalt lmet           spc            rmet ralt
+)
+
+;; Define aliases for custom key behaviors
+(defalias
+  ;; Ctrl+H → Backspace
+  h-fork (fork h bspc (lctl))
+
+  ;; Ctrl+F → Right Arrow
+  f-fork (fork f rght (lctl))
+
+  ;; Ctrl+B → Left Arrow
+  b-fork (fork b left (lctl))
+
+  ;; Ctrl+M → Enter
+  m-fork (fork m ret (lctl))
+
+  ;; Ctrl+[ → Esc + 英数 (japanese_eisuu)
+  ;; eisu is the keycode for japanese_eisuu on macOS
+  [-fork (fork [ (macro esc eisu) (lctl))
+)

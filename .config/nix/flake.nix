@@ -32,6 +32,7 @@
       url = "github:kawarimidoll/nur-packages";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    kanata-darwin-nix.url = "github:ryoppippi/kanata-darwin-nix";
   };
 
   outputs =
@@ -46,6 +47,7 @@
       homebrew-cask,
       version-lsp,
       kawarimidoll-nur,
+      kanata-darwin-nix,
       ...
     }:
     let
@@ -64,7 +66,10 @@
 
       pkgs = import nixpkgs {
         inherit system;
-        overlays = [ localOverlay ];
+        overlays = [
+          localOverlay
+          kanata-darwin-nix.overlays.default
+        ];
         config.allowUnfree = true;
       };
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
@@ -93,10 +98,14 @@
         ./darwin
         # Apply custom overlay to nixpkgs
         {
-          nixpkgs.overlays = [ localOverlay ];
+          nixpkgs.overlays = [
+            localOverlay
+            kanata-darwin-nix.overlays.default
+          ];
           nixpkgs.config.allowUnfree = true;
         }
         home-manager.darwinModules.home-manager
+        kanata-darwin-nix.darwinModules.default
         (
           { config, ... }:
           {
