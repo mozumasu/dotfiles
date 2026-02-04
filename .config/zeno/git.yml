@@ -55,6 +55,16 @@ snippets:
   - keyword: gds
     snippet: git diff --stat {{branch}}..HEAD
 
+  # GitHub Projects-related snippets
+  - keyword: ghp
+    snippet: gh project view {{number}} --owner {{owner}} --web
+
+  - keyword: ghpi
+    snippet: gh project item-list {{number}} --owner {{owner}}
+
+  - keyword: ghpv
+    snippet: gh project view {{number}} --owner {{owner}}
+
 completions:
   - name: gh browse
     patterns:
@@ -80,4 +90,23 @@ completions:
     options:
       --prompt: "'Run ID> '"
       --preview: "echo {} | cut -f2-"
+    callback: "awk '{print $1}'"
+
+  # GitHub Projects Suggestions
+  - name: gh project owner option
+    patterns:
+      - "^gh project (?:view|list|edit|close|delete|item-list|field-list) --owner $"
+    sourceCommand: "(echo '@me'; gh org list 2>/dev/null | awk '{print $1}')"
+    options:
+      --prompt: "'Owner> '"
+      --preview: "gh api users/{} 2>/dev/null | jq -r '.name, .bio' || gh api orgs/{} 2>/dev/null | jq -r '.name, .description'"
+    callback: "awk '{print $1}'"
+
+  - name: gh project number
+    patterns:
+      - "^gh project (?:view|edit|close|delete|item-list|field-list)( .*)? $"
+    sourceCommand: "OWNER=$(echo \"${LBUFFER}${RBUFFER}\" | perl -ne 'print $1 if /--owner(?:=|\\s+)([A-Za-z0-9._-]+)/'); gh project list --owner ${OWNER:-@me} --limit 1000 --format json 2>/dev/null | jq -r '.projects[] | \"\\(.number)\\t\\(.title)\"'"
+    options:
+      --prompt: "'Project> '"
+      --preview: "OWNER=$(echo \"${LBUFFER}${RBUFFER}\" | perl -ne 'print $1 if /--owner(?:=|\\s+)([A-Za-z0-9._-]+)/'); echo {} | awk '{print $1}' | xargs -I NUM gh project view NUM --owner ${OWNER:-@me} 2>/dev/null"
     callback: "awk '{print $1}'"
