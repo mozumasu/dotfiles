@@ -15,6 +15,7 @@ completions:
   - name: gcloud project
     patterns:
       - '^gcloud\b.*--project(?:=|\s+)[A-Za-z0-9._-]*$'
+      - '^gcloud config set project'
     sourceCommand: "gcloud projects list --format='value(projectId)' 2>/dev/null"
     options:
       --prompt: "'GCP Project> '"
