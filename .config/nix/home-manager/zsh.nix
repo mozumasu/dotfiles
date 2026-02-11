@@ -169,7 +169,7 @@ in
         function ensure_zcompiled {
           local src=$1
           local zwc="$src.zwc"
-          local dir="${src:h}"
+          local dir="${"src:h"}"
           if [[ ! -w "$dir" ]]; then
             return
           fi

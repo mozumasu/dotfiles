@@ -33,7 +33,7 @@
 
       # System utilities
       "aws-vault-binary"
-      "karabiner-elements"
+      # "karabiner-elements"  # kanataと競合するため無効化
       "shottr"
 
       # Input methods

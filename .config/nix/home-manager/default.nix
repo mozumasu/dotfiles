@@ -9,6 +9,7 @@
     ./dotfiles.nix
     ./packages.nix
     ./zsh.nix
+    ./sops.nix
   ];
 
   home.username = hostSpec.username;

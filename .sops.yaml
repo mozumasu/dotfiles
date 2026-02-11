@@ -1,0 +1,8 @@
+keys:
+  - &admin age15qveha0mdsrmrkzvfrv7nyrmpqgauafh40q66lhctfj4mmefldeqy5hjdl
+
+creation_rules:
+  - path_regex: (secrets|\.config/nix/secrets)/.*\.yaml$
+    key_groups:
+      - age:
+          - *admin

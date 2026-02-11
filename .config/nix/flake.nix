@@ -33,6 +33,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     kanata-darwin-nix.url = "github:ryoppippi/kanata-darwin-nix";
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -48,6 +52,7 @@
       version-lsp,
       kawarimidoll-nur,
       kanata-darwin-nix,
+      sops-nix,
       ...
     }:
     let
@@ -105,6 +110,7 @@
           nixpkgs.config.allowUnfree = true;
         }
         home-manager.darwinModules.home-manager
+        sops-nix.darwinModules.sops
         kanata-darwin-nix.darwinModules.default
         (
           { config, ... }:
@@ -117,6 +123,9 @@
                 hostSpec = config.hostSpec;
               };
               users.${config.hostSpec.username} = import ./home-manager;
+              sharedModules = [
+                sops-nix.homeManagerModules.sops
+              ];
             };
           }
         )
