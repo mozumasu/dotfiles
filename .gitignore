@@ -25,6 +25,10 @@ Session.vim
 # czg cz-git
 .config/.czrc
 
+# sops-nix (secret keys and decrypted files)
+.config/sops/age/keys.txt
+.config/secrets/
+
 # zsh
 .zsh_history
 .config/zsh/.zsh_sessions/*
