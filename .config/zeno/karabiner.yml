@@ -1,0 +1,21 @@
+snippets:
+  # karabiner_cli shorthand
+  - name: karabiner cli
+    keyword: kara
+    snippet: karabiner_cli --select-profile
+
+  # show current profile
+  - name: karabiner show profile
+    keyword: kara-show
+    snippet: karabiner_cli --show-current-profile-name
+
+completions:
+  # Profile selection with fzf
+  - name: karabiner profile
+    patterns:
+      - "^karabiner_cli --select-profile $"
+    sourceCommand: |
+      karabiner_cli --list-profile-names
+    options:
+      --prompt: "'Karabiner Profile> '"
+      --preview: "echo 'Switch to: {}'"
