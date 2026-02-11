@@ -1,7 +1,7 @@
 { config, ... }:
 {
   services.kanata = {
-    enable = true;
+    enable = false; # Karabinerで管理するため無効化
     keyboards = {
       macbook = {
         configFile = "/Users/${config.hostSpec.username}/dotfiles/.config/kanata/macbook.kbd";

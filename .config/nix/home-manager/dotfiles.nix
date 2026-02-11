@@ -14,8 +14,7 @@ in
     "borders".source = mkLink ".config/borders";
     "ghostty".source = mkLink ".config/ghostty";
     "git".source = mkLink ".config/git";
-    # karabiner設定はkarabiner.nixで生成（複数プロファイル対応）
-    # "karabiner".source = mkLink ".config/karabiner";
+    "karabiner".source = mkLink ".config/karabiner";
     "kitty".source = mkLink ".config/kitty";
     "lazygit".source = mkLink ".config/lazygit";
     "lazydocker".source = mkLink ".config/lazydocker";
