@@ -1022,3 +1022,5 @@ hostSpec
 octo
 hostName
 Cognito
+fzf
+peco
