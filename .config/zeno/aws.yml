@@ -181,6 +181,24 @@ completions:
     - 'aws cloudformation.*--stack-name'
     sourceCommand: aws cloudformation describe-stacks --query 'Stacks[].StackName' --output text | tr '\t' '\n'
 
+  # Secrets Manager
+  - name: SecretId
+    patterns:
+      - '^.*secretsmanager\s+get-secret-value\s+--secret-id\s+$'
+      - '^.*secretsmanager\s+get-secret-value\s+--secret-id(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+      - '^.*secretsmanager\s+describe-secret\s+--secret-id\s+$'
+      - '^.*secretsmanager\s+describe-secret\s+--secret-id(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+      - '^.*secretsmanager\s+delete-secret\s+--secret-id\s+$'
+      - '^.*secretsmanager\s+delete-secret\s+--secret-id(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+      - '^.*secretsmanager\s+put-secret-value\s+--secret-id\s+$'
+      - '^.*secretsmanager\s+put-secret-value\s+--secret-id(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+      - '^.*secretsmanager\s+update-secret\s+--secret-id\s+$'
+      - '^.*secretsmanager\s+update-secret\s+--secret-id(?:=|\s+)(?=[^\s\\-])[^\\]*$'
+    sourceCommand: "aws secretsmanager list-secrets --query 'SecretList[].[Name, Description]' --output text | perl -pe 's/\\t/ : /g'"
+    callback: "awk '{ print $1 }'"
+    options:
+      --prompt: "'Secret ID> '"
+
   - name: aws cli completer
     patterns:
       - '^\s*(?:[A-Z_]+=\S+\s+)*aws(?:$|\s.*)$'
