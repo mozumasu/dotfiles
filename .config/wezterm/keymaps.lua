@@ -278,6 +278,44 @@ local keys = {
       window:perform_action(act.TogglePaneZoomState, new_pane)
     end),
   },
+  -- ファジーファインダーでコマンドを選択して新しいタブで実行（終了後は元のタブに戻る）
+  {
+    key = "l",
+    mods = "LEADER",
+    action = act.InputSelector({
+      title = "Launch Command",
+      choices = {
+        { label = "Ghost" },
+        { label = "Lazygit" },
+      },
+      fuzzy = true,
+      action = wezterm.action_callback(function(window, pane, _, label)
+        if not label then
+          return
+        end
+
+        local current_tab_id = window:active_tab():tab_id()
+        local command = ""
+
+        if label == "Ghost" then
+          command = "ghost"
+        elseif label == "Lazygit" then
+          command = "lazygit"
+        end
+
+        window:perform_action(
+          act.SpawnCommandInNewTab({
+            args = {
+              os.getenv("SHELL"),
+              "-lc",
+              string.format("%s; wezterm cli activate-tab --tab-id %d", command, current_tab_id),
+            },
+          }),
+          pane
+        )
+      end),
+    }),
+  },
 }
 
 local key_tables = {
@@ -406,24 +444,11 @@ local key_tables = {
   },
 }
 
--- コマンドパレット用のランチャーメニュー
-local launch_menu = {
-  {
-    label = "Ghost",
-    args = { os.getenv("SHELL"), "-lc", "ghost" },
-  },
-  {
-    label = "Lazygit",
-    args = { os.getenv("SHELL"), "-lc", "lazygit" },
-  },
-}
-
 function module.apply_to_config(config)
   config.disable_default_key_bindings = true
   config.keys = keys
   config.key_tables = key_tables
   config.leader = leader
-  config.launch_menu = launch_menu
 end
 
 return module
