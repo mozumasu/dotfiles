@@ -48,6 +48,19 @@ return {
         end,
         desc = "Picker: help pages",
       },
+      {
+        "<leader>gf",
+        function()
+          Snacks.picker.git_log_file({
+            confirm = function(picker, item)
+              if item and item.commit then
+                Snacks.gitbrowse({ commit = item.commit })
+              end
+            end,
+          })
+        end,
+        desc = "Git Log File & Browse",
+      },
     },
     ---@type snacks.Config
     opts = {
