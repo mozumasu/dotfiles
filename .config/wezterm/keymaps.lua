@@ -406,11 +406,20 @@ local key_tables = {
   },
 }
 
+-- コマンドパレット用のランチャーメニュー
+local launch_menu = {
+  {
+    label = "Ghost",
+    args = { os.getenv("SHELL"), "-lc", "ghost" },
+  },
+}
+
 function module.apply_to_config(config)
   config.disable_default_key_bindings = true
   config.keys = keys
   config.key_tables = key_tables
   config.leader = leader
+  config.launch_menu = launch_menu
 end
 
 return module
