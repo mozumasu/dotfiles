@@ -444,6 +444,46 @@ local key_tables = {
   },
 }
 
+-- augment-command-palette イベントでコマンドパレットにカスタムアクションを追加
+wezterm.on("augment-command-palette", function(window, pane)
+  return {
+    {
+      brief = "Launch: Ghost",
+      icon = "md_ghost",
+      action = wezterm.action_callback(function(win, p)
+        local current_tab_id = win:active_tab():tab_id()
+        win:perform_action(
+          act.SpawnCommandInNewTab({
+            args = {
+              os.getenv("SHELL"),
+              "-lc",
+              string.format("ghost; wezterm cli activate-tab --tab-id %d", current_tab_id),
+            },
+          }),
+          p
+        )
+      end),
+    },
+    {
+      brief = "Launch: Lazygit",
+      icon = "md_git",
+      action = wezterm.action_callback(function(win, p)
+        local current_tab_id = win:active_tab():tab_id()
+        win:perform_action(
+          act.SpawnCommandInNewTab({
+            args = {
+              os.getenv("SHELL"),
+              "-lc",
+              string.format("lazygit; wezterm cli activate-tab --tab-id %d", current_tab_id),
+            },
+          }),
+          p
+        )
+      end),
+    },
+  }
+end)
+
 function module.apply_to_config(config)
   config.disable_default_key_bindings = true
   config.keys = keys
