@@ -68,6 +68,7 @@
     "ask": [
       "Bash(git rebase:*)",
       "Bash(git reset:*)",
+      "Bash(git commit:*)",
       "Bash(gh pr create:*)",
       "Bash(gh issue create:*)",
       "Bash(gh release create:*)",
