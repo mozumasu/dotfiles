@@ -412,6 +412,10 @@ local launch_menu = {
     label = "Ghost",
     args = { os.getenv("SHELL"), "-lc", "ghost" },
   },
+  {
+    label = "Lazygit",
+    args = { os.getenv("SHELL"), "-lc", "lazygit" },
+  },
 }
 
 function module.apply_to_config(config)
