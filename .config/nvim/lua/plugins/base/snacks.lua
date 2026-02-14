@@ -59,7 +59,7 @@ return {
             end,
           })
         end,
-        desc = "Git Log File & Browse",
+        desc = "Git Log File (Enter=Browse, o=Checkout)",
       },
     },
     ---@type snacks.Config
@@ -146,6 +146,18 @@ return {
             keys = {
               ["h"] = { "toggle_hidden", mode = { "n" } },
               ["I"] = { "toggle_ignored", mode = { "n" } },
+            },
+          },
+        },
+        sources = {
+          git_log_file = {
+            focus = "list", -- Default focus to the list
+            win = {
+              list = {
+                keys = {
+                  ["o"] = "git_checkout",
+                },
+              },
             },
           },
         },
