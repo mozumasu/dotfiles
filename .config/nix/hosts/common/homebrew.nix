@@ -40,6 +40,7 @@
       "macskk"
 
       # Productivity
+      "arto-app/tap/arto"
       "raycast"
 
       # Fonts (needed for terminals)

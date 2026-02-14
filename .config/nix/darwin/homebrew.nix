@@ -9,6 +9,7 @@
     };
 
     taps = [
+      "arto-app/tap"
       "d12frosted/emacs-plus"
       "felixkratz/formulae"
       "mtgto/macskk"

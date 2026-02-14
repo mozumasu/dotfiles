@@ -84,6 +84,10 @@ vim.api.nvim_create_autocmd("FileType", {
       desc = "🧮 Markdown文字数カウント",
       buffer = true,
     })
+    vim.keymap.set("n", "so", "<cmd>Arto<CR>", {
+      desc = "Open file in Arto",
+      buffer = true,
+    })
   end,
 })
 
@@ -208,4 +212,14 @@ vim.api.nvim_create_user_command("CoAuthoredBy", function(opts)
 end, {
   nargs = 1,
   desc = "Generate Co-Authored-By trailer from GitHub username",
+})
+
+-- Open file in Arto (markdown editor)
+vim.api.nvim_create_user_command("Arto", function(opts)
+  local path = opts.args ~= "" and vim.fn.fnamemodify(opts.args, ":p") or vim.fn.expand("%:p")
+  vim.system({ "open", "-a", "Arto", path })
+end, {
+  nargs = "?",
+  complete = "file",
+  desc = "Open file in Arto",
 })
