@@ -3,6 +3,18 @@ local act = wezterm.action
 
 local module = {}
 
+-- オーバーレイペインでコマンドを実行するヘルパー関数
+local function spawn_overlay_pane(command)
+  return wezterm.action_callback(function(window, pane)
+    local new_pane = pane:split({
+      direction = "Bottom",
+      size = 1.0,
+      args = { os.getenv("SHELL"), "-lc", command },
+    })
+    window:perform_action(act.TogglePaneZoomState, new_pane)
+  end)
+end
+
 -- ペインの高さを指定したパーセンテージに設定するヘルパー関数
 local function set_pane_height_percent(percent)
   return wezterm.action_callback(function(window, pane)
@@ -278,7 +290,7 @@ local keys = {
       window:perform_action(act.TogglePaneZoomState, new_pane)
     end),
   },
-  -- ファジーファインダーでコマンドを選択して新しいタブで実行（終了後は元のタブに戻る）
+  -- ファジーファインダーでコマンドを選択してオーバーレイペインで実行
   {
     key = "l",
     mods = "LEADER",
@@ -294,25 +306,19 @@ local keys = {
           return
         end
 
-        local current_tab_id = window:active_tab():tab_id()
         local command = ""
-
         if label == "Ghost" then
           command = "ghost"
         elseif label == "Lazygit" then
           command = "lazygit"
         end
 
-        window:perform_action(
-          act.SpawnCommandInNewTab({
-            args = {
-              os.getenv("SHELL"),
-              "-lc",
-              string.format("%s; wezterm cli activate-tab --tab-id %d", command, current_tab_id),
-            },
-          }),
-          pane
-        )
+        local new_pane = pane:split({
+          direction = "Bottom",
+          size = 1.0,
+          args = { os.getenv("SHELL"), "-lc", command },
+        })
+        window:perform_action(act.TogglePaneZoomState, new_pane)
       end),
     }),
   },
@@ -450,36 +456,12 @@ wezterm.on("augment-command-palette", function(window, pane)
     {
       brief = "Launch: Ghost",
       icon = "md_ghost",
-      action = wezterm.action_callback(function(win, p)
-        local current_tab_id = win:active_tab():tab_id()
-        win:perform_action(
-          act.SpawnCommandInNewTab({
-            args = {
-              os.getenv("SHELL"),
-              "-lc",
-              string.format("ghost; wezterm cli activate-tab --tab-id %d", current_tab_id),
-            },
-          }),
-          p
-        )
-      end),
+      action = spawn_overlay_pane("ghost"),
     },
     {
       brief = "Launch: Lazygit",
       icon = "md_git",
-      action = wezterm.action_callback(function(win, p)
-        local current_tab_id = win:active_tab():tab_id()
-        win:perform_action(
-          act.SpawnCommandInNewTab({
-            args = {
-              os.getenv("SHELL"),
-              "-lc",
-              string.format("lazygit; wezterm cli activate-tab --tab-id %d", current_tab_id),
-            },
-          }),
-          p
-        )
-      end),
+      action = spawn_overlay_pane("lazygit"),
     },
   }
 end)
