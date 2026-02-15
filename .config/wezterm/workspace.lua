@@ -3,8 +3,9 @@ local act = wezterm.action
 
 local module = {}
 
--- Store the workspace we came from before switching to scratch
+-- Store the workspace we came from before switching to scratch/nb
 local previous_workspace = nil
+local previous_workspace_nb = nil
 
 -- Toggle scratch workspace
 local function toggle_scratch_workspace()
@@ -23,16 +24,41 @@ local function toggle_scratch_workspace()
   end)
 end
 
--- Switch to next workspace, skipping scratch
+-- Toggle nb workspace
+local function toggle_nb_workspace()
+  return wezterm.action_callback(function(window, pane)
+    local current = wezterm.mux.get_active_workspace()
+
+    if current == "nb" then
+      -- If in nb, go back to previous workspace or default
+      local target = previous_workspace_nb or "default"
+      window:perform_action(act.SwitchToWorkspace({ name = target }), pane)
+    else
+      -- Store current workspace and switch to nb
+      previous_workspace_nb = current
+      window:perform_action(
+        act.SwitchToWorkspace({
+          name = "nb",
+          spawn = {
+            cwd = wezterm.home_dir .. "/src/github.com/mozumasu/nb",
+          },
+        }),
+        pane
+      )
+    end
+  end)
+end
+
+-- Switch to next workspace, skipping scratch and nb
 local function switch_to_next_workspace_skip_scratch()
   return wezterm.action_callback(function(window, pane)
     local workspaces = wezterm.mux.get_workspace_names()
     local current = wezterm.mux.get_active_workspace()
 
-    -- Filter out scratch workspace
+    -- Filter out scratch and nb workspaces
     local filtered = {}
     for _, ws in ipairs(workspaces) do
-      if ws ~= "scratch" then
+      if ws ~= "scratch" and ws ~= "nb" then
         table.insert(filtered, ws)
       end
     end
@@ -58,16 +84,16 @@ local function switch_to_next_workspace_skip_scratch()
   end)
 end
 
--- Switch to previous workspace, skipping scratch
+-- Switch to previous workspace, skipping scratch and nb
 local function switch_to_prev_workspace_skip_scratch()
   return wezterm.action_callback(function(window, pane)
     local workspaces = wezterm.mux.get_workspace_names()
     local current = wezterm.mux.get_active_workspace()
 
-    -- Filter out scratch workspace
+    -- Filter out scratch and nb workspaces
     local filtered = {}
     for _, ws in ipairs(workspaces) do
-      if ws ~= "scratch" then
+      if ws ~= "scratch" and ws ~= "nb" then
         table.insert(filtered, ws)
       end
     end
@@ -96,7 +122,9 @@ end
 local keys = {
   -- Toggle scratch workspace with CTRL+CMD+s
   { key = "s", mods = "CTRL|CMD", action = toggle_scratch_workspace() },
-  -- Skip scratch workspace when switching workspaces
+  -- Toggle nb workspace with CTRL+CMD+b
+  { key = "a", mods = "CTRL|CMD", action = toggle_nb_workspace() },
+  -- Skip scratch and nb workspace when switching workspaces
   { key = "n", mods = "CTRL|CMD", action = switch_to_next_workspace_skip_scratch() },
   { key = "p", mods = "CTRL|CMD", action = switch_to_prev_workspace_skip_scratch() },
 
@@ -106,11 +134,11 @@ local keys = {
     action = wezterm.action_callback(function(win, pane)
       -- 現在のPaneでworkspace_modeを有効化
       win:perform_action(act.ActivateKeyTable({ name = "workspace_mode", one_shot = false }), pane)
-      -- workspace のリストを作成 (scratchを除外)
+      -- workspace のリストを作成 (scratch と nb を除外)
       local workspaces = {}
       local index = 1
       for _, name in ipairs(wezterm.mux.get_workspace_names()) do
-        if name ~= "scratch" then
+        if name ~= "scratch" and name ~= "nb" then
           table.insert(workspaces, {
             id = name,
             label = string.format("%d. %s", index, name),
