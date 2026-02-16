@@ -32,6 +32,9 @@ in
 
     # シェルエイリアス (alias.zsh の内容)
     shellAliases = {
+      # CLI wrappers
+      aws = "aws-wrapper";
+
       v = "nvim";
       "..." = "../../";
       "...." = "../../../";
@@ -258,100 +261,6 @@ in
         hash -d xdata=$XDG_DATA_HOME
         hash -d nvim=$XDG_DATA_HOME/nvim
         hash -d nvimplugins=$XDG_DATA_HOME/nvim/lua
-
-        # Homebrew wrapper
-        function brew() {
-          command brew "$@"
-          if [[ "$1" == "install" || "$1" == "uninstall" ]]; then
-            echo "Refreshing completions..."
-            rm -f ''${ZDOTDIR:-~}/.zcompdump*
-            compinit
-          fi
-        }
-
-        # AWS CLI wrapper with auto SSO login
-        function aws() {
-          # Prevent infinite loop
-          if [[ -n "''${__AWS_AUTO_LOGIN_RUNNING:-}" ]]; then
-            command aws "$@"
-            return $?
-          fi
-
-          # Skip auto-login if disabled
-          if [[ -n "''${AWS_AUTO_LOGIN_DISABLED:-}" ]]; then
-            command aws "$@"
-            return $?
-          fi
-
-          # Skip auto-login in CI environments
-          if [[ -n "''${CI:-}" || -n "''${GITHUB_ACTIONS:-}" || -n "''${CIRCLECI:-}" || -n "''${JENKINS_HOME:-}" ]]; then
-            command aws "$@"
-            return $?
-          fi
-
-          # Skip auto-login if AWS_PROFILE is not set
-          if [[ -z "''${AWS_PROFILE:-}" ]]; then
-            command aws "$@"
-            return $?
-          fi
-
-          # Skip auto-login for interactive commands
-          local first_arg="''${1:-}"
-          if [[ "$first_arg" == "configure" || "$first_arg" == "sso" ]]; then
-            command aws "$@"
-            return $?
-          fi
-
-          # Capture stderr and execute command
-          local temp_stderr=$(mktemp)
-          local exit_code
-
-          command aws "$@" 2>"$temp_stderr"
-          exit_code=$?
-          cat "$temp_stderr" >&2
-
-          # Check error patterns
-          local stderr_content=$(cat "$temp_stderr")
-          rm -f "$temp_stderr"
-
-          # Detect SSO token errors
-          if [[ $exit_code -ne 0 ]] && [[
-            "$stderr_content" == *"Token has expired"* ||
-            "$stderr_content" == *"Token for ''${AWS_PROFILE} does not exist"* ||
-            "$stderr_content" == *"Error when retrieving token from sso"* ||
-            "$stderr_content" == *"Error loading SSO Token"* ||
-            "$stderr_content" == *"access token has either expired"* ||
-            "$stderr_content" == *"The provided token has expired"*
-          ]]; then
-            echo -e "\n----------------------------"
-            echo "SSO token expired for profile: ''${AWS_PROFILE}"
-            echo "Attempting automatic login..."
-            echo -e "----------------------------\n"
-
-            # Attempt automatic login
-            __AWS_AUTO_LOGIN_RUNNING=1 command aws sso login --profile "''${AWS_PROFILE}"
-            local login_exit_code=$?
-            unset __AWS_AUTO_LOGIN_RUNNING
-
-            if [[ $login_exit_code -eq 0 ]]; then
-              echo -e "\n----------------------------"
-              echo "Login successful. Retrying original command..."
-              echo -e "----------------------------\n"
-
-              # Retry original command
-              __AWS_AUTO_LOGIN_RUNNING=1 command aws "$@"
-              exit_code=$?
-              unset __AWS_AUTO_LOGIN_RUNNING
-            else
-              echo -e "\n----------------------------"
-              echo "Login failed. Please check your credentials."
-              echo -e "----------------------------\n"
-              return $login_exit_code
-            fi
-          fi
-
-          return $exit_code
-        }
 
         # ----------------------------------------------------
         # Options

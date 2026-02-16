@@ -60,16 +60,3 @@ alias vpnd='vpn-disconnect-if-connected'
 
 # notification
 alias beep='for i in {1..3}; do afplay /System/Library/Sounds/Submarine.aiff; done'
-
-# ----------------------------------------------------
-# Homebrew wrapper
-# ----------------------------------------------------
-# Auto-refresh completions after install/uninstall
-function brew() {
-  command brew "$@"
-  if [[ "$1" == "install" || "$1" == "uninstall" ]]; then
-    echo "Refreshing completions..."
-    rm -f ${ZDOTDIR:-~}/.zcompdump*
-    compinit
-  fi
-}
