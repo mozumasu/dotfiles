@@ -65,6 +65,19 @@ snippets:
   - keyword: ghpv
     snippet: gh project view {{number}} --owner {{owner}}
 
+  # GitHub Status Management
+  - name: gh status check
+    keyword: ghst
+    snippet: gh api graphql -f query='query { viewer { status { emoji message indicatesLimitedAvailability } } }'
+
+  - name: gh status busy
+    keyword: ghbusy
+    snippet: gh api graphql -f query='mutation { changeUserStatus(input:{ emoji:":no_entry_sign:", message:"Busy", limitedAvailability:true }) { status { emoji message indicatesLimitedAvailability } } }'
+
+  - name: gh status clear
+    keyword: ghclear
+    snippet: gh api graphql -f query='mutation { changeUserStatus(input:{ emoji:"", message:"", limitedAvailability:false }) { status { emoji message indicatesLimitedAvailability } } }'
+
 completions:
   - name: gh browse
     patterns:
