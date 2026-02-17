@@ -2,6 +2,14 @@ local wezterm = require("wezterm")
 local act = wezterm.action
 local module = {}
 
+-- アイコン定義
+local ICONS = {
+  workspace = wezterm.nerdfonts.md_view_dashboard,
+  project = wezterm.nerdfonts.md_folder,
+  claude = wezterm.nerdfonts.md_robot,
+  separator = wezterm.nerdfonts.ple_right_half_circle_thin,
+}
+
 -- プロジェクト名を取得（パスから）
 local function get_project_name(path)
   if not path or path == "" then
@@ -133,12 +141,21 @@ local function create_active_session_choices(sessions)
     local project_name = get_project_name(session.cwd)
     local content = session.content or ""
 
-    -- 表示形式: [ワークスペース] プロジェクト名 | セッション内容
+    -- 形式: 🗂 ワークスペース ▸ 📁 プロジェクト名 ▸ 🤖 セッション内容
     local label
     if content ~= "" then
-      label = string.format("[%s] %s | %s", workspace, project_name, content)
+      label = string.format(
+        "%s %s %s %s %s %s %s",
+        ICONS.workspace,
+        workspace,
+        ICONS.separator,
+        ICONS.project,
+        project_name,
+        ICONS.separator,
+        content
+      )
     else
-      label = string.format("[%s] %s", workspace, project_name)
+      label = string.format("%s %s %s %s %s", ICONS.workspace, workspace, ICONS.separator, ICONS.project, project_name)
     end
 
     table.insert(choices, {
@@ -156,12 +173,7 @@ local function create_active_session_selector()
     local sessions = scan_active_claude_sessions()
 
     if not sessions or #sessions == 0 then
-      window:toast_notification(
-        "Active Claude Code Sessions",
-        "No active Claude Code sessions found",
-        nil,
-        4000
-      )
+      window:toast_notification("Active Claude Code Sessions", "No active Claude Code sessions found", nil, 4000)
       return
     end
 
