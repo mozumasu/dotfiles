@@ -27,5 +27,6 @@
   # mocha-specific casks
   homebrew.casks = [
     "docker"
+    "jordanbaird-ice"
   ];
 }
