@@ -2,18 +2,6 @@
     "global": { "show_in_menu_bar": false },
     "profiles": [
         {
-            "simple_modifications": [
-                {
-                    "from": {
-                        "key_code": "caps_lock"
-                    },
-                    "to": [
-                        {
-                            "key_code": "left_control"
-                        }
-                    ]
-                }
-            ],
             "complex_modifications": {
                 "rules": [
                     {
@@ -235,7 +223,12 @@
                 }
             ],
             "name": "Mac Built-in (US)",
-            "selected": true,
+            "simple_modifications": [
+                {
+                    "from": { "key_code": "caps_lock" },
+                    "to": [{ "key_code": "left_control" }]
+                }
+            ],
             "virtual_hid_keyboard": { "keyboard_type_v2": "ansi" }
         },
         {
@@ -460,6 +453,7 @@
                 }
             ],
             "name": "External Keyboard (JIS)",
+            "selected": true,
             "virtual_hid_keyboard": { "keyboard_type_v2": "jis" }
         }
     ]
