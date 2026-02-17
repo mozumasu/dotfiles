@@ -1,4 +1,9 @@
 snippets:
+  - keyword: gc
+    snippet: gcloud
+    patterns:
+      - '^gcloud\b'
+
   - keyword: ga;
     snippet: gcloud auth application-default login --impersonate-service-account {{SERVICE_ACCOUNT_EMAIL}}
 
