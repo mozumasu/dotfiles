@@ -2,6 +2,10 @@ local wezterm = require("wezterm")
 local act = wezterm.action
 local module = {}
 
+-- NOTE: Lua診断で`utf8`がundefined globalとして警告されますが、
+-- これはLua 5.3以降の標準ライブラリであり、実行時には正常に動作します。
+-- Weztermは適切なLuaバージョンを使用しているため、この警告は無視できます。
+
 -- アイコン定義
 local ICONS = {
   workspace = wezterm.nerdfonts.md_view_dashboard,
@@ -194,19 +198,39 @@ local function format_session_for_fzf(session)
   if content ~= "" then
     return string.format(
       "%s%s %s%s %s%s%s %s%s %s%s %s%s%s %s%s%s|%s",
-      purple, ICONS.workspace, workspace, reset,
-      gray, ICONS.separator, reset,
-      blue, ICONS.project, project_name, reset,
-      gray, ICONS.separator, reset,
-      white, content, reset,
+      purple,
+      ICONS.workspace,
+      workspace,
+      reset,
+      gray,
+      ICONS.separator,
+      reset,
+      blue,
+      ICONS.project,
+      project_name,
+      reset,
+      gray,
+      ICONS.separator,
+      reset,
+      white,
+      content,
+      reset,
       pane_id
     )
   else
     return string.format(
       "%s%s %s%s %s%s%s %s%s %s%s|%s",
-      purple, ICONS.workspace, workspace, reset,
-      gray, ICONS.separator, reset,
-      blue, ICONS.project, project_name, reset,
+      purple,
+      ICONS.workspace,
+      workspace,
+      reset,
+      gray,
+      ICONS.separator,
+      reset,
+      blue,
+      ICONS.project,
+      project_name,
+      reset,
       pane_id
     )
   end
@@ -352,7 +376,8 @@ local function create_fzf_session_selector()
     local path_prefix = homebrew_prefix .. "/bin:/usr/local/bin"
 
     -- fzfカラー設定
-    local fzf_colors = "--color=fg:255,bg:-1,hl:117,fg+:255,bg+:237,hl+:141,info:240,prompt:141,pointer:141,marker:141,spinner:141,header:240"
+    local fzf_colors =
+      "--color=fg:255,bg:-1,hl:117,fg+:255,bg+:237,hl+:141,info:240,prompt:141,pointer:141,marker:141,spinner:141,header:240"
 
     -- fzfコマンド（PATHを明示的に設定）
     local command = string.format(
@@ -414,147 +439,6 @@ local function create_fzf_session_selector()
 
       check_pane_closed()
     end)
-  end)
-end
-
--- アクティブセッション用のchoices配列生成
-local function create_active_session_choices(sessions)
-  local choices = {}
-
-  local purple = "\x1b[38;5;141m" -- ラベンダー（ワークスペース）
-  local blue = "\x1b[38;5;117m" -- スカイブルー（プロジェクト）
-  local white = "\x1b[38;5;255m" -- ホワイト（セッション内容）
-  local gray = "\x1b[38;5;240m" -- ダークグレー（セパレーター）
-  local reset = "\x1b[0m" -- リセット
-
-  for _, session in ipairs(sessions) do
-    local workspace = session.workspace or "default"
-    local project_name = get_project_name(session.cwd)
-    local content = session.content or ""
-
-    -- 形式: 🗂 ワークスペース ▸ 📁 プロジェクト名 ▸ セッション内容
-    local label
-    if content ~= "" then
-      label = string.format(
-        "%s%s %s%s %s%s %s%s %s%s %s%s %s%s",
-        purple,
-        ICONS.workspace,
-        workspace,
-        reset,
-        gray,
-        ICONS.separator,
-        blue,
-        ICONS.project,
-        project_name,
-        reset,
-        gray,
-        ICONS.separator,
-        white,
-        content .. reset
-      )
-    else
-      label = string.format(
-        "%s%s %s%s %s%s %s%s %s%s",
-        purple,
-        ICONS.workspace,
-        workspace,
-        reset,
-        gray,
-        ICONS.separator,
-        blue,
-        ICONS.project,
-        project_name .. reset
-      )
-    end
-
-    table.insert(choices, {
-      label = label,
-      id = tostring(session.pane_id),
-    })
-  end
-
-  return choices
-end
-
--- アクティブセッションセレクター
-local function create_active_session_selector()
-  return wezterm.action_callback(function(window, pane)
-    local sessions = scan_active_claude_sessions()
-
-    if not sessions or #sessions == 0 then
-      window:toast_notification("Active Claude Code Sessions", "No active Claude Code sessions found", nil, 4000)
-      return
-    end
-
-    local choices = create_active_session_choices(sessions)
-
-    window:perform_action(
-      act.InputSelector({
-        action = wezterm.action_callback(function(_, input_pane, id, label)
-          if not id and not label then
-            wezterm.log_info("Active session selection cancelled")
-            return
-          end
-
-          wezterm.log_info("Selected active Claude Code session: " .. (label or ""))
-
-          -- IDを使ってsessions配列からpaneを検索
-          for _, session in ipairs(sessions) do
-            if tostring(session.pane_id) == id then
-              local target_pane = session.pane
-              local target_workspace = session.workspace
-              local current_workspace = wezterm.mux.get_active_workspace()
-
-              if not target_pane then
-                wezterm.log_error("Failed to activate pane: pane not found")
-                window:toast_notification(
-                  "Active Claude Code Sessions",
-                  "Failed to activate session: pane not found",
-                  nil,
-                  4000
-                )
-                return
-              end
-
-              -- 別のワークスペースの場合は切り替え
-              if target_workspace ~= current_workspace then
-                wezterm.log_info("Switching workspace: " .. current_workspace .. " -> " .. target_workspace)
-                window:perform_action(act.SwitchToWorkspace({ name = target_workspace }), input_pane)
-              end
-
-              -- タブのインデックスを取得してアクティブにする
-              local mux_window = session.mux_window
-              if mux_window then
-                local tabs = mux_window:tabs()
-                local tab_index = nil
-                for i, tab in ipairs(tabs) do
-                  if tab:tab_id() == session.tab_id then
-                    tab_index = i - 1 -- 0-indexed
-                    break
-                  end
-                end
-
-                if tab_index then
-                  window:perform_action(act.ActivateTab(tab_index), input_pane)
-                  wezterm.log_info("Activated tab index: " .. tab_index)
-                end
-              end
-
-              -- ペインをアクティブにする
-              target_pane:activate()
-              wezterm.log_info("Activated pane: " .. id)
-
-              break
-            end
-          end
-        end),
-        title = "🤖 Select Active Claude Code Session",
-        choices = choices,
-        fuzzy = true,
-        fuzzy_description = "Search sessions...",
-      }),
-      pane
-    )
   end)
 end
 
