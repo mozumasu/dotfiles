@@ -136,26 +136,50 @@ end
 local function create_active_session_choices(sessions)
   local choices = {}
 
+  local purple = "\x1b[38;5;141m" -- ラベンダー（ワークスペース）
+  local blue = "\x1b[38;5;117m" -- スカイブルー（プロジェクト）
+  local white = "\x1b[38;5;255m" -- ホワイト（セッション内容）
+  local gray = "\x1b[38;5;240m" -- ダークグレー（セパレーター）
+  local reset = "\x1b[0m" -- リセット
+
   for _, session in ipairs(sessions) do
     local workspace = session.workspace or "default"
     local project_name = get_project_name(session.cwd)
     local content = session.content or ""
 
-    -- 形式: 🗂 ワークスペース ▸ 📁 プロジェクト名 ▸ 🤖 セッション内容
+    -- 形式: 🗂 ワークスペース ▸ 📁 プロジェクト名 ▸ セッション内容
     local label
     if content ~= "" then
       label = string.format(
-        "%s %s %s %s %s %s %s",
+        "%s%s %s%s %s%s %s%s %s%s %s%s %s%s",
+        purple,
         ICONS.workspace,
         workspace,
+        reset,
+        gray,
         ICONS.separator,
+        blue,
         ICONS.project,
         project_name,
+        reset,
+        gray,
         ICONS.separator,
-        content
+        white,
+        content .. reset
       )
     else
-      label = string.format("%s %s %s %s %s", ICONS.workspace, workspace, ICONS.separator, ICONS.project, project_name)
+      label = string.format(
+        "%s%s %s%s %s%s %s%s %s%s",
+        purple,
+        ICONS.workspace,
+        workspace,
+        reset,
+        gray,
+        ICONS.separator,
+        blue,
+        ICONS.project,
+        project_name .. reset
+      )
     end
 
     table.insert(choices, {
@@ -239,9 +263,10 @@ local function create_active_session_selector()
             end
           end
         end),
-        title = "Select Active Claude Code Session",
+        title = "🤖 Select Active Claude Code Session",
         choices = choices,
         fuzzy = true,
+        fuzzy_description = "Search sessions...",
       }),
       pane
     )
