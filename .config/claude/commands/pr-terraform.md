@@ -20,11 +20,12 @@ PRテンプレートが `.github/PULL_REQUEST_TEMPLATE` にあればそれに従
 !`result=$(git diff --name-only --diff-filter=D origin/main...HEAD); [ -n "$result" ] && echo "$result" || echo "なし"`
 ```
 
-- 以下の情報を元に要約を記載してください
-  - 差分を確認してください:
+- PRの作業内容を確認し、設定内容や作成されるリソースを箇条書きで完結に記載してください
+
+  - 差分を確認
     - `git diff origin/main...HEAD`
 
-  - 以下のコミット履歴から重要な意思決定を抽出してPRに含めてください:
+  - コミット履歴
     ```bash
     !`git log origin/main..HEAD --pretty=format:"%h %s%n%b%n"`
     ```
