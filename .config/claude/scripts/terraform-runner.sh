@@ -10,6 +10,9 @@ command=$(echo "$input" | jq -r '.tool_input.command // empty')
 # terraform/terragrunt コマンドでなければスキップ（cd付きも対応）
 echo "$command" | grep -qE '\b(terraform|terragrunt)\b' || exit 0
 
+# すでに docker compose exec 経由であればスキップ（二重インターセプト防止）
+echo "$command" | grep -qE '\bdocker\s+compose\b.*\bexec\b' && exit 0
+
 # コマンド内の cd 先ディレクトリを抽出、なければ PWD を使用
 work_dir=$(echo "$command" | perl -ne 'print $1 if /(?:^|&&)\s*cd\s+(\S+)/' | tail -1)
 [ -z "$work_dir" ] && work_dir="$PWD"
