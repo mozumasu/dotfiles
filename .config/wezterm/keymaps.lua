@@ -457,6 +457,11 @@ local key_tables = {
 wezterm.on("augment-command-palette", function(window, pane)
   return {
     {
+      brief = "Launch: zsh",
+      icon = "md_terminal",
+      action = spawn_overlay_pane("zsh"),
+    },
+    {
       brief = "Launch: Ghost",
       icon = "md_ghost",
       action = spawn_overlay_pane("ghost"),
