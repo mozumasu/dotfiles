@@ -89,6 +89,21 @@
     ]
   },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ~/.config/claude/hooks/prevent-git-push.py"
+          },
+          {
+            "type": "command",
+            "command": "~/.config/claude/scripts/terraform-runner.sh"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "matcher": "",
