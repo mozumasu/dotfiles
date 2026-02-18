@@ -99,6 +99,10 @@
           },
           {
             "type": "command",
+            "command": "python3 ~/.config/claude/hooks/prevent-terraform-apply.py"
+          },
+          {
+            "type": "command",
             "command": "~/.config/claude/scripts/terraform-runner.sh"
           }
         ]
