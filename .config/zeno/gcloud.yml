@@ -16,6 +16,9 @@ snippets:
   - keyword: gaos;
     snippet: gcloud app open-console --project {{PROJECT_ID}} --service {{SERVICE}}
 
+  - keyword: gsva;
+    snippet: gcloud secrets versions access latest --project={{PROJECT_ID}} --secret={{SECRET_NAME}}
+
 completions:
   - name: gcloud project
     patterns:
@@ -31,3 +34,11 @@ completions:
     sourceCommand: "PROJECT=$(echo \"${LBUFFER}${RBUFFER}\" | perl -ne 'print $1 if /--project[=\\s]+(\\S+)/'); [ -n \"$PROJECT\" ] && gcloud app services list --format='value(id)' --project=\"$PROJECT\" 2>/dev/null"
     options:
       --prompt: "'App Service> '"
+
+  - name: gcloud secret
+    patterns:
+      - '^gcloud\b.*--secret(?:=|\s+)[A-Za-z0-9._-]*$'
+      - '^gcloud secrets\b.*[^-\s][A-Za-z0-9._-]*$'
+    sourceCommand: "PROJECT=$(echo \"${LBUFFER}${RBUFFER}\" | perl -ne 'print $1 if /--project[=\\s]+([A-Za-z0-9][A-Za-z0-9._:-]*)/'); { [ -n \"$PROJECT\" ] && gcloud secrets list --format='value(name)' --project=\"$PROJECT\" 2>/dev/null || gcloud secrets list --format='value(name)' 2>/dev/null; }"
+    options:
+      --prompt: "'GCP Secret> '"
