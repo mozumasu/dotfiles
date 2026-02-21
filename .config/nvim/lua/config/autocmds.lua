@@ -7,6 +7,15 @@
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
 
+-- octo.nvim: octo://バッファでスワップファイルを無効化（E325: ATTENTION対策）
+-- BufNew: バッファ名が設定された直後（nvim_buf_set_nameのタイミング）に発火
+vim.api.nvim_create_autocmd({ "BufNew", "BufAdd", "BufWinEnter" }, {
+  pattern = "octo://*",
+  callback = function()
+    vim.opt_local.swapfile = false
+  end,
+})
+
 -- SpellCap（青い波線）を無効化
 vim.api.nvim_create_autocmd("ColorScheme", {
   callback = function()
