@@ -9,6 +9,8 @@ local PURPLE = '\x1b[38;5;141m'
 local BLUE = '\x1b[38;5;117m'
 local WHITE = '\x1b[38;5;255m'
 local GRAY = '\x1b[38;5;240m'
+local GREEN = '\x1b[38;5;114m'
+local YELLOW = '\x1b[38;5;214m'
 local RESET = '\x1b[0m'
 
 -- pane_idを抽出
@@ -21,7 +23,7 @@ end
 
 -- jqでJSONパース
 local jq_cmd = string.format(
-  "grep '\"pane_id\":\"%s\"' '%s' | jq -r '.workspace,.project,.cwd,.content,.tab_title'",
+  "grep '\"pane_id\":\"%s\"' '%s' | jq -r '.workspace,.project,.cwd,.content,.tab_title,.status'",
   pane_id,
   sessions_file
 )
@@ -37,6 +39,7 @@ local project = handle:read("*line") or ""
 local cwd = handle:read("*line") or ""
 local content = handle:read("*line") or ""
 local tab_title = handle:read("*line") or ""
+local status = handle:read("*line") or "idle"
 handle:close()
 
 -- ヘッダー表示
@@ -45,7 +48,18 @@ print(PURPLE .. "🤖 Claude Code Session" .. RESET)
 print(GRAY .. "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" .. RESET)
 print("")
 
+-- ステータス表示
+local status_display
+if status == "running" then
+  status_display = GREEN .. "● running" .. RESET
+elseif status == "waiting" then
+  status_display = YELLOW .. "◐ waiting" .. RESET
+else
+  status_display = GRAY .. "○ idle" .. RESET
+end
+
 -- セッション詳細
+print(WHITE .. "Status:   " .. RESET .. " " .. status_display)
 print(WHITE .. "Workspace:" .. RESET .. " " .. PURPLE .. workspace .. RESET)
 print(WHITE .. "Project:  " .. RESET .. " " .. BLUE .. project .. RESET)
 print(WHITE .. "Tab:      " .. RESET .. " " .. GRAY .. tab_title .. RESET)

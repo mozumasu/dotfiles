@@ -12,6 +12,9 @@ local ICONS = {
   project = wezterm.nerdfonts.md_folder,
   claude = wezterm.nerdfonts.md_robot,
   separator = wezterm.nerdfonts.ple_right_half_circle_thin,
+  status_running = "●",
+  status_waiting = "◐",
+  status_idle = "○",
 }
 
 -- プロジェクト名を取得（パスから）
@@ -53,6 +56,25 @@ local function sanitize_utf8(str)
   end
 
   return table.concat(result)
+end
+
+-- ペインタイトルからClaudeのステータスを判定
+local function get_claude_status(pane)
+  local success, title = pcall(function()
+    return pane:get_title()
+  end)
+  if not success or not title or title == "" then
+    return "idle"
+  end
+  -- 点字スピナー (U+2800-U+28FF): UTF-8 では "\xe2\xa0" で始まる
+  if title:find("\xe2\xa0") then
+    return "running"
+  end
+  -- ✳ (U+2733): UTF-8 では "\xe2\x9c\xb3"
+  if title:find("\xe2\x9c\xb3") then
+    return "waiting"
+  end
+  return "idle"
 end
 
 -- ペインタイトルからセッション内容を取得
@@ -123,6 +145,7 @@ local function scan_active_claude_sessions()
             tab_title = tab_title,
             cwd = cwd,
             content = content,
+            status = get_claude_status(pane),
             pane_id = pane:pane_id(),
             mux_window = mux_window,
             tab = tab,
@@ -156,13 +179,14 @@ local function export_sessions_to_file(sessions, filepath)
   for _, session in ipairs(sessions) do
     local project_name = get_project_name(session.cwd)
     local json = string.format(
-      '{"pane_id":"%s","workspace":"%s","project":"%s","cwd":"%s","content":"%s","tab_title":"%s"}',
+      '{"pane_id":"%s","workspace":"%s","project":"%s","cwd":"%s","content":"%s","tab_title":"%s","status":"%s"}',
       json_escape(tostring(session.pane_id)),
       json_escape(session.workspace or "default"),
       json_escape(project_name),
       json_escape(session.cwd or ""),
       json_escape(session.content or ""),
-      json_escape(session.tab_title or "")
+      json_escape(session.tab_title or ""),
+      json_escape(session.status or "idle")
     )
     table.insert(lines, json)
   end
@@ -189,15 +213,28 @@ local function format_session_for_fzf(session)
   local gray = "\x1b[38;5;240m"
   local reset = "\x1b[0m"
 
+  -- ステータス色とアイコンのテーブル
+  local status_styles = {
+    running = { color = "\x1b[38;5;114m", icon = ICONS.status_running },
+    waiting = { color = "\x1b[38;5;214m", icon = ICONS.status_waiting },
+    idle    = { color = "\x1b[38;5;240m", icon = ICONS.status_idle },
+  }
+
   local workspace = session.workspace or "default"
   local project_name = get_project_name(session.cwd)
   local content = session.content or ""
   local pane_id = tostring(session.pane_id)
+  local status = session.status or "idle"
+  local style = status_styles[status] or status_styles.idle
 
-  -- 形式: 🗂 ワークスペース ▸ 📁 プロジェクト ▸ 内容|pane_id
+  -- ステータスアイコンのプレフィックス
+  local status_prefix = string.format("%s%s%s ", style.color, style.icon, reset)
+
+  -- 形式: <status> 🗂 ワークスペース ▸ 📁 プロジェクト ▸ 内容|pane_id
   if content ~= "" then
     return string.format(
-      "%s%s %s%s %s%s%s %s%s %s%s %s%s%s %s%s%s|%s",
+      "%s%s%s %s%s %s%s%s %s%s %s%s %s%s%s %s%s%s|%s",
+      status_prefix,
       purple,
       ICONS.workspace,
       workspace,
@@ -219,7 +256,8 @@ local function format_session_for_fzf(session)
     )
   else
     return string.format(
-      "%s%s %s%s %s%s%s %s%s %s%s|%s",
+      "%s%s%s %s%s %s%s%s %s%s %s%s|%s",
+      status_prefix,
       purple,
       ICONS.workspace,
       workspace,
