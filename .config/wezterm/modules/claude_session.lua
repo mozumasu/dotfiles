@@ -392,6 +392,7 @@ local function create_fzf_session_selector()
     local sessions_file = temp_dir .. "/wezterm_claude_sessions_" .. os.time() .. ".jsonl"
     local formatted_file = temp_dir .. "/wezterm_fzf_input_" .. os.time() .. ".txt"
     local result_file = temp_dir .. "/wezterm_claude_result_" .. os.time() .. ".txt"
+    local port_file = temp_dir .. "/wezterm_claude_port_" .. os.time() .. ".txt"
 
     -- データをエクスポート
     if not export_sessions_to_file(sessions, sessions_file) then
@@ -418,8 +419,10 @@ local function create_fzf_session_selector()
       "--color=fg:255,bg:-1,hl:117,fg+:255,bg+:237,hl+:141,info:240,prompt:141,pointer:141,marker:141,spinner:141,header:240"
 
     -- fzfコマンド（PATHを明示的に設定）
+    -- PORTをランダム生成してport_fileに書き出し、--listen で起動
     local command = string.format(
-      [[fzf \
+      [[PORT=$((RANDOM + 10000)); echo "$PORT" > "%s"; fzf \
+        --listen "$PORT" \
         --ansi \
         --height=50%% \
         --reverse \
@@ -432,6 +435,7 @@ local function create_fzf_session_selector()
         %s \
         < "%s" \
         > "%s"; exit]],
+      port_file,
       path_prefix,
       preview_script,
       sessions_file,
@@ -451,6 +455,8 @@ local function create_fzf_session_selector()
 
     -- 結果処理
     wezterm.time.call_after(0.5, function()
+      local refresh_counter = 0
+
       local function check_pane_closed()
         local tab = window:active_tab()
         if not tab then
@@ -467,11 +473,36 @@ local function create_fzf_session_selector()
         end
 
         if pane_exists then
+          -- 5回（約1秒）ごとにセッションを再スキャンしてfzfをリロード
+          refresh_counter = refresh_counter + 1
+          if refresh_counter >= 5 then
+            refresh_counter = 0
+
+            -- sessions を再スキャン（クロージャーのアップバリューを更新）
+            sessions = scan_active_claude_sessions()
+            export_sessions_to_file(sessions, sessions_file)
+            export_formatted_sessions_to_file(sessions, formatted_file)
+
+            -- port_file からポートを読み取り、fzf に reload を送信
+            local pf = io.open(port_file, "r")
+            if pf then
+              local port = pf:read("*line")
+              pf:close()
+              if port and port ~= "" then
+                os.execute(string.format(
+                  "curl -s -m 1 'http://localhost:%s' -d 'reload(cat \"%s\")' >/dev/null 2>&1 &",
+                  port, formatted_file
+                ))
+              end
+            end
+          end
+
           wezterm.time.call_after(0.2, check_pane_closed)
         else
           process_fzf_result(window, pane, sessions, result_file)
           os.remove(sessions_file)
           os.remove(formatted_file)
+          os.remove(port_file)
         end
       end
 
