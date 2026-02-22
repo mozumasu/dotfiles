@@ -455,7 +455,9 @@ local key_tables = {
 
 -- augment-command-palette イベントでコマンドパレットにカスタムアクションを追加
 wezterm.on("augment-command-palette", function(window, pane)
-  return {
+  local karabiner = require("modules.karabiner_profile")
+
+  local commands = {
     {
       brief = "Launch: zsh",
       icon = "md_terminal",
@@ -482,6 +484,13 @@ wezterm.on("augment-command-palette", function(window, pane)
       action = spawn_overlay_pane("curl wttr.in | less -R"),
     },
   }
+
+  -- Karabinerプロファイルエントリを追加
+  for _, cmd in ipairs(karabiner.get_commands()) do
+    table.insert(commands, cmd)
+  end
+
+  return commands
 end)
 
 function module.apply_to_config(config)

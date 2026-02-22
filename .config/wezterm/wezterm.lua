@@ -35,6 +35,7 @@ require("statusbar").apply_to_config(config)
 -- オプショナルモジュール（keymapsの後に読み込む）
 require("modules.opacity").apply_to_config(config)
 require("modules.aws_profile").apply_to_config(config)
+require("modules.karabiner_profile").apply_to_config(config)
 require("modules.claude_session").apply_to_config(config)
 require("modules.translate").apply_to_config(config)
 
