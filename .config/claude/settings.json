@@ -138,6 +138,10 @@
           {
             "type": "command",
             "command": "~/.config/claude/scripts/format-nix.sh"
+          },
+          {
+            "type": "command",
+            "command": "python3 ~/.config/claude/scripts/terraform-post-hook.py"
           }
         ]
       }
