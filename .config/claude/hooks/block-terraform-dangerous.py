@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-terraform/terragrunt apply および state push を確実にブロックする PreToolUse hook。
+terraform/terragrunt apply / destroy / state push を確実にブロックする PreToolUse hook。
 &&/||/; で連結されたコマンド列も全トークンを検査する。
 クォート内のコンテンツを保護し、ヒアドキュメントの誤検知を防ぐ。
 """
@@ -52,6 +52,9 @@ def get_block_reason(tokens: list[str]) -> str | None:
 
     if subcmd == "apply":
         return "terraform/terragrunt apply は自動実行できません。手動で実行してください。"
+
+    if subcmd == "destroy":
+        return "terraform/terragrunt destroy は自動実行できません。手動で実行してください。"
 
     if subcmd == "state":
         # state サブコマンドのフラグをスキップして次のサブコマンドを確認
