@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-terraform/terragrunt apply を確実にブロックする PreToolUse hook。
+terraform/terragrunt apply および state push を確実にブロックする PreToolUse hook。
 &&/||/; で連結されたコマンド列も全トークンを検査する。
 クォート内のコンテンツを保護し、ヒアドキュメントの誤検知を防ぐ。
 """
@@ -37,14 +37,31 @@ def split_commands(s: str) -> list[str]:
     return parts
 
 
-def is_terraform_apply(tokens: list[str]) -> bool:
-    """トークン列が terraform/terragrunt apply コマンドかどうかを判定"""
+def get_block_reason(tokens: list[str]) -> str | None:
+    """ブロック対象なら理由文字列を、そうでなければ None を返す"""
     if not tokens or tokens[0] not in ("terraform", "terragrunt"):
-        return False
-    for tok in tokens[1:]:
-        if not tok.startswith("-"):
-            return tok == "apply"
-    return False
+        return None
+
+    # グローバルフラグをスキップして最初のサブコマンドを取得
+    i = 1
+    while i < len(tokens) and tokens[i].startswith("-"):
+        i += 1
+    if i >= len(tokens):
+        return None
+    subcmd = tokens[i]
+
+    if subcmd == "apply":
+        return "terraform/terragrunt apply は自動実行できません。手動で実行してください。"
+
+    if subcmd == "state":
+        # state サブコマンドのフラグをスキップして次のサブコマンドを確認
+        j = i + 1
+        while j < len(tokens) and tokens[j].startswith("-"):
+            j += 1
+        if j < len(tokens) and tokens[j] == "push":
+            return "terraform state push は自動実行できません。手動で実行してください。"
+
+    return None
 
 
 for part in split_commands(cmd):
@@ -55,11 +72,9 @@ for part in split_commands(cmd):
         tokens = shlex.split(part)
     except ValueError:
         tokens = part.split()
-    if is_terraform_apply(tokens):
-        print(json.dumps({
-            "decision": "block",
-            "reason": "terraform/terragrunt applyは自動実行できません。手動で実行してください。",
-        }))
+    reason = get_block_reason(tokens)
+    if reason:
+        print(json.dumps({"decision": "block", "reason": reason}))
         sys.exit(0)
 
 sys.exit(0)

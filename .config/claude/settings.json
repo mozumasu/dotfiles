@@ -46,7 +46,6 @@
       "Bash(aws sqs delete-queue:*)",
       "Bash(npm uninstall:*)",
       "Bash(npm remove:*)",
-      "Bash(terraform state push)",
       "Bash(just apply:*)",
       "Read(.env)",
       "Read(.env.*)",
