@@ -18,7 +18,7 @@ return {
       })
 
       -- Optional: Reduce updatetime for faster hover (default is 4000ms)
-      vim.opt.updatetime = 100 -- Show hover after 1 second
+      vim.opt.updatetime = 300 -- CursorHold発火間隔（100msは短すぎてフリーズ原因になりやすい）
     end,
     keys = {
       {
