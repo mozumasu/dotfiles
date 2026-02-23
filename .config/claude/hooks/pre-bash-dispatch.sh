@@ -30,7 +30,7 @@ fi
 
 # terraform / terragrunt コマンドのみ apply チェックと Docker ルーティングを実行
 if echo "$COMMAND" | grep -qE '\b(terraform|terragrunt)\b'; then
-  run_check python3 ~/.config/claude/hooks/prevent-terraform-apply.py
+  run_check python3 ~/.config/claude/hooks/block-terraform-dangerous.py
   run_check ~/.config/claude/scripts/terraform-runner.sh
 fi
 
