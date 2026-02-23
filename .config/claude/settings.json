@@ -47,8 +47,6 @@
       "Bash(npm uninstall:*)",
       "Bash(npm remove:*)",
       "Bash(terraform state push)",
-      "Bash(terraform apply:*)",
-      "Bash(terragrunt apply:*)",
       "Bash(just apply:*)",
       "Read(.env)",
       "Read(.env.*)",
