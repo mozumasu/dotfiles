@@ -8,7 +8,7 @@ terraform/terragrunt コマンドを検査する PreToolUse hook。
   - docker compose exec 経由 → skip（二重インターセプト防止、ブロック判定後）
   - terraform/terragrunt が先頭でない → skip（ルーティング対象外）
   - plan / validate / fmt → allow（exit 0）
-  - その他 → compose.yaml 有無を確認してルーティング
+  - その他 → compose.yaml 有無を確認し、コンテナを起動して Docker 内で自動実行
 """
 
 import sys
@@ -17,6 +17,7 @@ import re
 import shlex
 import subprocess
 import os
+from typing import Optional
 
 input_data = json.load(sys.stdin)
 cmd = input_data.get("tool_input", {}).get("command", "")
@@ -27,19 +28,21 @@ if not cmd:
 # グループ1が None → クォート文字列（スキップ）
 # グループ1が値あり → 演算子（分割点）
 _TOKEN_PAT = re.compile(
-    r'"(?:[^"\\]|\\.)*"'        # ダブルクォート文字列
-    r"|'(?:[^'\\]|\\.)*'"       # シングルクォート文字列
-    r"|(&&|\|\||;|\|(?!\|)|\n)" # 演算子（グループ1のみキャプチャ）
+    r'"(?:[^"\\]|\\.)*"'  # ダブルクォート文字列
+    r"|'(?:[^'\\]|\\.)*'"  # シングルクォート文字列
+    r"|(&&|\|\||;|\|(?!\|)|\n)"  # 演算子（グループ1のみキャプチャ）
 )
 
 # docker compose exec 経由コマンドの検出パターン（定数化してループ外でコンパイル）
 _DOCKER_COMPOSE_EXEC_RE = re.compile(r"\bdocker\s+compose\b.*\bexec\b")
 
 _DANGEROUS = {
-    "apply":   "terraform/terragrunt apply は自動実行できません。手動で実行してください。",
+    "apply": "terraform/terragrunt apply は自動実行できません。手動で実行してください。",
     "destroy": "terraform/terragrunt destroy は自動実行できません。手動で実行してください。",
 }
-_STATE_PUSH_BLOCK_MSG = "terraform state push は自動実行できません。手動で実行してください。"
+_STATE_PUSH_BLOCK_MSG = (
+    "terraform state push は自動実行できません。手動で実行してください。"
+)
 _SAFE_COMMANDS = {"plan", "validate", "fmt"}
 
 
@@ -50,13 +53,13 @@ def split_commands(s: str) -> list[str]:
     for m in _TOKEN_PAT.finditer(s):
         if m.group(1) is None:
             continue  # クォート文字列: 保護してスキップ
-        parts.append(s[current_start:m.start()])
+        parts.append(s[current_start : m.start()])
         current_start = m.end()
     parts.append(s[current_start:])
     return parts
 
 
-def find_tf_offset(tokens: list[str]) -> int | None:
+def find_tf_offset(tokens: list[str]) -> Optional[int]:
     """トークンリスト内の terraform/terragrunt の位置（最初の出現）を返す"""
     for i, tok in enumerate(tokens):
         if tok in ("terraform", "terragrunt"):
@@ -64,7 +67,7 @@ def find_tf_offset(tokens: list[str]) -> int | None:
     return None
 
 
-def get_subcommand_idx(tokens: list[str], offset: int = 0) -> int | None:
+def get_subcommand_idx(tokens: list[str], offset: int = 0) -> Optional[int]:
     """offset から始めてフラグをスキップし、サブコマンドのインデックスを返す"""
     i = offset + 1
     while i < len(tokens) and tokens[i].startswith("-"):
@@ -85,6 +88,14 @@ def block(reason: str) -> None:
     sys.exit(0)
 
 
+def allow_modified(new_cmd: str) -> None:
+    """コマンドを差し替えて実行する"""
+    print(
+        json.dumps({"decision": "allow", "modified_tool_input": {"command": new_cmd}})
+    )
+    sys.exit(0)
+
+
 def get_work_dir(part: str) -> str:
     """コマンド内の cd 先ディレクトリを抽出、なければ PWD を使用"""
     m = re.search(r"(?:^|&&)\s*cd\s+(\S+)", part)
@@ -93,12 +104,13 @@ def get_work_dir(part: str) -> str:
     return os.environ.get("PWD", os.getcwd())
 
 
-def get_project_root(work_dir: str) -> str | None:
+def get_project_root(work_dir: str) -> Optional[str]:
     """git リポジトリルートを取得"""
     try:
         result = subprocess.run(
             ["git", "-C", work_dir, "rev-parse", "--show-toplevel"],
-            capture_output=True, text=True,
+            capture_output=True,
+            text=True,
         )
         if result.returncode == 0:
             return result.stdout.strip()
@@ -107,7 +119,7 @@ def get_project_root(work_dir: str) -> str | None:
     return None
 
 
-def find_compose_file(project_root: str) -> str | None:
+def find_compose_file(project_root: str) -> Optional[str]:
     """compose.yaml / compose.yml を探す"""
     for name in ("compose.yaml", "compose.yml"):
         path = os.path.join(project_root, name)
@@ -120,6 +132,7 @@ def find_terraform_service(compose_file: str) -> str:
     """compose ファイルから terraform/terragrunt サービス名を取得"""
     try:
         import yaml  # pyright: ignore[reportMissingModuleSource]
+
         with open(compose_file) as f:
             compose_config = yaml.safe_load(f)
         services = compose_config.get("services", {})
@@ -137,32 +150,20 @@ def get_container_base(compose_file: str, project_root: str, service: str) -> st
     try:
         result = subprocess.run(
             ["docker", "compose", "-f", compose_file, "config", "--format", "json"],
-            capture_output=True, text=True,
+            capture_output=True,
+            text=True,
         )
         if result.returncode == 0:
             docker_config = json.loads(result.stdout)
-            volumes = docker_config.get("services", {}).get(service, {}).get("volumes", [])
+            volumes = (
+                docker_config.get("services", {}).get(service, {}).get("volumes", [])
+            )
             for vol in volumes:
                 if vol.get("source") == project_root:
                     return vol.get("target", "/workspace")
     except (FileNotFoundError, json.JSONDecodeError):
         pass
     return "/workspace"
-
-
-def is_container_running(compose_file: str, service: str) -> bool:
-    """コンテナが起動中かどうか確認"""
-    try:
-        result = subprocess.run(
-            ["docker", "compose", "-f", compose_file, "ps", "--status", "running", "--services"],
-            capture_output=True, text=True,
-        )
-        if result.returncode == 0:
-            running_services = result.stdout.strip().split("\n")
-            return service in running_services
-    except FileNotFoundError:
-        pass
-    return False
 
 
 def route_to_docker(part: str, tokens: list[str]) -> None:
@@ -177,24 +178,18 @@ def route_to_docker(part: str, tokens: list[str]) -> None:
         return  # compose ファイルなし → ローカル実行
 
     service = find_terraform_service(compose_file)
-    compose_filename = os.path.basename(compose_file)
     container_base = get_container_base(compose_file, project_root, service)
 
-    rel_path = work_dir[len(project_root):].lstrip("/")
+    rel_path = work_dir[len(project_root) :].lstrip("/")
     container_dir = f"{container_base}/{rel_path}" if rel_path else container_base
     tf_command = shlex.join(tokens)
 
-    if not is_container_running(compose_file, service):
-        block(
-            f'[terraform-hook] Docker service "{service}" is not running. '
-            f"Run `docker compose -f {project_root}/{compose_filename} up -d {service}` first, then retry."
-        )
-    else:
-        block(
-            f"[terraform-hook] This project runs terraform inside Docker. Run this instead:\n"
-            f"docker compose -f {project_root}/{compose_filename} exec {service} sh -c "
-            f'"cd {container_dir} && {tf_command}"'
-        )
+    new_cmd = (
+        f"docker compose -f {compose_file} up -d {service} && "
+        f"docker compose -f {compose_file} exec {service} sh -c "
+        f'"cd {container_dir} && {tf_command}"'
+    )
+    allow_modified(new_cmd)
 
 
 def process_command_part(part: str) -> None:
