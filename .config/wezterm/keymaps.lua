@@ -456,6 +456,7 @@ local key_tables = {
 -- augment-command-palette イベントでコマンドパレットにカスタムアクションを追加
 wezterm.on("augment-command-palette", function(window, pane)
   local karabiner = require("modules.karabiner_profile")
+  local caffeinate = require("modules.caffeinate")
 
   local commands = {
     {
@@ -487,6 +488,11 @@ wezterm.on("augment-command-palette", function(window, pane)
 
   -- Karabinerプロファイルエントリを追加
   for _, cmd in ipairs(karabiner.get_commands()) do
+    table.insert(commands, cmd)
+  end
+
+  -- Caffeinateエントリを追加
+  for _, cmd in ipairs(caffeinate.get_commands()) do
     table.insert(commands, cmd)
   end
 
