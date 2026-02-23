@@ -99,7 +99,7 @@ local keys = {
   -- AltキーをMetaキーとして扱いつつ、バックスラッシュ機能（Alt+¥）は維持する
   { key = "¥", mods = "ALT", action = wezterm.action.SendString("\\") },
   -- 終了
-  { key = "q", mods = "SUPER", action = act.QuitApplication },
+  -- { key = "q", mods = "SUPER", action = act.QuitApplication },
   -- ウィンドウ操作
   { key = "Enter", mods = "ALT", action = act.ToggleFullScreen },
   { key = "n", mods = "SUPER", action = act.SpawnWindow },
