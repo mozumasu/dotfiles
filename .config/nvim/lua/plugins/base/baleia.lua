@@ -422,13 +422,14 @@ return {
       if wezterm_path == "" then
         wezterm_path = "/opt/homebrew/bin/wezterm"
       end
-      -- スクロールバック全体を取得（-100000 から開始）
-      local cmd = wezterm_path .. " cli get-text --escapes --start-line -100000"
+      -- スクロールバック全体を取得（-100000 から開始、タイムアウト10秒）
+      local args = { wezterm_path, "cli", "get-text", "--escapes", "--start-line", "-100000" }
       if pane_id then
-        cmd = cmd .. " --pane-id=" .. pane_id
+        table.insert(args, "--pane-id=" .. pane_id)
       end
-      -- 出力を取得して変換
-      local output = vim.fn.system(cmd)
+      -- vim.fn.system の代わりに vim.system でタイムアウト付き実行
+      local sys_result = vim.system(args, { text = true, timeout = 10000 }):wait()
+      local output = sys_result.stdout or ""
       local converted = convert_sgr_colon_to_semicolon(output)
       -- 行に分割
       local lines = vim.split(converted, "\n", { plain = true })

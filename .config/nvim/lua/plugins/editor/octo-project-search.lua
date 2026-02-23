@@ -12,27 +12,19 @@ return {
       ttl = 86400      -- TTL: 1日（プロジェクトは頻繁に変わらないため）
     }
 
-    -- 組織一覧を取得する関数
+    -- 組織一覧を取得する関数（タイムアウト5秒でハング防止）
     local function get_orgs()
-      local handle = io.popen("gh org list 2>/dev/null | awk '{print $1}'")
-      if not handle then
+      local result = vim.system({ "gh", "org", "list" }, { text = true, timeout = 5000 }):wait()
+      if result.code ~= 0 or not result.stdout or result.stdout == "" then
         return {}
       end
-
-      local result = handle:read("*a")
-      handle:close()
-
-      if not result or result == "" then
-        return {}
-      end
-
       local orgs = {}
-      for org in result:gmatch("[^\r\n]+") do
-        if org ~= "" then
+      for line in result.stdout:gmatch("[^\r\n]+") do
+        local org = line:match("^(%S+)")
+        if org and org ~= "" then
           table.insert(orgs, org)
         end
       end
-
       return orgs
     end
 

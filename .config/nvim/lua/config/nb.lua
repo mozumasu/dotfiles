@@ -9,14 +9,18 @@ function M.get_nb_dir()
   return vim.fn.expand("~/src/github.com/mozumasu/nb")
 end
 
--- nbコマンドを実行
+-- nbコマンドを実行（タイムアウト10秒でハング防止）
 function M.run_cmd(args)
   local cmd = NB_CMD .. " " .. args
-  local output = vim.fn.systemlist(cmd)
-  if vim.v.shell_error ~= 0 then
+  local result = vim.system({ "sh", "-c", cmd }, { text = true, timeout = 10000 }):wait()
+  if result.code ~= 0 then
     return nil
   end
-  return output
+  local output = {}
+  for line in result.stdout:gmatch("[^\r\n]+") do
+    table.insert(output, line)
+  end
+  return #output > 0 and output or nil
 end
 
 -- リスト行をパースして構造化データを返す

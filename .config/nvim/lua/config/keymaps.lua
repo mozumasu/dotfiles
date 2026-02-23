@@ -75,8 +75,12 @@ end, { desc = "Notification History" })
 -- Get git root from current buffer
 local function get_git_root()
   local buf_dir = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":h")
-  local git_root = vim.fn.systemlist("git -C " .. vim.fn.shellescape(buf_dir) .. " rev-parse --show-toplevel")[1]
-  return (vim.v.shell_error == 0 and git_root) or LazyVim.root.get({ buf = 0 })
+  -- vim.fn.systemlist の代わりに vim.system + タイムアウトでハング防止
+  local result = vim.system(
+    { "git", "-C", buf_dir, "rev-parse", "--show-toplevel" },
+    { text = true, timeout = 3000 }
+  ):wait()
+  return (result.code == 0 and vim.trim(result.stdout)) or LazyVim.root.get({ buf = 0 })
 end
 
 -- Swap LazyGit keymaps (gg: cwd, gG: root)
@@ -105,7 +109,7 @@ end, { desc = "Grep (Root Dir)" })
 keymap("n", "gh", function()
   local cfile = vim.fn.expand("<cfile>")
   if cfile:match("^https?://") then
-    os.execute("open '" .. cfile .. "'") -- for macOS
+    vim.system({ "open", cfile }) -- for macOS（os.executeのブロッキング回避）
   else
     vim.cmd("normal! gF!")
   end
@@ -127,7 +131,7 @@ end, { desc = "Open URL or AWS ARN" })
 keymap("n", "<leader>gR", function()
   local github_repogitory_name = vim.fn.expand("<cfile>")
   if github_repogitory_name:match(".+/[^/]+") then
-    os.execute("open 'https://github.com/" .. github_repogitory_name .. "'") -- for macOS
+    vim.system({ "open", "https://github.com/" .. github_repogitory_name }) -- for macOS（os.executeのブロッキング回避）
   else
     vim.cmd("normal!, gF!")
   end

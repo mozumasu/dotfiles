@@ -149,19 +149,10 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = function(err, result, ctx,
 end
 
 vim.api.nvim_create_user_command("InsertDatetime", function()
-  local handle = io.popen('date "+%Y-%m-%d %H:%M:%S"')
-  if not handle then
-    print("日付取得に失敗")
-    return
-  end
-
-  local result = handle:read("*a")
-  handle:close()
-  result = result:gsub("%s+$", "") -- 改行除去
-
+  -- io.popen('date ...') の代わりに vim.fn.strftime を使用（外部プロセス不要）
+  local result = vim.fn.strftime("%Y-%m-%d %H:%M:%S")
   local row, col = unpack(vim.api.nvim_win_get_cursor(0))
   row = row - 1 -- Lua は 0-indexed
-
   vim.api.nvim_buf_set_text(0, row, col, row, col, { result })
 end, {})
 
@@ -205,19 +196,19 @@ vim.api.nvim_create_user_command("CoAuthoredBy", function(opts)
     [[gh api /users/%s -q '"Co-Authored-By: \(.name) <\(.id)+\(.login)@users.noreply.github.com>"']],
     username
   )
-  local result = vim.fn.system(cmd)
-
-  if vim.v.shell_error ~= 0 then
-    vim.notify("Failed to get user info: " .. result, vim.log.levels.ERROR)
-    return
-  end
-
-  -- Remove trailing newline
-  result = result:gsub("\n$", "")
-
-  -- Insert at cursor position
-  vim.api.nvim_put({ result }, "l", true, true)
-  vim.notify("Inserted: " .. result, vim.log.levels.INFO)
+  -- 非同期実行（GitHub API呼び出しのフリーズ防止、タイムアウト10秒）
+  vim.notify("Fetching user info for " .. username .. "...", vim.log.levels.INFO)
+  vim.system({ "sh", "-c", cmd }, { text = true, timeout = 10000 }, function(result)
+    vim.schedule(function()
+      if result.code ~= 0 then
+        vim.notify("Failed to get user info: " .. (result.stderr or ""), vim.log.levels.ERROR)
+        return
+      end
+      local text = result.stdout:gsub("\n$", "")
+      vim.api.nvim_put({ text }, "l", true, true)
+      vim.notify("Inserted: " .. text, vim.log.levels.INFO)
+    end)
+  end)
 end, {
   nargs = 1,
   desc = "Generate Co-Authored-By trailer from GitHub username",
