@@ -8,6 +8,10 @@ local keydel = vim.keymap.del
 local opts = { noremap = true, silent = true }
 local util = require("lazyvim.util")
 
+-- Paste from system clipboard
+keymap({ "n", "v" }, "p", '"+p', opts)
+keymap({ "n", "v" }, "P", '"+P', opts)
+
 -- emacs like keybind
 keymap("i", "<C-a>", "<Home>", opts)
 keymap("i", "<C-e>", "<End>", opts)
