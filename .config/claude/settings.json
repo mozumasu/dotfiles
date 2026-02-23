@@ -93,15 +93,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ~/.config/claude/hooks/prevent-git-push.py"
-          },
-          {
-            "type": "command",
-            "command": "python3 ~/.config/claude/hooks/prevent-terraform-apply.py"
-          },
-          {
-            "type": "command",
-            "command": "~/.config/claude/scripts/terraform-runner.sh"
+            "command": "~/.config/claude/hooks/pre-bash-dispatch.sh"
           }
         ]
       }
