@@ -7,8 +7,7 @@ terraform/terragrunt コマンドを検査する PreToolUse hook。
   - apply / destroy / state push → block（docker compose exec 経由でも常にブロック）
   - docker compose exec 経由 → skip（二重インターセプト防止、ブロック判定後）
   - terraform/terragrunt が先頭でない → skip（ルーティング対象外）
-  - plan / validate / fmt → allow（exit 0）
-  - その他 → compose.yaml 有無を確認し、コンテナを起動して Docker 内で自動実行
+  - plan / validate / fmt / その他 → compose.yaml 有無を確認し、あればコンテナ内で実行、なければローカル実行
 """
 
 import sys
@@ -43,7 +42,6 @@ _DANGEROUS = {
 _STATE_PUSH_BLOCK_MSG = (
     "terraform state push は自動実行できません。手動で実行してください。"
 )
-_SAFE_COMMANDS = {"plan", "validate", "fmt"}
 
 
 def split_commands(s: str) -> list[str]:
@@ -226,11 +224,7 @@ def process_command_part(part: str) -> None:
     if terraform_idx != 0:
         return
 
-    # plan / validate / fmt → 通過
-    if subcommand in _SAFE_COMMANDS:
-        return
-
-    # その他（init / import / output 等）→ Docker 環境を検出してルーティング
+    # plan / validate / fmt / その他 → compose.yaml があれば Docker、なければローカル実行
     route_to_docker(part, tokens)
 
 
