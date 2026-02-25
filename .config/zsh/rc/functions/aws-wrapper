@@ -20,15 +20,28 @@ if [[ -n "${CI:-}" || -n "${GITHUB_ACTIONS:-}" || -n "${CIRCLECI:-}" || -n "${JE
   return $?
 fi
 
-# Skip auto-login if AWS_PROFILE is not set
-if [[ -z "${AWS_PROFILE:-}" ]]; then
+# Skip auto-login for interactive commands
+local first_arg="${1:-}"
+if [[ "$first_arg" == "configure" || "$first_arg" == "sso" ]]; then
   command aws "$@"
   return $?
 fi
 
-# Skip auto-login for interactive commands
-local first_arg="${1:-}"
-if [[ "$first_arg" == "configure" || "$first_arg" == "sso" ]]; then
+# Determine effective profile: --profile arg takes precedence over AWS_PROFILE
+local effective_profile="${AWS_PROFILE:-}"
+local args=("$@")
+for ((i=1; i<=${#args[@]}; i++)); do
+  if [[ "${args[$i]}" == "--profile" && $i -lt ${#args[@]} ]]; then
+    effective_profile="${args[$((i+1))]}"
+    break
+  elif [[ "${args[$i]}" == --profile=* ]]; then
+    effective_profile="${args[$i]#--profile=}"
+    break
+  fi
+done
+
+# Skip auto-login if no profile is determined
+if [[ -z "${effective_profile}" ]]; then
   command aws "$@"
   return $?
 fi
@@ -55,12 +68,12 @@ if [[ $exit_code -ne 0 ]] && [[
   "$stderr_content" == *"The provided token has expired"*
 ]]; then
   echo -e "\n----------------------------"
-  echo "SSO token expired for profile: ${AWS_PROFILE}"
+  echo "SSO token expired for profile: ${effective_profile}"
   echo "Attempting automatic login..."
   echo -e "----------------------------\n"
 
   # Attempt automatic login
-  __AWS_AUTO_LOGIN_RUNNING=1 command aws sso login --profile "${AWS_PROFILE}"
+  __AWS_AUTO_LOGIN_RUNNING=1 command aws sso login --profile "${effective_profile}"
   local login_exit_code=$?
   unset __AWS_AUTO_LOGIN_RUNNING
 
