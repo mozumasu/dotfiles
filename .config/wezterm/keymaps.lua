@@ -480,6 +480,11 @@ wezterm.on("augment-command-palette", function(window, pane)
       action = spawn_overlay_pane("nvim"),
     },
     {
+      brief = "Launch: Claude Code",
+      icon = "md_robot",
+      action = spawn_overlay_pane("claude"),
+    },
+    {
       brief = "Weather: wttr.in",
       icon = "md_weather_cloudy",
       action = spawn_overlay_pane("curl wttr.in | less -R"),
