@@ -223,6 +223,7 @@
                 }
             ],
             "name": "Mac Built-in (US)",
+            "selected": true,
             "simple_modifications": [
                 {
                     "from": { "key_code": "caps_lock" },
@@ -453,7 +454,6 @@
                 }
             ],
             "name": "External Keyboard (JIS)",
-            "selected": true,
             "virtual_hid_keyboard": { "keyboard_type_v2": "jis" }
         }
     ]
