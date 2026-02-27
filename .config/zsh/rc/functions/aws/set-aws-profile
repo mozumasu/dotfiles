@@ -24,7 +24,26 @@ check_sso_session=$(aws sts get-caller-identity 2>&1)
 
 if [[ "$check_sso_session" == *"Token has expired"* || "$check_sso_session" == *"Token for ${selected_profile} does not exist"* ]]; then
   echo -e "\n----------------------------\nSSO session is missing or expired! Logging in...\n----------------------------\n"
-  aws sso login --profile "${selected_profile}"
+
+  login_result=$(aws sso login --profile "${selected_profile}" 2>&1)
+  login_exit=$?
+
+  if [[ $login_exit -ne 0 && "$login_result" == *"Missing the following required SSO configuration values"* ]]; then
+    # source_profile 経由の assume-role プロファイルの場合、source_profile でログイン
+    local source_profile
+    source_profile=$(aws configure get source_profile --profile "${selected_profile}" 2>/dev/null)
+    if [[ -n "$source_profile" ]]; then
+      echo "Profile '${selected_profile}' uses source_profile '${source_profile}'. Logging in with source profile..."
+      aws sso login --profile "${source_profile}"
+    else
+      echo "Cannot determine source profile. Please run: aws configure sso"
+      return 1
+    fi
+  elif [[ $login_exit -ne 0 ]]; then
+    echo "$login_result"
+    return 1
+  fi
+
   aws sts get-caller-identity
 else
   echo "${check_sso_session}"
