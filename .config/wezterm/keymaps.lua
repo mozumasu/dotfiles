@@ -485,6 +485,11 @@ wezterm.on("augment-command-palette", function(window, pane)
       action = spawn_overlay_pane("claude"),
     },
     {
+      brief = "GitHub: Browse (gh browse)",
+      icon = "md_github",
+      action = spawn_overlay_pane("gh browse"),
+    },
+    {
       brief = "Weather: wttr.in",
       icon = "md_weather_cloudy",
       action = spawn_overlay_pane("curl wttr.in | less -R"),
