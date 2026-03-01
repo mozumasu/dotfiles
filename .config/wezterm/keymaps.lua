@@ -490,6 +490,11 @@ wezterm.on("augment-command-palette", function(window, pane)
       action = spawn_overlay_pane("gh browse"),
     },
     {
+      brief = "Edit: ~/.aws/config",
+      icon = "md_aws",
+      action = spawn_overlay_pane("nvim ~/.aws/config"),
+    },
+    {
       brief = "Weather: wttr.in",
       icon = "md_weather_cloudy",
       action = spawn_overlay_pane("curl wttr.in | less -R"),
