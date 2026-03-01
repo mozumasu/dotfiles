@@ -66,6 +66,7 @@
         kiro-cli = final.callPackage ./packages/kiro.nix { };
         czg = final.callPackage ./packages/czg.nix { };
         gogcli = final.callPackage ./packages/gogcli.nix { };
+        ccplan = final.callPackage ./packages/ccplan.nix { };
         version-lsp = version-lsp.packages.${system}.default;
         plamo-translate = kawarimidoll-nur.packages.${system}.plamo-translate;
       };

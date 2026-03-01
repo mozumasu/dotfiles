@@ -21,7 +21,7 @@
 
   # mocha-specific packages
   environment.systemPackages = with pkgs; [
-    # Add mocha-specific tools here
+    ccplan
   ];
 
   # mocha-specific casks
