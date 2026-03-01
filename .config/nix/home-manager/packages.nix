@@ -79,6 +79,9 @@
     asciiquarium
     asciinema
 
+    # Google Workspace CLI
+    gogcli
+
     # その他
     translate-shell
     nkf

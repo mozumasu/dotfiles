@@ -65,6 +65,7 @@
         safe-chain = final.callPackage ./packages/safe-chain.nix { };
         kiro-cli = final.callPackage ./packages/kiro.nix { };
         czg = final.callPackage ./packages/czg.nix { };
+        gogcli = final.callPackage ./packages/gogcli.nix { };
         version-lsp = version-lsp.packages.${system}.default;
         plamo-translate = kawarimidoll-nur.packages.${system}.plamo-translate;
       };
@@ -160,6 +161,7 @@
           yaskkserv2
           skanehira-ghost
           czg
+          gogcli
           ;
       };
 
