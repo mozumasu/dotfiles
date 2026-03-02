@@ -497,7 +497,7 @@ local function create_fzf_session_selector()
             end
           end
 
-          wezterm.time.call_after(0.2, check_pane_closed)
+          wezterm.time.call_after(0.3, check_pane_closed)
         else
           process_fzf_result(window, pane, sessions, result_file)
           os.remove(sessions_file)

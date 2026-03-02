@@ -139,6 +139,7 @@ end
 
 function module.apply_to_config(config)
   local title_cache = {}
+  local raw_cwd_cache = {}
   local ssh_host_cache = {}
 
   -- タイトルキャッシュの更新
@@ -150,7 +151,11 @@ function module.apply_to_config(config)
     if not (user_vars.ssh_host and user_vars.ssh_host ~= "") then
       local cwd_url = pane:get_current_working_dir()
       local cwd = cwd_url and cwd_url.file_path
-      title_cache[pane_id] = extract_project_name(cwd)
+      -- cwd が変わった場合のみ extract_project_name を実行
+      if cwd ~= raw_cwd_cache[pane_id] then
+        raw_cwd_cache[pane_id] = cwd
+        title_cache[pane_id] = extract_project_name(cwd)
+      end
     end
   end)
 
