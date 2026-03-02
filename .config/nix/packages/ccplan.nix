@@ -5,7 +5,7 @@
 }:
 
 writeShellScriptBin "ccplan" ''
-  exec ${nodejs}/bin/npx -y ccplan@0.1.3 "$@"
+  exec ${nodejs}/bin/npx -y ccplan@0.2.0 "$@"
 ''
 // {
   meta = {
