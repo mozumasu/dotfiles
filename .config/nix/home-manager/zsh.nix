@@ -372,6 +372,14 @@ in
 
         # Safe-chain (only if installed)
         [[ -f ~/.safe-chain/scripts/init-posix.sh ]] && source ~/.safe-chain/scripts/init-posix.sh
+
+        # ----------------------------------------------------
+        # ccplan
+        # ----------------------------------------------------
+        function _ccplan_init() {
+          eval "$(ccplan --completions zsh --init)"
+        }
+        zsh-defer _ccplan_init
       ''
     ];
   };
