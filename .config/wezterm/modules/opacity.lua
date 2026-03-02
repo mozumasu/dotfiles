@@ -45,4 +45,17 @@ wezterm.on("reset-opacity", function(window, config)
   reactivate_setting_mode(window)
 end)
 
+-- フォーカス連動ブラー（opacityで制御）
+-- フォーカス時: opacity=0.9 → blurが見える
+-- 非フォーカス時: opacity=1.0 → blurが視覚的に消える
+wezterm.on("window-focus-changed", function(window, pane)
+  local overrides = window:get_config_overrides() or {}
+  if window:is_focused() then
+    overrides.window_background_opacity = 0.9
+  else
+    overrides.window_background_opacity = 1.0
+  end
+  window:set_config_overrides(overrides)
+end)
+
 return module

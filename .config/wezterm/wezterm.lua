@@ -17,8 +17,11 @@ config.font_size = 13.0
 config.font = wezterm.font("HackGen Console NF")
 
 -- 背景の透過度とぼかし
-config.window_background_opacity = 0.7
-config.macos_window_background_blur = 13
+config.window_background_opacity = 0.9  -- 非フォーカス時のデフォルト（blur見える）
+config.macos_window_background_blur = 8  -- opacityで視覚的に制御
+
+-- ステータスバー更新間隔（デフォルト1000ms → 1500ms）
+config.status_update_interval = 1500
 
 -- QuickSelect patterns (SUPER + Space)
 config.quick_select_patterns = {
