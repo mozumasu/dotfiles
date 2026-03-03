@@ -57,13 +57,7 @@ snippets:
 
   # GitHub Projects-related snippets
   - keyword: ghp
-    snippet: gh project view {{number}} --owner {{owner}} --web
-
-  - keyword: ghpi
-    snippet: gh project item-list {{number}} --owner {{owner}}
-
-  - keyword: ghpv
-    snippet: gh project view {{number}} --owner {{owner}}
+    snippet: gh search issues --project "{{owner/projectId}}" --assignee "@me" --state open --limit 100
 
   # GitHub Status Management
   - name: gh status check
