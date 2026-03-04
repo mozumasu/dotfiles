@@ -153,7 +153,15 @@ else:
             else:
                 msgs.append(f"[terraform validate] failed:\n{(r.stdout + r.stderr).strip()}")
 
-if msgs:
-    print(json.dumps({"systemMessage": "\n".join(msgs)}))
+error_msgs = [m for m in msgs if "failed" in m or ("error" in m.lower() and "✓" not in m)]
+info_msgs = [m for m in msgs if m not in error_msgs]
+
+if info_msgs:
+    print(json.dumps({"systemMessage": "\n".join(info_msgs)}))
+
+if error_msgs:
+    # エラーはplain textで出力 → Claudeへの直接フィードバックになり無視できない
+    print("\n".join(error_msgs))
+    print("\nFix the above errors before completing the task.")
 
 sys.exit(0)
