@@ -25,9 +25,15 @@
     pup
   ];
 
+  # mocha-specific taps
+  homebrew.taps = [
+    "manaflow-ai/cmux"
+  ];
+
   # mocha-specific casks
   homebrew.casks = [
-    "docker"
+    "cmux"
+    "docker-desktop"
     "jordanbaird-ice"
   ];
 }
