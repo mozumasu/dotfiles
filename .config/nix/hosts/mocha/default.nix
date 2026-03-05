@@ -22,6 +22,7 @@
   # mocha-specific packages
   environment.systemPackages = with pkgs; [
     ccplan
+    google-cloud-sdk
     pup
   ];
 
