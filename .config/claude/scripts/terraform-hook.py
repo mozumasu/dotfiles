@@ -82,15 +82,25 @@ def is_state_push(tokens: list[str], subcmd_idx: int) -> bool:
 
 
 def block(reason: str) -> None:
-    print(json.dumps({"decision": "block", "reason": reason}))
+    print(json.dumps({
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "deny",
+            "permissionDecisionReason": reason,
+        }
+    }))
     sys.exit(0)
 
 
 def allow_modified(new_cmd: str) -> None:
     """コマンドを差し替えて実行する"""
-    print(
-        json.dumps({"decision": "allow", "modified_tool_input": {"command": new_cmd}})
-    )
+    print(json.dumps({
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "allow",
+            "updatedInput": {"command": new_cmd},
+        }
+    }))
     sys.exit(0)
 
 

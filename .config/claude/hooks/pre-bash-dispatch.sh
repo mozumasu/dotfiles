@@ -6,9 +6,10 @@ COMMAND=$(jq -r '.tool_input.command // empty' <<<"$INPUT")
 
 [ -z "$COMMAND" ] && exit 0
 
-# ブロック判定を伝播する共通ランナー
+# フック結果を伝播する共通ランナー
 # - exit 2 で終了したスクリプト → そのまま exit 2 で伝播
-# - {"decision":"block",...} を出力したスクリプト → そのまま stdout に流して exit 0
+# - {"hookSpecificOutput":{...}} を出力したスクリプト → そのまま stdout に流して exit 0
+# - {"decision":"block",...} を出力したスクリプト（旧形式）→ そのまま stdout に流して exit 0
 run_check() {
   local output exit_code
   output=$(echo "$INPUT" | "$@" 2>&1)
@@ -17,7 +18,7 @@ run_check() {
     echo "$output"
     exit 2
   fi
-  if [ -n "$output" ] && echo "$output" | jq -e '.decision == "block"' >/dev/null 2>&1; then
+  if [ -n "$output" ] && echo "$output" | jq -e 'has("hookSpecificOutput") or has("decision")' >/dev/null 2>&1; then
     echo "$output"
     exit 0
   fi
