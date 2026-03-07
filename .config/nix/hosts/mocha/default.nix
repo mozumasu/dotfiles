@@ -23,6 +23,7 @@
   environment.systemPackages = with pkgs; [
     ccplan
     google-cloud-sdk
+    nushell
     pup
   ];
 
