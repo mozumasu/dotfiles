@@ -300,6 +300,7 @@ local keys = {
         { label = "Ghost" },
         { label = "Lazygit" },
         { label = "Neovim" },
+        { label = "Yazi" },
       },
       fuzzy = true,
       action = wezterm.action_callback(function(window, pane, _, label)
@@ -314,6 +315,8 @@ local keys = {
           command = "lazygit"
         elseif label == "Neovim" then
           command = "nvim"
+        elseif label == "Yazi" then
+          command = "yazi"
         end
 
         local new_pane = pane:split({
@@ -478,6 +481,11 @@ wezterm.on("augment-command-palette", function(window, pane)
       brief = "Launch: Neovim",
       icon = "md_vim",
       action = spawn_overlay_pane("nvim"),
+    },
+    {
+      brief = "Launch: Yazi",
+      icon = "md_folder",
+      action = spawn_overlay_pane("yazi"),
     },
     {
       brief = "Launch: Claude Code",
