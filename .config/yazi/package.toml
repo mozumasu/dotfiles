@@ -1,0 +1,7 @@
+[[plugin.deps]]
+use = "yazi-rs/plugins:smart-paste"
+rev = "1962818"
+hash = "3f8d49413bc8691b4c652eb417a20178"
+
+[flavor]
+deps = []
