@@ -394,6 +394,16 @@ local key_tables = {
     { key = "[", mods = "NONE", action = act.CopyMode({ MoveBackwardZoneOfType = "Input" }) }, -- Input, Output, Promptから選択可能
     -- セマンティックゾーン選択モード開始（現在位置のゾーン全体を選択）
     { key = "z", mods = "NONE", action = act.CopyMode({ SetSelectionMode = "SemanticZone" }) },
+    -- CopyMode中のペーストはモードを終了してからペースト
+    {
+      key = "v",
+      mods = "SUPER",
+      action = act.Multiple({
+        "ScrollToBottom",
+        { CopyMode = "Close" },
+        act.PasteFrom("Clipboard"),
+      }),
+    },
   },
 
   search_mode = {
