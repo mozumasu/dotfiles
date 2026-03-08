@@ -23,13 +23,9 @@
   environment.systemPackages = with pkgs; [
     ccplan
     google-cloud-sdk
+    gws
     nushell
     pup
-  ];
-
-  # gws is temporarily installed via Homebrew until nixpkgs-unstable picks up nixpkgs PR #496806
-  homebrew.brews = [
-    "gws"
   ];
 
   # mocha-specific taps

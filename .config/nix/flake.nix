@@ -3,6 +3,11 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    # Temporary: until gws (googleworkspace/cli) is available in nixpkgs-unstable (PR #496806)
+    googleworkspace-cli = {
+      url = "github:googleworkspace/cli";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     darwin = {
       url = "github:nix-darwin/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -53,6 +58,7 @@
       kawarimidoll-nur,
       kanata-darwin-nix,
       sops-nix,
+      googleworkspace-cli,
       ...
     }:
     let
@@ -68,6 +74,8 @@
         gogcli = final.callPackage ./packages/gogcli.nix { };
         ccplan = final.callPackage ./packages/ccplan.nix { };
         pup = final.callPackage ./packages/pup.nix { };
+        # Temporary: until gws is available in nixpkgs-unstable (PR #496806)
+        gws = googleworkspace-cli.packages.${system}.default;
         version-lsp = version-lsp.packages.${system}.default;
         plamo-translate = kawarimidoll-nur.packages.${system}.plamo-translate;
       };
