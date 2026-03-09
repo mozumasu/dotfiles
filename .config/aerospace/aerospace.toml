@@ -128,7 +128,7 @@ alt-n = 'workspace N'
 # alt-p = 'workspace P'
 alt-q = 'workspace Q'
 alt-r = 'workspace R'
-alt-s = 'workspace S'
+# alt-s = 'workspace S'
 # alt-t = 'workspace T'
 alt-u = 'workspace U'
 # alt-v = 'workspace V'
@@ -211,7 +211,7 @@ run = 'move-node-to-workspace 2'
 
 [[on-window-detected]]
 if.app-id = 'com.tinyspeck.slackmacgap'
-run = 'move-node-to-workspace S'
+run = 'move-node-to-workspace 3'
 
 [[on-window-detected]]
 if.app-id = 'com.spotify.client'
