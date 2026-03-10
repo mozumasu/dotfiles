@@ -94,9 +94,39 @@ vim.api.nvim_create_autocmd("FileType", {
       buffer = true,
     })
     vim.keymap.set("n", "<leader>mo", function()
-      Snacks.picker.lsp_symbols()
+      local buf = vim.api.nvim_get_current_buf()
+      local ok, parser = pcall(vim.treesitter.get_parser, buf, "markdown")
+      if not ok or not parser then
+        vim.notify("treesitter markdown parser が利用できません", vim.log.levels.WARN)
+        return
+      end
+      parser:parse(true)
+
+      local query = vim.treesitter.query.parse("markdown", "(atx_heading) @heading")
+      local items = {}
+      for _, tree in ipairs(parser:trees()) do
+        for _, node in query:iter_captures(tree:root(), buf) do
+          local row = node:start()
+          local line = vim.api.nvim_buf_get_lines(buf, row, row + 1, false)[1] or ""
+          local level, text = line:match("^(#+)%s+(.+)$")
+          if level and text then
+            items[#items + 1] = {
+              text = string.rep("  ", #level - 1) .. text,
+              pos = { row + 1, 0 },
+              buf = buf,
+            }
+          end
+        end
+      end
+
+      Snacks.picker.pick({
+        title = "Markdown Outline",
+        items = items,
+        format = "text",
+        sort = false,
+      })
     end, {
-      desc = "Markdown outline",
+      desc = "Markdown outline (treesitter)",
       buffer = true,
     })
     vim.keymap.set("n", "so", "<cmd>Arto<CR>", {
