@@ -93,6 +93,12 @@ vim.api.nvim_create_autocmd("FileType", {
       desc = "🧮 Markdown文字数カウント",
       buffer = true,
     })
+    vim.keymap.set("n", "<leader>mo", function()
+      Snacks.picker.lsp_symbols()
+    end, {
+      desc = "Markdown outline",
+      buffer = true,
+    })
     vim.keymap.set("n", "so", "<cmd>Arto<CR>", {
       desc = "Open file in Arto",
       buffer = true,
