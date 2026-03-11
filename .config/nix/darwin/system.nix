@@ -249,6 +249,35 @@
       "com.apple.BluetoothAudioAgent" = {
         "Apple Bitpool Min (editable)" = 40;
       };
+      # SpotlightのCmd+Spaceショートカットを無効化 (WezTermのQuick Selectに使用)
+      "com.apple.symbolichotkeys" = {
+        AppleSymbolicHotKeys = {
+          # Spotlight検索 (Cmd+Space)
+          "64" = {
+            enabled = false;
+            value = {
+              parameters = [
+                32
+                49
+                1048576
+              ];
+              type = "standard";
+            };
+          };
+          # Spotlightウィンドウ (Opt+Cmd+Space)
+          "65" = {
+            enabled = false;
+            value = {
+              parameters = [
+                32
+                49
+                1572864
+              ];
+              type = "standard";
+            };
+          };
+        };
+      };
       # クラッシュレポートを無効化
       "com.apple.CrashReporter" = {
         DialogType = "none";
