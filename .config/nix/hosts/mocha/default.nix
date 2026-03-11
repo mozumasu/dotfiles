@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   # hostSpec configuration
   hostSpec = {
@@ -27,6 +32,25 @@
     nushell
     pup
   ];
+
+  # mocha-specific brews
+  homebrew.brews = [
+    "agent-browser"
+  ];
+
+  # agent-browser: Chromiumのダウンロード（初回のみ）
+  home-manager.users.${config.hostSpec.username} =
+    { lib, ... }:
+    {
+      home.activation.agentBrowserInstall = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        PLAYWRIGHT_CACHE="$HOME/Library/Caches/ms-playwright"
+        AGENT_BROWSER="/opt/homebrew/bin/agent-browser"
+        if [ -x "$AGENT_BROWSER" ] && [ ! -d "$PLAYWRIGHT_CACHE" ]; then
+          export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+          "$AGENT_BROWSER" install
+        fi
+      '';
+    };
 
   # mocha-specific taps
   homebrew.taps = [
