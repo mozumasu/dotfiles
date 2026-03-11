@@ -36,6 +36,7 @@
   # mocha-specific brews
   homebrew.brews = [
     "agent-browser"
+    "timac/vpnstatus/vpnutil"
   ];
 
   # agent-browser: Chromiumのダウンロード（初回のみ）
@@ -55,6 +56,7 @@
   # mocha-specific taps
   homebrew.taps = [
     "manaflow-ai/cmux"
+    "timac/vpnstatus"
   ];
 
   # mocha-specific casks
