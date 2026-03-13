@@ -24,9 +24,23 @@ config.macos_window_background_blur = 8  -- opacityで視覚的に制御
 config.status_update_interval = 1500
 
 -- QuickSelect patterns (SUPER + Space)
+-- デフォルトパターンを無効化し、パスパターンはプロンプト行頭を除外
+config.disable_default_quick_select_patterns = true
 config.quick_select_patterns = {
+  -- URL
+  "\\bhttps?://[\\w\\-._~:/?#@!$&'()*+,;=%]+",
   -- AWS ARN
   "\\barn:[\\w\\-]+:[\\w\\-]+:[\\w\\-]*:[0-9]*:[\\w\\-/:]+",
+  -- ファイルパス: スペース・記号の後にあるもののみ（行頭=プロンプトを除外）
+  "(?<=[\\s:=(\"'`])(?:~|/)[/\\w\\-.@~]+",
+  -- ファイルパス: 行頭かつ行末まで（pwd出力など）。プロンプト行はgit情報が続くので除外される
+  "(?m)^(?:~|/)[/\\w\\-.@~]+(?=\\s*$)",
+  -- Git commit hash (7-40 chars)
+  "\\b[0-9a-f]{7,40}\\b",
+  -- IP address
+  "\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b",
+  -- UUID
+  "\\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\b",
 }
 
 require("keymaps").apply_to_config(config)
