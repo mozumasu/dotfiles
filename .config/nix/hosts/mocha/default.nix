@@ -27,6 +27,7 @@
   # mocha-specific packages
   environment.systemPackages = with pkgs; [
     ccplan
+    glab
     google-cloud-sdk
     gws
     nushell
