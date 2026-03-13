@@ -71,6 +71,7 @@
     yaskkserv2 # SKK server
     safe-chain # Block malicious packages
     kiro-cli # Terminal AI assistant
+    codex # OpenAI Codex CLI
 
     # ネタ系
     cowsay
