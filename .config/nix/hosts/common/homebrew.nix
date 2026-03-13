@@ -9,7 +9,6 @@
 
       # macOS specific
       "felixkratz/formulae/borders"
-      "xwmx/taps/nb"
       "terminal-notifier"
 
       # Container runtime

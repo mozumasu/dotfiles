@@ -83,6 +83,9 @@
     # Google Workspace CLI
     gogcli
 
+    # ノート
+    nb
+
     # その他
     translate-shell
     nkf
