@@ -42,6 +42,9 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+    };
   };
 
   outputs =
@@ -59,6 +62,7 @@
       kanata-darwin-nix,
       sops-nix,
       googleworkspace-cli,
+      llm-agents,
       ...
     }:
     let
@@ -85,6 +89,7 @@
         overlays = [
           localOverlay
           kanata-darwin-nix.overlays.default
+          llm-agents.overlays.default
         ];
         config.allowUnfree = true;
       };
@@ -117,6 +122,7 @@
           nixpkgs.overlays = [
             localOverlay
             kanata-darwin-nix.overlays.default
+            llm-agents.overlays.default
           ];
           nixpkgs.config.allowUnfree = true;
         }
