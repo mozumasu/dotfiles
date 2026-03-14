@@ -8,11 +8,10 @@ local keydel = vim.keymap.del
 local opts = { noremap = true, silent = true }
 local util = require("lazyvim.util")
 
--- Paste from system clipboard (explicit)
--- p/P は Neovim の " レジスタからペースト（デフォルト動作）
--- OS クリップボードからペーストするには "+p を使う
-keymap({ "n", "v" }, "<leader>p", '"+p', opts)
-keymap({ "n", "v" }, "<leader>P", '"+P', opts)
+-- Paste from system clipboard (p/P)
+-- 削除（d/c/x）はクリップボードに入らない
+keymap({ "n", "v" }, "p", '"+p', opts)
+keymap({ "n", "v" }, "P", '"+P', opts)
 
 -- emacs like keybind
 keymap("i", "<C-a>", "<Home>", opts)
