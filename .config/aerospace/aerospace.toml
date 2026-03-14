@@ -177,18 +177,18 @@ alt-tab = 'workspace-back-and-forth'
 alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#focus-monitor
-# alt-ctrl-shift-h is also converted to alt-shift-backspace
-alt-backspace = 'focus-monitor left'
-alt-ctrl-l = 'focus-monitor right'
-alt-ctrl-k = 'focus-monitor up'
-alt-ctrl-j = 'focus-monitor down'
+# cmd-ctrl-h is also converted to cmd-backspace
+cmd-backspace = 'focus-monitor left'
+cmd-ctrl-l = 'focus-monitor right'
+cmd-ctrl-k = 'focus-monitor up'
+cmd-ctrl-j = 'focus-monitor down'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-monitor
-# alt-ctrl-shift-h is also converted to alt-shift-backspace
-alt-shift-backspace = 'move-node-to-monitor left'
-alt-ctrl-shift-l = 'move-node-to-monitor right'
-alt-ctrl-shift-k = 'move-node-to-monitor up'
-alt-ctrl-shift-j = 'move-node-to-monitor down'
+# cmd-ctrl-shift-h is also converted to cmd-shift-backspace
+cmd-shift-backspace = 'move-node-to-monitor left'
+cmd-ctrl-shift-l = 'move-node-to-monitor right'
+cmd-ctrl-shift-k = 'move-node-to-monitor up'
+cmd-ctrl-shift-j = 'move-node-to-monitor down'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#mode
 alt-shift-semicolon = 'mode service'
