@@ -16,7 +16,6 @@ in
     "git".source = mkLink ".config/git";
     "karabiner".source = mkLink ".config/karabiner";
     "kitty".source = mkLink ".config/kitty";
-    "lazygit".source = mkLink ".config/lazygit";
     "lazydocker".source = mkLink ".config/lazydocker";
     "starship.toml".source = mkLink ".config/starship.toml";
     "sheldon".source = mkLink ".config/sheldon";

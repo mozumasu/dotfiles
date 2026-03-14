@@ -1,0 +1,58 @@
+{
+  programs.lazygit = {
+    enable = true;
+    settings = {
+      customCommands = [
+        {
+          command = "czg";
+          context = "files";
+          key = "c";
+          output = "terminal";
+        }
+        {
+          command = "czg ai";
+          context = "files";
+          key = "C";
+          output = "terminal";
+        }
+        {
+          key = "<c-f>";
+          description = "Search commit messages (all branches)";
+          context = "commits";
+          prompts = [
+            {
+              type = "input";
+              title = "Search pattern:";
+            }
+            {
+              type = "menuFromCommand";
+              title = "Matching commits:";
+              command = "git log --all --oneline --grep='{{index .PromptResponses 0}}'";
+              filter = "(?P<hash>[a-zA-Z0-9]+) (?P<message>.*)";
+              valueFormat = "{{.hash}}";
+              labelFormat = "{{.hash | green}} {{.message | yellow}}";
+            }
+          ];
+          command = "git show {{index .PromptResponses 1}}";
+          output = "popup";
+        }
+      ];
+      gui = {
+        language = "ja";
+        showIcons = true;
+      };
+      git = {
+        branchLogCmd = "git log --graph --color=always --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' {{branchName}} --";
+        pagers = [
+          {
+            colorArg = "always";
+            pager = "delta --dark --paging=never";
+          }
+        ];
+        allBranchesLogCmds = [
+          "git log --graph --color=always --pretty='%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --all"
+        ];
+      };
+    };
+  };
+}

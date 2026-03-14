@@ -7,6 +7,7 @@
 {
   imports = [
     ./dotfiles.nix
+    ./lazygit.nix
     ./packages.nix
     ./zsh.nix
     ./sops.nix

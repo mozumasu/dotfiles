@@ -18,7 +18,6 @@
     git
     gh
     ghq
-    lazygit
     delta # git-delta
     tig
     gibo
