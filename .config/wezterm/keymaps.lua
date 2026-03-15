@@ -15,42 +15,46 @@ local function spawn_overlay_pane(command)
   end)
 end
 
--- ペインの高さを指定したパーセンテージに設定するヘルパー関数
+-- ペインの高さを指定したパーセンテージに設定する内部処理
+local function apply_pane_height_percent(window, pane, percent)
+  local tab = pane:tab()
+  local tab_size = tab:get_size()
+  local pane_dims = pane:get_dimensions()
+  local pane_id = pane:pane_id()
+
+  -- ペインの位置を取得（topが0なら上のペイン）
+  local is_top_pane = false
+  for _, info in ipairs(tab:panes_with_info()) do
+    if info.pane:pane_id() == pane_id then
+      is_top_pane = (info.top == 0)
+      break
+    end
+  end
+
+  local target_rows = math.floor(tab_size.rows * percent)
+  local current_rows = pane_dims.viewport_rows
+  local diff = current_rows - target_rows
+
+  if is_top_pane then
+    -- 上ペイン: 縮小はUp、拡大はDown
+    if diff > 0 then
+      window:perform_action(act.AdjustPaneSize({ "Up", diff }), pane)
+    elseif diff < 0 then
+      window:perform_action(act.AdjustPaneSize({ "Down", -diff }), pane)
+    end
+  else
+    -- 下ペイン: 縮小はDown、拡大はUp
+    if diff > 0 then
+      window:perform_action(act.AdjustPaneSize({ "Down", diff }), pane)
+    elseif diff < 0 then
+      window:perform_action(act.AdjustPaneSize({ "Up", -diff }), pane)
+    end
+  end
+end
+
 local function set_pane_height_percent(percent)
   return wezterm.action_callback(function(window, pane)
-    local tab = pane:tab()
-    local tab_size = tab:get_size()
-    local pane_dims = pane:get_dimensions()
-    local pane_id = pane:pane_id()
-
-    -- ペインの位置を取得（topが0なら上のペイン）
-    local is_top_pane = false
-    for _, info in ipairs(tab:panes_with_info()) do
-      if info.pane:pane_id() == pane_id then
-        is_top_pane = (info.top == 0)
-        break
-      end
-    end
-
-    local target_rows = math.floor(tab_size.rows * percent)
-    local current_rows = pane_dims.viewport_rows
-    local diff = current_rows - target_rows
-
-    if is_top_pane then
-      -- 上ペイン: 縮小はUp、拡大はDown
-      if diff > 0 then
-        window:perform_action(act.AdjustPaneSize({ "Up", diff }), pane)
-      elseif diff < 0 then
-        window:perform_action(act.AdjustPaneSize({ "Down", -diff }), pane)
-      end
-    else
-      -- 下ペイン: 縮小はDown、拡大はUp
-      if diff > 0 then
-        window:perform_action(act.AdjustPaneSize({ "Down", diff }), pane)
-      elseif diff < 0 then
-        window:perform_action(act.AdjustPaneSize({ "Up", -diff }), pane)
-      end
-    end
+    apply_pane_height_percent(window, pane, percent)
   end)
 end
 
@@ -192,7 +196,20 @@ local keys = {
   { key = "d", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) }, -- Control+q → d 縦分割
   { key = "x", mods = "LEADER", action = act({ CloseCurrentPane = { confirm = true } }) }, -- Control+q → x ペインを閉じる
   -- Ctrl+Shift+C: 現在のペインを最大化（他ペインを1行に最小化）
-  { key = "C", mods = "CTRL|SHIFT", action = set_pane_height_percent(0) },
+  -- { key = "C", mods = "CTRL|SHIFT", action = set_pane_height_percent(0) },
+
+  -- Ctrl+C: ラベルを注入して上ペインへ移動（オーバーレイペインが1行に最小化される）
+  {
+    key = "c",
+    mods = "CTRL|SHIFT",
+    action = wezterm.action_callback(function(window, pane)
+      apply_pane_height_percent(window, pane, 0) -- 現在のペインを1行に最小化
+      local process = pane:get_foreground_process_name()
+      local name = process and process:match("([^/]+)$") or pane:get_title()
+      pane:inject_output("\r\x1b[2K\x1b[33m◀ " .. name .. " ▶\x1b[0m")
+      -- window:perform_action(act.ActivatePaneDirection("Up"), pane)
+    end),
+  },
 
   -- AWS ARN を Quick Select してブラウザで開く
   {
