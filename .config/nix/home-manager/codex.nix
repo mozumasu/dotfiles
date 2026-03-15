@@ -15,5 +15,6 @@
     undo = true
     voice_transcription = true
     suppress_unstable_features_warning = true
+    realtime_conversation = true
   '';
 }
