@@ -188,6 +188,7 @@ local keys = {
   { key = "]", mods = "ALT", action = act.ScrollToPrompt(1) },
 
   -- Pane
+  { key = ":", mods = "CTRL", action = act.PaneSelect },
   { key = "r", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) }, -- Control+q → r 横分割
   { key = "d", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) }, -- Control+q → d 縦分割
   { key = "x", mods = "LEADER", action = act({ CloseCurrentPane = { confirm = true } }) }, -- Control+q → x ペインを閉じる
