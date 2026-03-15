@@ -198,11 +198,18 @@ local keys = {
   -- Ctrl+Shift+C: 現在のペインを最大化（他ペインを1行に最小化）
   -- { key = "C", mods = "CTRL|SHIFT", action = set_pane_height_percent(0) },
 
-  -- Ctrl+C: ラベルを注入して上ペインへ移動（オーバーレイペインが1行に最小化される）
+  -- Ctrl+Shift+C: すでに1行に最小化されていれば50%に復元、そうでなければ1行に最小化してラベルを注入
   {
     key = "c",
     mods = "CTRL|SHIFT",
     action = wezterm.action_callback(function(window, pane)
+      local pane_dims = pane:get_dimensions()
+      -- すでに1行に最小化されている場合は50%に復元
+      if pane_dims.viewport_rows <= 1 then
+        apply_pane_height_percent(window, pane, 0.5)
+        return
+      end
+
       local title = pane:get_title()
       local cwd_uri = pane:get_current_working_dir()
       local cwd = cwd_uri and cwd_uri.file_path:match("([^/]+)/?$") or ""
@@ -220,7 +227,6 @@ local keys = {
       wezterm.time.call_after(0.05, function()
         pane:inject_output("\r\x1b[2K\x1b[33m◀ " .. label .. " ▶\x1b[0m")
       end)
-      -- window:perform_action(act.ActivatePaneDirection("Up"), pane)
     end),
   },
 
