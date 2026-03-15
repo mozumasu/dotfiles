@@ -6,6 +6,7 @@
 }:
 {
   imports = [
+    ./codex.nix
     ./dotfiles.nix
     ./lazygit.nix
     ./packages.nix
