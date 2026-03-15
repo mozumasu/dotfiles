@@ -97,6 +97,9 @@ local function set_pane_width_percent(percent)
   end)
 end
 
+-- ペインの最小化前の高さを記憶するテーブル (pane_id -> percent)
+local pane_height_store = {}
+
 local leader = { key = "q", mods = "CTRL", timeout_milliseconds = 2000 }
 
 local keys = {
@@ -198,17 +201,26 @@ local keys = {
   -- Ctrl+Shift+C: 現在のペインを最大化（他ペインを1行に最小化）
   -- { key = "C", mods = "CTRL|SHIFT", action = set_pane_height_percent(0) },
 
-  -- Ctrl+Shift+C: すでに1行に最小化されていれば50%に復元、そうでなければ1行に最小化してラベルを注入
+  -- Ctrl+Shift+C: すでに1行に最小化されていれば元の高さ（or 50%）に復元、そうでなければ1行に最小化してラベルを注入
   {
     key = "c",
     mods = "CTRL|SHIFT",
     action = wezterm.action_callback(function(window, pane)
       local pane_dims = pane:get_dimensions()
-      -- すでに1行に最小化されている場合は50%に復元
+      local pane_id = pane:pane_id()
+
+      -- すでに1行に最小化されている場合は元の高さ（記憶がなければ50%）に復元
       if pane_dims.viewport_rows <= 1 then
-        apply_pane_height_percent(window, pane, 0.5)
+        local restore_percent = pane_height_store[pane_id] or 0.5
+        pane_height_store[pane_id] = nil
+        apply_pane_height_percent(window, pane, restore_percent)
         return
       end
+
+      -- 最小化前に現在の高さ比率を保存
+      local tab = pane:tab()
+      local tab_size = tab:get_size()
+      pane_height_store[pane_id] = pane_dims.viewport_rows / tab_size.rows
 
       local title = pane:get_title()
       local cwd_uri = pane:get_current_working_dir()
