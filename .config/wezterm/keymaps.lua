@@ -131,7 +131,6 @@ local keys = {
 
   { key = "c", mods = "SUPER", action = act.CopyTo("Clipboard") },
   { key = "v", mods = "SUPER", action = act.PasteFrom("Clipboard") },
-  { key = "C", mods = "CTRL", action = act.CopyTo("Clipboard") },
 
   -- Debug
   { key = "l", mods = "SUPER", action = act.ShowDebugOverlay },
@@ -192,6 +191,8 @@ local keys = {
   { key = "r", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) }, -- Control+q → r 横分割
   { key = "d", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) }, -- Control+q → d 縦分割
   { key = "x", mods = "LEADER", action = act({ CloseCurrentPane = { confirm = true } }) }, -- Control+q → x ペインを閉じる
+  -- Ctrl+Shift+C: 現在のペインを最大化（他ペインを1行に最小化）
+  { key = "C", mods = "CTRL|SHIFT", action = set_pane_height_percent(0) },
 
   -- AWS ARN を Quick Select してブラウザで開く
   {
