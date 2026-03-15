@@ -13,5 +13,7 @@
 
     [features]
     undo = true
+    voice_transcription = true
+    suppress_unstable_features_warning = true
   '';
 }
