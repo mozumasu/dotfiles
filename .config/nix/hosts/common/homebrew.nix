@@ -40,6 +40,7 @@
 
       # Productivity
       "arto-app/tap/arto"
+      "drawio"
       "raycast"
 
       # Fonts (needed for terminals)
