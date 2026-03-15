@@ -70,7 +70,6 @@
     yaskkserv2 # SKK server
     safe-chain # Block malicious packages
     kiro-cli # Terminal AI assistant
-    llm-agents.codex # OpenAI Codex CLI (via llm-agents.nix)
 
     # ネタ系
     cowsay

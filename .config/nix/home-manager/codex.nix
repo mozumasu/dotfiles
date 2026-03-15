@@ -1,5 +1,9 @@
-{ config, ... }:
+{ pkgs, config, ... }:
 {
+  home.packages = with pkgs; [
+    llm-agents.codex
+  ];
+
   home.file.".codex/config.toml".text = ''
     personality = "pragmatic"
     model = "gpt-5.4"
