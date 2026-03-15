@@ -203,10 +203,13 @@ local keys = {
     key = "c",
     mods = "CTRL|SHIFT",
     action = wezterm.action_callback(function(window, pane)
-      apply_pane_height_percent(window, pane, 0) -- 現在のペインを1行に最小化
       local process = pane:get_foreground_process_name()
       local name = process and process:match("([^/]+)$") or pane:get_title()
-      pane:inject_output("\r\x1b[2K\x1b[33m◀ " .. name .. " ▶\x1b[0m")
+      apply_pane_height_percent(window, pane, 0) -- 現在のペインを1行に最小化
+      -- リサイズ完了後にラベルを注入
+      wezterm.time.call_after(0.05, function()
+        pane:inject_output("\r\x1b[2K\x1b[33m◀ " .. name .. " ▶\x1b[0m")
+      end)
       -- window:perform_action(act.ActivatePaneDirection("Up"), pane)
     end),
   },
