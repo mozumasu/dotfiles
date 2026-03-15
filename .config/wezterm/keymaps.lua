@@ -203,12 +203,22 @@ local keys = {
     key = "c",
     mods = "CTRL|SHIFT",
     action = wezterm.action_callback(function(window, pane)
-      local process = pane:get_foreground_process_name()
-      local name = process and process:match("([^/]+)$") or pane:get_title()
+      local title = pane:get_title()
+      local cwd_uri = pane:get_current_working_dir()
+      local cwd = cwd_uri and cwd_uri.file_path:match("([^/]+)/?$") or ""
+      -- titleがcwdと同じ場合はプロセス名にフォールバック
+      local name
+      if title ~= "" and title ~= cwd then
+        name = title
+      else
+        local process = pane:get_foreground_process_name()
+        name = process and process:match("([^/]+)$") or "?"
+      end
+      local label = cwd ~= "" and (name .. " (" .. cwd .. ")") or name
       apply_pane_height_percent(window, pane, 0) -- 現在のペインを1行に最小化
       -- リサイズ完了後にラベルを注入
       wezterm.time.call_after(0.05, function()
-        pane:inject_output("\r\x1b[2K\x1b[33m◀ " .. name .. " ▶\x1b[0m")
+        pane:inject_output("\r\x1b[2K\x1b[33m◀ " .. label .. " ▶\x1b[0m")
       end)
       -- window:perform_action(act.ActivatePaneDirection("Up"), pane)
     end),
