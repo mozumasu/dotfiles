@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-terraform/terragrunt ファイル編集後に terraform fmt / validate を実行する PostToolUse hook。
+terraform/terragrunt ファイル編集後に terraform fmt / validate / tflint を実行する PostToolUse hook。
 
 処理フロー:
   - .tf / .tfvars / .tfvars.json でない → skip
-  - compose.yaml あり、コンテナ起動中 → Docker コンテナ内で fmt / validate
-  - compose.yaml なし → ローカルで fmt（常時） / validate（.terraform があるとき）
+  - compose.yaml あり、コンテナ起動中 → Docker コンテナ内で fmt / validate / tflint
+  - compose.yaml なし → ローカルで fmt（常時） / validate（.terraform があるとき） / tflint（インストール済みの場合）
 """
 
 import sys
@@ -134,6 +134,14 @@ if compose_file and project_root:
             msgs.append("[terraform validate] ✓ Success")
         else:
             msgs.append(f"[terraform validate] failed:\n{(r.stdout + r.stderr).strip()}")
+
+        # tflint
+        r = run_docker(compose_file, service, container_dir, "tflint --no-color")
+        if r.returncode == 0:
+            output = (r.stdout + r.stderr).strip()
+            msgs.append(f"[tflint] ✓ No issues{f': {output}' if output else ''}")
+        else:
+            msgs.append(f"[tflint] failed:\n{(r.stdout + r.stderr).strip()}")
 else:
     # ローカル fmt
     r = run_local(["terraform", "fmt", "."], work_dir)
@@ -152,6 +160,15 @@ else:
                 msgs.append("[terraform validate] ✓ Success")
             else:
                 msgs.append(f"[terraform validate] failed:\n{(r.stdout + r.stderr).strip()}")
+
+    # ローカル tflint
+    r = run_local(["tflint", "--no-color"], work_dir)
+    if r is not None:
+        if r.returncode == 0:
+            output = (r.stdout + r.stderr).strip()
+            msgs.append(f"[tflint] ✓ No issues{f': {output}' if output else ''}")
+        else:
+            msgs.append(f"[tflint] failed:\n{(r.stdout + r.stderr).strip()}")
 
 error_msgs = [m for m in msgs if "failed" in m or ("error" in m.lower() and "✓" not in m)]
 info_msgs = [m for m in msgs if m not in error_msgs]
