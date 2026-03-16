@@ -95,6 +95,15 @@
             "command": "~/.config/claude/hooks/pre-bash-dispatch.sh"
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.config/claude/hooks/prevent-deprecated-tf-providers.sh"
+          }
+        ]
       }
     ],
     "Stop": [
