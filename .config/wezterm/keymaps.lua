@@ -281,6 +281,63 @@ local keys = {
     }),
   },
   { key = "s", mods = "LEADER", action = act.ActivateKeyTable({ name = "setting_mode", one_shot = false }) },
+
+  -- Codex stash: Ctrl+G を送信 → Neovim が開いたら <leader>S でスタッシュ → :wq で戻る
+  {
+    key = "u",
+    mods = "LEADER",
+    action = wezterm.action_callback(function(window, pane)
+      -- Ctrl+G を送信して Codex に Neovim を開かせる
+      window:perform_action(wezterm.action.SendKey({ key = "g", mods = "CTRL" }), pane)
+      -- Neovim が起動するまで待つ（500ms）
+      wezterm.time.call_after(0.5, function()
+        -- <Space>S でスタッシュ（LazyVim のデフォルト leader = Space）
+        window:perform_action(wezterm.action.SendString(" S"), pane)
+        -- スタッシュ処理完了を待つ（300ms）
+        wezterm.time.call_after(0.3, function()
+          -- :wq で保存・終了
+          window:perform_action(wezterm.action.SendString(":wq\n"), pane)
+          window:set_right_status("📦 Stashed!")
+          wezterm.time.call_after(3, function()
+            window:set_right_status("")
+          end)
+        end)
+      end)
+    end),
+  },
+
+  -- Codex stash pop: スタッシュファイルからポップしてペーストする
+  {
+    key = "y",
+    mods = "LEADER",
+    action = wezterm.action_callback(function(window, pane)
+      local stash_file = os.getenv("HOME") .. "/.local/share/codex_stash.txt"
+      local f = io.open(stash_file, "r")
+      if not f then
+        window:set_right_status("⚠ Stash empty")
+        wezterm.time.call_after(3, function()
+          window:set_right_status("")
+        end)
+        return
+      end
+      local content = f:read("*a")
+      f:close()
+      if content == "" then
+        window:set_right_status("⚠ Stash empty")
+        wezterm.time.call_after(3, function()
+          window:set_right_status("")
+        end)
+        return
+      end
+      -- 末尾の改行を除去
+      content = content:gsub("\n$", "")
+      window:perform_action(wezterm.action.SendString(content), pane)
+      window:set_right_status("📋 Popped!")
+      wezterm.time.call_after(3, function()
+        window:set_right_status("")
+      end)
+    end),
+  },
   -- 直前のコマンドと出力をコピー
   {
     key = "z",

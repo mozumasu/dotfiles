@@ -153,6 +153,20 @@ keymap("n", "<leader>say", function()
   vim.api.nvim_feedkeys(":!say -v Ava " .. current_word .. "\n", "n", false)
 end, { desc = "say command" })
 
+-- Codex stash: バッファ内容を保存してクリア（Codex Ctrl+G 連携）
+vim.keymap.set("n", "<leader>S", function()
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  local content = table.concat(lines, "\n")
+  local stash_file = vim.fn.expand("~/.local/share/codex_stash.txt")
+  local f = io.open(stash_file, "w")
+  if f then
+    f:write(content)
+    f:close()
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, {})
+    vim.notify("Stashed to " .. stash_file, vim.log.levels.INFO)
+  end
+end, { desc = "Stash buffer to codex_stash.txt and clear" })
+
 -- zz -> z -> z cycle: center -> top -> bottom -> center ...
 -- ref: https://zenn.dev/vim_jp/articles/67ec77641af3f2
 local zz_state = { pos = 0, last_time = 0 }
