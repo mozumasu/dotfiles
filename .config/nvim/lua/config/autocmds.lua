@@ -89,6 +89,10 @@ end, {})
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "markdown",
   callback = function()
+    -- コードブロック (```) 入力時に誤補完されないよう backtick の autopair を無効化
+    vim.schedule(function()
+      vim.keymap.set("i", "`", "`", { buffer = true, noremap = true })
+    end)
     vim.keymap.set({ "n", "v" }, "<leader>mc", "<cmd>CountCleanTextLength<CR>", {
       desc = "🧮 Markdown文字数カウント",
       buffer = true,
