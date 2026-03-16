@@ -8,10 +8,9 @@ local keydel = vim.keymap.del
 local opts = { noremap = true, silent = true }
 local util = require("lazyvim.util")
 
--- Paste from system clipboard (p/P)
--- 削除（d/c/x）はクリップボードに入らない
-keymap({ "n", "v" }, "p", '"+p', opts)
-keymap({ "n", "v" }, "P", '"+P', opts)
+-- p/P: 無名レジスタからペースト（d/c で削除したものを貼り付け可能）
+-- クリップボードからペーストしたい場合は "+p を使う
+-- y はクリップボードにも入る（autocmds.lua の TextYankPost で制御）
 
 -- emacs like keybind
 keymap("i", "<C-a>", "<Home>", opts)

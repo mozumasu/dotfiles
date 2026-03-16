@@ -193,11 +193,27 @@ vim.api.nvim_create_user_command("InsertDatetime", function()
 end, {})
 
 -- ヤンク時のみクリップボード連携（削除などは除外）
+-- _last_vim_yank: vim内でyankした最後の内容を記録（外部コピーとの区別用）
+local _last_vim_yank = ""
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = vim.api.nvim_create_augroup("yank_to_clipboard", { clear = true }),
   callback = function()
     if vim.v.event.operator == "y" then
-      vim.fn.setreg("+", vim.fn.getreg('"'))
+      local text = vim.fn.getreg('"')
+      vim.fn.setreg("+", text)
+      _last_vim_yank = text
+    end
+  end,
+})
+
+-- 外部アプリでコピーした内容をpで貼り付けられるようにする
+-- クリップボードがvim内のyankと異なる場合（＝外部でコピーされた場合）のみ無名レジスタに同期
+vim.api.nvim_create_autocmd("FocusGained", {
+  group = vim.api.nvim_create_augroup("clipboard_to_unnamed", { clear = true }),
+  callback = function()
+    local clip = vim.fn.getreg("+")
+    if clip ~= "" and clip ~= _last_vim_yank then
+      vim.fn.setreg('"', clip)
     end
   end,
 })
