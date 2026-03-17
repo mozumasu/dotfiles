@@ -141,6 +141,15 @@
             "command": "~/.config/claude/hooks/post-write-dispatch.sh"
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.config/claude/hooks/check-tf-provider-versions.sh"
+          }
+        ]
       }
     ]
   },
