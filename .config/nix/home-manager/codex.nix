@@ -13,6 +13,7 @@
     trust_level = "trusted"
 
     [features]
+    codex_git_commit = true
     undo = true
     voice_transcription = true
     realtime_conversation = true
