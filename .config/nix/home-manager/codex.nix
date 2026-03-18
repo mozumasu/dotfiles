@@ -7,6 +7,7 @@
   home.file.".codex/config.toml".text = ''
     personality = "pragmatic"
     model = "gpt-5.4"
+    suppress_unstable_features_warning = true
 
     [projects."${config.home.homeDirectory}/dotfiles"]
     trust_level = "trusted"
@@ -14,7 +15,6 @@
     [features]
     undo = true
     voice_transcription = true
-    suppress_unstable_features_warning = true
     realtime_conversation = true
   '';
 }
