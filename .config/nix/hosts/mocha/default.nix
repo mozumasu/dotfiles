@@ -26,6 +26,7 @@
 
   # mocha-specific packages
   environment.systemPackages = with pkgs; [
+    _1password-cli
     ccplan
     glab
     google-cloud-sdk
@@ -62,6 +63,7 @@
 
   # mocha-specific casks
   homebrew.casks = [
+    "1password"
     "cmux"
     "docker-desktop"
     "jordanbaird-ice"
