@@ -14,6 +14,7 @@
 
     [features]
     codex_git_commit = true
+    codex_hooks = true
     undo = true
     voice_transcription = true
     realtime_conversation = true
