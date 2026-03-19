@@ -1,4 +1,7 @@
 { pkgs, config, ... }:
+let
+  modelName = "gpt-5.4";
+in
 {
   home.packages = with pkgs; [
     llm-agents.codex
@@ -6,8 +9,8 @@
 
   home.file.".codex/config.toml".text = ''
     personality = "pragmatic"
-    model = "gpt-5.4"
-    commit_attribution = "Codex (gpt-5.4) <noreply@openai.com>"
+    model = "${modelName}"
+    commit_attribution = "Codex (${modelName}) <noreply@openai.com>"
     suppress_unstable_features_warning = true
 
     [projects."${config.home.homeDirectory}/dotfiles"]
