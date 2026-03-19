@@ -24,9 +24,9 @@ in
     realtime_conversation = true
 
     [hooks.session_start.log_session_start]
-    command = "sh -c 'printf \"%s session_start\\n\" \"$(date -Iseconds)\" >> /tmp/codex-hooks.log'"
+    command = "touch /tmp/codex-hooks-session_start"
 
     [hooks.stop.log_stop]
-    command = "sh -c 'printf \"%s stop\\n\" \"$(date -Iseconds)\" >> /tmp/codex-hooks.log'"
+    command = "touch /tmp/codex-hooks-stop"
   '';
 }
