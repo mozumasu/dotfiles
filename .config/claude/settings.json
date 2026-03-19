@@ -161,6 +161,7 @@
     "example-skills@anthropic-agent-skills": true,
     "pyright-lsp@claude-plugins-official": true
   },
+  "plansDirectory": "./plans",
   "maxTokens": 8192,
   "temperature": 0,
   "preferences": {
@@ -170,5 +171,12 @@
       "includeExplanations": false
     }
   },
-  "plansDirectory": "./plans"
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    }
+  }
 }
