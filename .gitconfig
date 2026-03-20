@@ -1,5 +1,11 @@
 [include]
   path = ~/.gitconfig.local
+
+[user]
+  name = mozumasu
+  email = ouri1229@gmail.com
+	signingkey = /Users/ori.matsumoto/.ssh/id_ed25519.pub
+
 [alias]
 	ci = commit
 	st = status
@@ -33,3 +39,7 @@
 	postBuffer = 524288000
 [ghq]
 	root = ~/src
+[commit]
+	gpgsign = true
+[gpg]
+	format = ssh
