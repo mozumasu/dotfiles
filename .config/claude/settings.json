@@ -85,6 +85,7 @@
       "~/src/github.com/mozumasu/zenn/articles"
     ]
   },
+  "model": "opus[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -161,6 +162,14 @@
     "example-skills@anthropic-agent-skills": true,
     "pyright-lsp@claude-plugins-official": true
   },
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    }
+  },
   "plansDirectory": "./plans",
   "maxTokens": 8192,
   "temperature": 0,
@@ -171,12 +180,5 @@
       "includeExplanations": false
     }
   },
-  "extraKnownMarketplaces": {
-    "anthropic-agent-skills": {
-      "source": {
-        "source": "github",
-        "repo": "anthropics/skills"
-      }
-    }
-  }
+  "effortLevel": "high"
 }
