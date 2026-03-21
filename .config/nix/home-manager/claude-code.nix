@@ -137,6 +137,10 @@ let
             }
             {
               type = "command";
+              command = "~/.config/claude/hooks/check-settings-drift.sh";
+            }
+            {
+              type = "command";
               command = ''terminal-notifier -title "Claude" -message "$(basename "$PWD")" & \nafplay /System/Library/Sounds/Glass.aiff'';
             }
           ];
@@ -240,6 +244,10 @@ in
     else
       install -Dm644 "${settingsFile}" "$CLAUDE_DIR/settings.json"
     fi
+
+    # Nix 生成時の settings.json を参照コピーとして保存
+    # Stop hook での差分検出に使用
+    cp "$CLAUDE_DIR/settings.json" "$CLAUDE_DIR/.settings.json.nix-managed"
   '';
 
   # ~/.claude/skills → dotfiles のスキルディレクトリ
