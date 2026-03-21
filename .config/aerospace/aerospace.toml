@@ -133,7 +133,7 @@ alt-r = 'workspace R'
 alt-u = 'workspace U'
 # alt-v = 'workspace V'
 alt-w = 'workspace W'
-alt-x = 'workspace X'
+# alt-x = 'workspace X' use wezterm hotkey with raycast
 alt-y = 'workspace Y'
 alt-z = 'workspace Z'
 
