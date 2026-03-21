@@ -4,6 +4,25 @@ snippets:
     patterns:
       - '^gcloud\b'
 
+  - keyword: c
+    snippet: config
+    context:
+      lbuffer: '^gcloud\s'
+
+  - keyword: u
+    snippet: unset
+    context:
+      lbuffer: '^gcloud config\s'
+
+  - keyword: gcua
+    snippet: gcloud config unset account
+
+  - keyword: gcsa
+    snippet: gcloud config set account
+
+  - keyword: adc
+    snippet: gcloud auth application-default print-access-token | xargs -I{} curl -s "https://oauth2.googleapis.com/tokeninfo?access_token={}" | jq -r '.email'
+
   - keyword: ga;
     snippet: gcloud auth application-default login --impersonate-service-account {{SERVICE_ACCOUNT_EMAIL}}
 
@@ -41,6 +60,13 @@ completions:
     sourceCommand: "gcloud auth list --format='value(account)' 2>/dev/null"
     options:
       --prompt: "'GCP Account> '"
+
+  - name: gcloud config property
+    patterns:
+      - '^gcloud config (set|unset)\s+[A-Za-z0-9./_-]*$'
+    sourceCommand: "gcloud topic configurations 2>/dev/null | perl -pe 's/\\e\\[[0-9;]*m//g' | perl -ne 'if (/^     (\\w[\\w_]*)\\s*$/) { $s=$1 } elsif (/^         (\\w[\\w_]*)\\s*$/) { print $s eq \"core\" ? \"$1\\n\" : \"$s/$1\\n\" }'"
+    options:
+      --prompt: "'GCP Config Property> '"
 
   - name: gcloud secret
     patterns:
