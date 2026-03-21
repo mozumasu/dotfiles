@@ -35,6 +35,13 @@ completions:
     options:
       --prompt: "'App Service> '"
 
+  - name: gcloud account
+    patterns:
+      - '^gcloud config set account'
+    sourceCommand: "gcloud auth list --format='value(account)' 2>/dev/null"
+    options:
+      --prompt: "'GCP Account> '"
+
   - name: gcloud secret
     patterns:
       - '^gcloud\b.*--secret(?:=|\s+)[A-Za-z0-9._-]*$'
