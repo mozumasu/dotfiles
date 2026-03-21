@@ -10,6 +10,7 @@ $git_status\
 $direnv\
 $python\
 $aws\
+${custom.gcloud}\
 $fill\
 $cmd_duration\
 $time\
@@ -101,3 +102,20 @@ vimcmd_symbol = '[V](bold green) '
 format = '[$symbol $profile ]($style)'
 symbol = "💭"
 style = "bold fg:#ffcb6b"
+
+# ----------------------------------------------------
+# GCP module
+# ----------------------------------------------------
+[gcloud]
+disabled = true
+
+[custom.gcloud]
+when = "command -v gcloud && command -v terraform"
+command = '''
+f=~/.config/gcloud/configurations/config_$(cat ~/.config/gcloud/active_config 2>/dev/null || echo default)
+a=$(perl -ne 'print $1 if /^account\s*=\s*[^@]*@(.+)/' "$f" 2>/dev/null)
+p=$(perl -ne 'print $1 if /^project\s*=\s*(.+)/' "$f" 2>/dev/null)
+[ -n "$a" ] && echo "☁️ ${a}(${p})"
+'''
+format = "[$output]($style)"
+style = "bold fg:#4285F4"
