@@ -97,7 +97,8 @@ in
       export XDG_STATE_HOME=''${HOME}/.local/state
 
       # claude
-      export CLAUDE_CONFIG_DIR=''${XDG_CONFIG_HOME}/claude
+      # export CLAUDE_CONFIG_DIR=''${XDG_CONFIG_HOME}/claude
+      export CLAUDE_CONFIG_DIR=''$HOME/dotfiles/.config/claude
 
       # zsh
       export ZRCDIR=$ZDOTDIR/rc

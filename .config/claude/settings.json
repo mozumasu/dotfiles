@@ -170,6 +170,7 @@
       }
     }
   },
+  "effortLevel": "high",
   "plansDirectory": "./plans",
   "maxTokens": 8192,
   "temperature": 0,
@@ -179,6 +180,5 @@
       "concise": false,
       "includeExplanations": false
     }
-  },
-  "effortLevel": "high"
+  }
 }
