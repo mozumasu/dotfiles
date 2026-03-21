@@ -212,33 +212,49 @@ let
   settingsFile = pkgs.writeText "claude-settings.json" (builtins.toJSON publicSettings);
 in
 {
-  # ~/.config/claude/ 配下の読み取り専用ファイルはシンボリックリンク
-  xdg.configFile = {
-    "claude/CLAUDE.md".source = mkLink ".config/claude/CLAUDE.md";
-    "claude/hooks".source = mkLink ".config/claude/hooks";
-    "claude/skills".source = mkLink ".config/claude/skills";
-    "claude/plugins".source = mkLink ".config/claude/plugins";
-  };
+  # ~/.config/claude/ は activation script で管理
+  # xdg.configFile + mkOutOfStoreSymlink だと home-manager が
+  # nix store 経由で dotfiles に解決した後、dotfiles 内のファイルを
+  # シンボリンクで上書きし循環参照が発生するため使用しない
+  home.activation.claudeFiles = lib.hm.dag.entryAfter [ "writeBoundary" "setupSecrets" ] ''
+    CLAUDE_DIR="$HOME/.config/claude"
+    DOTFILES="${dotfilesPath}/.config/claude"
 
-  # ~/.claude/skills → dotfiles のスキルディレクトリ
-  home.file.".claude/skills".source = mkLink ".config/claude/skills";
+    # ~/.config/claude が nix store へのシンボリンク（旧世代の残骸）なら削除
+    if [ -L "$CLAUDE_DIR" ]; then
+      rm "$CLAUDE_DIR"
+    fi
+    mkdir -p "$CLAUDE_DIR"
 
-  # settings.json は書き込み可能なファイルとしてコピー
-  # Claude Code の /config エディタが書き戻せるようにするため
-  home.activation.claudeSettings = lib.hm.dag.entryAfter [ "writeBoundary" "setupSecrets" ] ''
-    SETTINGS_DIR="$HOME/.config/claude"
-    mkdir -p "$SETTINGS_DIR"
+    # 読み取り専用ファイルは dotfiles へのシンボリンク
+    for item in CLAUDE.md hooks skills plugins; do
+      if [ -L "$CLAUDE_DIR/$item" ] || [ -e "$CLAUDE_DIR/$item" ]; then
+        rm -f "$CLAUDE_DIR/$item"
+      fi
+      ln -s "$DOTFILES/$item" "$CLAUDE_DIR/$item"
+    done
 
+    # settings.json は書き込み可能なファイルとしてコピー
+    # Claude Code の /config エディタが書き戻せるようにするため
     PRIVATE_FILE="${privateMarketplacesFile}"
     if [ -f "$PRIVATE_FILE" ]; then
-      # 公開設定と非公開設定を jq でマージ
       ${pkgs.jq}/bin/jq -s '.[0] * .[1]' \
         "${settingsFile}" \
         "$PRIVATE_FILE" \
-        > "$SETTINGS_DIR/settings.json"
-      chmod 644 "$SETTINGS_DIR/settings.json"
+        > "$CLAUDE_DIR/settings.json"
+      chmod 644 "$CLAUDE_DIR/settings.json"
     else
-      install -Dm644 "${settingsFile}" "$SETTINGS_DIR/settings.json"
+      install -Dm644 "${settingsFile}" "$CLAUDE_DIR/settings.json"
     fi
+  '';
+
+  # ~/.claude/skills → dotfiles のスキルディレクトリ
+  home.activation.claudeSkills = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    CLAUDE_HOME="$HOME/.claude"
+    mkdir -p "$CLAUDE_HOME"
+    if [ -L "$CLAUDE_HOME/skills" ] || [ -e "$CLAUDE_HOME/skills" ]; then
+      rm -f "$CLAUDE_HOME/skills"
+    fi
+    ln -s "${dotfilesPath}/.config/claude/skills" "$CLAUDE_HOME/skills"
   '';
 }
