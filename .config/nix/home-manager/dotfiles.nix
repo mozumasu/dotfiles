@@ -23,7 +23,8 @@ in
     "zeno".source = mkLink ".config/zeno";
     "gomi".source = mkLink ".config/gomi";
     "mise".source = mkLink ".config/mise";
-    "claude".source = mkLink ".config/claude";
+    # claude は claude-code.nix で個別管理
+    # settings.json は書き込み可能コピー、それ以外はシンボリックリンク
   };
 
   # ~/ 配下
@@ -31,11 +32,6 @@ in
     ".gitconfig".source = mkLink ".gitconfig";
     ".tmux.conf".source = mkLink ".tmux.conf";
     ".nbrc".source = mkLink ".nbrc";
-
-    # Claude Code skills directory
-    # Claude Codeはスキルを ~/.claude/skills/ から読み込むため、
-    # .config/claude/skills をここにシンボリックリンク
-    ".claude/skills".source = mkLink ".config/claude/skills";
   };
 
   # macSKK dictionaries - copy instead of symlink due to sandbox restrictions

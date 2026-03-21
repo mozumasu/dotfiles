@@ -11,10 +11,10 @@
         path = "${config.xdg.configHome}/.czrc";
       };
 
-      # Add more secrets here as needed
-      # example-secret = {
-      #   path = "${config.xdg.configHome}/secrets/example-secret";
-      # };
+      # Claude Code 非公開マーケットプレイス設定（JSON形式）
+      claude-private-marketplaces = {
+        path = "${config.xdg.configHome}/claude/.private-marketplaces.json";
+      };
     };
   };
 

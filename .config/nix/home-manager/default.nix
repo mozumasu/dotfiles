@@ -6,6 +6,7 @@
 }:
 {
   imports = [
+    ./claude-code.nix
     ./codex.nix
     ./dotfiles.nix
     ./lazygit.nix
