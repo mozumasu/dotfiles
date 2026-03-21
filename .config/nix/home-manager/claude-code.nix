@@ -195,13 +195,7 @@ let
     plansDirectory = "./plans";
     maxTokens = 8192;
     temperature = 0;
-    preferences = {
-      language = "ja";
-      responses = {
-        concise = false;
-        includeExplanations = false;
-      };
-    };
+    language = "ja";
   };
 
   # 非公開マーケットプレイス設定は sops-nix で管理
