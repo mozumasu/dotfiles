@@ -625,6 +625,11 @@ wezterm.on("augment-command-palette", function(window, pane)
       action = spawn_overlay_pane("nvim ~/.ssh/conf.d/hosts/"),
     },
     {
+      brief = "Edit: ~/.config/gcloud/configurations/",
+      icon = "md_cloud",
+      action = spawn_overlay_pane("nvim ~/.config/gcloud/configurations/"),
+    },
+    {
       brief = "Weather: wttr.in",
       icon = "md_weather_cloudy",
       action = spawn_overlay_pane("curl wttr.in | less -R"),
