@@ -23,6 +23,9 @@ snippets:
   - keyword: adc
     snippet: gcloud auth application-default print-access-token | xargs -I{} curl -s "https://oauth2.googleapis.com/tokeninfo?access_token={}" | jq -r '.email'
 
+  - keyword: gcloud-config
+    snippet: nvim ~/.config/gcloud/configurations/
+
   - keyword: ga;
     snippet: gcloud auth application-default login --impersonate-service-account {{SERVICE_ACCOUNT_EMAIL}}
 
