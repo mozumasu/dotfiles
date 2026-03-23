@@ -49,14 +49,7 @@ git add flake.nix .envrc flake.lock
 direnv allow
 ```
 
-## 6. 動作確認方法をユーザーに提示する
-
-```sh
-# ホームディレクトリに移動してからプロジェクトルートに戻ることでdevShellを確認
-cd && cd -
-```
-
-## 7. .git/info/excludeを設定するか確認する
+## 6. .git/info/excludeを設定するか確認する
 
 direnv allowが完了したら、必ずユーザーに確認する：
 
@@ -75,3 +68,28 @@ result-*
 # direnv
 .direnv
 ```
+
+**重要**: exclude に追加した後、`git add -f` で再追跡する：
+
+```sh
+git add -f flake.nix .envrc
+```
+
+exclude はあくまで「未追跡ファイルを `git status` に表示しない」だけであり、
+`git add -f` 済みのファイルは引き続き git に追跡される。
+Nix flake は `flake.nix` が git に追跡されていることを要求するため、
+**`git reset HEAD flake.nix` は絶対に行わないこと**。
+
+## 7. 動作検証
+
+セットアップが正しく完了したか検証する：
+
+```sh
+# flake.nix が git に追跡されているか確認
+git ls-files --error-unmatch flake.nix
+
+# flake.nix が評価できるか確認
+nix flake show --no-write-lock-file
+```
+
+追跡されていない場合は `git add -f flake.nix` を実行する。

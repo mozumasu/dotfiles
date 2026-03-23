@@ -145,14 +145,38 @@ if [[ "$answer" =~ ^[Yy]$ ]]; then
   done
 
   echo "✅ .git/info/exclude を設定しました"
+
+  # exclude に追加後、git add -f で再追跡する
+  # Nix flake は flake.nix が git に追跡されていることを要求するため、
+  # exclude していても git add -f で強制追加が必要
+  git add -f flake.nix .envrc
+  echo "✅ git add -f flake.nix .envrc（exclude 後も Nix が読み込めるよう再追跡）"
 else
   echo "スキップしました"
+fi
+
+# ── 6. 動作検証 ──────────────────────────────────────────
+echo ""
+echo "🔍 セットアップを検証中..."
+
+# flake.nix が git に追跡されているか確認
+if git ls-files --error-unmatch flake.nix &>/dev/null; then
+  echo "✅ flake.nix は git に追跡されています"
+else
+  echo "⚠️  flake.nix が git に追跡されていません。git add -f を実行します..."
+  git add -f flake.nix
+fi
+
+# nix flake show で flake.nix が評価できるか確認
+if command -v nix &>/dev/null; then
+  if nix flake show --no-write-lock-file 2>/dev/null; then
+    echo "✅ flake.nix の評価に成功しました"
+  else
+    echo "⚠️  flake.nix の評価に失敗しました。手動で確認してください"
+    echo "   nix flake show"
+  fi
 fi
 
 # ── 完了 ─────────────────────────────────────────────────
 echo ""
 echo "🎉 セットアップ完了！"
-echo ""
-echo "動作確認:"
-echo "  cd && cd -"
-echo "  # プロジェクトに戻ると自動で devShell が起動します"

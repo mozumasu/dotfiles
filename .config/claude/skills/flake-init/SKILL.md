@@ -40,7 +40,8 @@ bash scripts/flake-init.sh [project_dir]
 2. プロジェクトタイプに応じた `flake.nix` を `templates/` からコピー
 3. `git add flake.nix .envrc`
 4. `direnv allow` の実行
-5. `.git/info/exclude` の設定（対話的に確認）
+5. `.git/info/exclude` の設定（対話的に確認、設定後に `git add -f` で再追跡）
+6. 動作検証（git追跡確認 + `nix flake show` 評価確認）
 
 ### 新しいプロジェクトタイプの追加
 
