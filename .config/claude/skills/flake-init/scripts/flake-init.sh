@@ -100,7 +100,7 @@ if [ -f flake.nix ]; then
 fi
 
 cp "$TEMPLATE_FILE" flake.nix
-echo "✅ flake.nix を作成しました（テンプレート: $PROJECT_TYPE）"
+echo "✅ flake.nix を作成しました（テンプレート: ${PROJECT_TYPE}）"
 
 # ── 3. git add ───────────────────────────────────────────
 git add flake.nix .envrc
