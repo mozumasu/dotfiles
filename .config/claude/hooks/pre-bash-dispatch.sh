@@ -25,12 +25,14 @@ run_check() {
 }
 
 # git コマンドのみ git push チェックを実行
-if echo "$COMMAND" | grep -qE '\bgit\b'; then
+# コマンドとしての git にのみマッチ（ファイルパス中の git* は除外）
+if echo "$COMMAND" | grep -qE '(^|[;&|] *)git\b'; then
   run_check python3 ~/.config/claude/hooks/prevent-git-push.py
 fi
 
 # terraform / terragrunt コマンドのみ apply チェックと Docker ルーティングを実行
-if echo "$COMMAND" | grep -qE '\b(terraform|terragrunt)\b'; then
+# コマンドとしての terraform にのみマッチ（ファイルパス中の terraform.tf 等は除外）
+if echo "$COMMAND" | grep -qE '(^|[;&|] *)(terraform|terragrunt)\b'; then
   run_check python3 ~/.config/claude/scripts/terraform-hook.py
 fi
 
