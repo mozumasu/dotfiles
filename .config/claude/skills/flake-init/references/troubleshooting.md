@@ -62,8 +62,19 @@ git add -f flake.nix .envrc
 **重要**: `.git/info/exclude` は「未追跡ファイルを `git status` に表示しない」だけであり、
 `git add -f` で追加したファイルは引き続き追跡される。`git reset HEAD` は絶対に行わないこと。
 
-## .terraform-version のバージョンが nixpkgs と一致しない
+## .terraform-version を更新した後に flake が動かなくなった
 
-`nix flake update` で nixpkgs を更新するか、
-`.terraform-version` を nixpkgs が提供するバージョンに合わせる。
-エラーメッセージに現在のバージョンと要求バージョンが表示される。
+`.terraform-version` を正として HashiCorp 公式バイナリを直接取得する方式のため、
+バージョン更新時は `flake.nix` 内のハッシュ値も更新が必要。
+
+ハッシュの取得方法：
+
+```sh
+VERSION=1.14.5  # 新しいバージョンに置き換え
+nix-prefetch-url --unpack "https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_darwin_arm64.zip"
+nix-prefetch-url --unpack "https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_darwin_amd64.zip"
+nix-prefetch-url --unpack "https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_amd64.zip"
+nix-prefetch-url --unpack "https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_arm64.zip"
+```
+
+取得したハッシュを `flake.nix` の `terraformPlatform` の各 `hash` フィールドに設定する。
