@@ -27,9 +27,10 @@ BASE_DIR="${LOG_BASE}/${OWNER_REPO}/${DATE}-${BRANCH}/sessions"
 mkdir -p "$BASE_DIR"
 
 # --- mktemp でアトミックにファイル生成 ---
+# .wezesc 拡張子: Neovimで開くとANSIカラーが自動適用される
 RAW_FILE=$(mktemp "${BASE_DIR}/${LABEL}-XXXXXX")
-mv "$RAW_FILE" "${RAW_FILE}.md"
-RAW_FILE="${RAW_FILE}.md"
+mv "$RAW_FILE" "${RAW_FILE}.wezesc"
+RAW_FILE="${RAW_FILE}.wezesc"
 
 # --- ペインバッファの取得 ---
 if [[ -z "${WEZTERM_PANE:-}" ]]; then
@@ -37,7 +38,8 @@ if [[ -z "${WEZTERM_PANE:-}" ]]; then
   exit 1
 fi
 
-wezterm cli get-text --pane-id "$WEZTERM_PANE" --start-line -1000000 > "$RAW_FILE"
+# --escapes: ANSIエスケープシーケンス（色情報）を保持して取得
+wezterm cli get-text --pane-id "$WEZTERM_PANE" --escapes --start-line -1000000 > "$RAW_FILE"
 
 # --- 結果をstdoutに出力（後続処理用） ---
 echo "$RAW_FILE"
