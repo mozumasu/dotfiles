@@ -3,6 +3,18 @@ local act = wezterm.action
 
 local module = {}
 
+-- オーバーレイペインでコマンドを実行するヘルパー関数（autoload関数用: -lic で .zshrc を読み込む）
+local function spawn_overlay_pane_interactive(command)
+  return wezterm.action_callback(function(window, pane)
+    local new_pane = pane:split({
+      direction = "Bottom",
+      size = 1.0,
+      args = { os.getenv("SHELL"), "-lic", command },
+    })
+    window:perform_action(act.TogglePaneZoomState, new_pane)
+  end)
+end
+
 -- オーバーレイペインでコマンドを実行するヘルパー関数
 local function spawn_overlay_pane(command)
   return wezterm.action_callback(function(window, pane)
@@ -628,6 +640,11 @@ wezterm.on("augment-command-palette", function(window, pane)
       brief = "Edit: ~/.config/gcloud/configurations/",
       icon = "md_cloud",
       action = spawn_overlay_pane("nvim ~/.config/gcloud/configurations/"),
+    },
+    {
+      brief = "VPN: Connect (vpnc)",
+      icon = "md_vpn",
+      action = spawn_overlay_pane_interactive("vpn-connect-with-fzf"),
     },
     {
       brief = "Weather: wttr.in",
