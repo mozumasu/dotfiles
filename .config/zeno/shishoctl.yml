@@ -1,0 +1,39 @@
+snippets:
+  - keyword: shisho
+    snippet: shishoctl
+
+completions:
+  - name: shishoctl subcommands
+    patterns:
+      - "^shishoctl $"
+    sourceCommand: "shishoctl --help 2>/dev/null | perl -ne 'print \"$1\\n\" if /^\\s{4}(\\S+)/' | grep -v '^-'"
+    options:
+      --prompt: "'shishoctl> '"
+
+  - name: shishoctl workflow subcommands
+    patterns:
+      - "^shishoctl workflow $"
+    sourceCommand: "shishoctl workflow --help 2>/dev/null | perl -ne 'print \"$1\\n\" if /^\\s{4}(\\S+)/' | grep -v '^-'"
+    options:
+      --prompt: "'shishoctl workflow> '"
+
+  - name: shishoctl run subcommands
+    patterns:
+      - "^shishoctl run $"
+    sourceCommand: "shishoctl run --help 2>/dev/null | perl -ne 'print \"$1\\n\" if /^\\s{4}(\\S+)/' | grep -v '^-'"
+    options:
+      --prompt: "'shishoctl run> '"
+
+  - name: shishoctl finding subcommands
+    patterns:
+      - "^shishoctl finding $"
+    sourceCommand: "shishoctl finding --help 2>/dev/null | perl -ne 'print \"$1\\n\" if /^\\s{4}(\\S+)/' | grep -v '^-'"
+    options:
+      --prompt: "'shishoctl finding> '"
+
+  - name: shishoctl auth subcommands
+    patterns:
+      - "^shishoctl auth $"
+    sourceCommand: "shishoctl auth --help 2>/dev/null | perl -ne 'print \"$1\\n\" if /^\\s{4}(\\S+)/' | grep -v '^-'"
+    options:
+      --prompt: "'shishoctl auth> '"
