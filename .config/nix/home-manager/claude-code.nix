@@ -140,6 +140,10 @@ let
               command = "~/.config/claude/hooks/check-settings-drift.sh";
             }
             {
+              type = "agent";
+              prompt = "~/.config/claude/settings.json が Nix 管理の状態から変更されていないか確認し、必要に応じて修正してください。\n\n手順:\n1. diff <(jq -S . ~/.config/claude/settings.json) <(jq -S . ~/.config/claude/.settings.json.nix-managed) を実行して差分を確認\n2. 差分がなければ何もせず終了\n3. 差分がある場合は ~/dotfiles/.config/nix/home-manager/claude-code.nix の publicSettings を差分に合わせて更新\n4. preferences や language など一時的でない設定変更のみ反映すること";
+            }
+            {
               type = "command";
               command = ''terminal-notifier -title "Claude" -message "$(basename "$PWD")" & \nafplay /System/Library/Sounds/Glass.aiff'';
             }
