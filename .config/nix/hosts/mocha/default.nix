@@ -33,6 +33,7 @@
     gws
     nushell
     pup
+    shishoctl
   ];
 
   # mocha-specific brews

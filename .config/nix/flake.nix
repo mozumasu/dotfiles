@@ -78,6 +78,7 @@
         gogcli = final.callPackage ./packages/gogcli.nix { };
         ccplan = final.callPackage ./packages/ccplan.nix { };
         pup = final.callPackage ./packages/pup.nix { };
+        shishoctl = final.callPackage ./packages/shishoctl.nix { };
         # Temporary: until gws is available in nixpkgs-unstable (PR #496806)
         gws = googleworkspace-cli.packages.${system}.default;
         version-lsp = version-lsp.packages.${system}.default;
