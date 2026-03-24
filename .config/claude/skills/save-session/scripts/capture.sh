@@ -37,7 +37,7 @@ if [[ -z "${WEZTERM_PANE:-}" ]]; then
   exit 1
 fi
 
-wezterm cli get-text --pane-id "$WEZTERM_PANE" > "$RAW_FILE"
+wezterm cli get-text --pane-id "$WEZTERM_PANE" --start-line -1000000 > "$RAW_FILE"
 
 # --- 結果をstdoutに出力（後続処理用） ---
 echo "$RAW_FILE"
