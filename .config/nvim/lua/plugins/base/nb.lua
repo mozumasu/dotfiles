@@ -20,7 +20,8 @@ local function pick_notes()
       elseif item.is_folder then
         icon = " 📂"
       end
-      return { { prefix .. icon .. " " .. item.name } }
+      local folder_ctx = item.folder_path and (" " .. item.folder_path) or ""
+      return { { prefix .. folder_ctx .. icon .. " " .. item.name } }
     end,
     preview = function(ctx)
       local item = ctx.item
@@ -284,7 +285,8 @@ local function link_item()
       elseif item.is_folder then
         icon = " 📂"
       end
-      return { { prefix .. icon .. " " .. item.name } }
+      local folder_ctx = item.folder_path and (" " .. item.folder_path) or ""
+      return { { prefix .. folder_ctx .. icon .. " " .. item.name } }
     end,
     preview = function(ctx)
       local item = ctx.item

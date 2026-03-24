@@ -3,6 +3,9 @@ local M = {}
 -- nbコマンドのプレフィックス（TERM=dumbでANSIエスケープを完全無効化）
 local NB_CMD = "TERM=dumb NB_EDITOR=: NO_COLOR=1 nb"
 
+-- フォルダ再帰展開の最大深度（無限再帰防止）
+local MAX_FOLDER_DEPTH = 5
+
 -- nbのノートディレクトリパスを取得
 function M.get_nb_dir()
   -- nbのディレクトリパスに合わせて変更してください
@@ -281,9 +284,21 @@ function M.parse_list_item_with_notebook(line, notebook)
   }
 end
 
--- 特定ノートブックのアイテム一覧を取得
-function M.list_items_for_notebook(notebook)
-  local output = M.run_cmd(notebook .. ":list --no-color")
+-- 特定ノートブックのアイテム一覧を取得（フォルダ内を再帰展開）
+function M.list_items_for_notebook(notebook, folder_path, depth)
+  depth = depth or 0
+  if depth > MAX_FOLDER_DEPTH then
+    return {}
+  end
+
+  local cmd
+  if folder_path then
+    cmd = notebook .. ":list " .. folder_path .. " --no-color"
+  else
+    cmd = notebook .. ":list --no-color"
+  end
+
+  local output = M.run_cmd(cmd)
   if not output then
     return {}
   end
@@ -292,7 +307,19 @@ function M.list_items_for_notebook(notebook)
   for _, line in ipairs(output) do
     local item = M.parse_list_item_with_notebook(line, notebook)
     if item then
+      if folder_path then
+        item.folder_path = folder_path
+      end
       table.insert(items, item)
+
+      -- フォルダの場合は再帰的に中身を取得
+      if item.is_folder then
+        local sub_folder = (folder_path or "") .. item.name .. "/"
+        local sub_items = M.list_items_for_notebook(notebook, sub_folder, depth + 1)
+        for _, sub_item in ipairs(sub_items) do
+          table.insert(items, sub_item)
+        end
+      end
     end
   end
   return items
