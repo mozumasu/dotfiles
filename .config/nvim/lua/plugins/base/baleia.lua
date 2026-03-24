@@ -517,17 +517,28 @@ return {
       end,
     })
 
-    -- 拡張子で読むとき
+    -- 拡張子で読むとき（WezCaptureと同じパイプラインで色付き表示）
     vim.api.nvim_create_autocmd("BufReadPost", {
       pattern = { "*.wezesc", "*.esc", "*.ansilog" },
       callback = function(ctx)
         vim.bo[ctx.buf].filetype = "wezesc"
-        render_ansi_current_buf()
-        local b = ensure_baleia()
-        if b then
-          ---@diagnostic disable-next-line:param-type-mismatch
-          b.automatically(ctx.buf) -- ctx.buf は bufnr
+        vim.bo[ctx.buf].modifiable = true
+        local raw = table.concat(vim.api.nvim_buf_get_lines(ctx.buf, 0, -1, false), "\n")
+        local converted = convert_sgr_colon_to_semicolon(raw)
+        local lines = vim.split(converted, "\n", { plain = true })
+        -- 末尾の空行を除去
+        while #lines > 0 and lines[#lines] == "" do
+          table.remove(lines)
         end
+        -- 空の行を設定（後で上書き）
+        local empty_lines = {}
+        for _ = 1, #lines do
+          table.insert(empty_lines, "")
+        end
+        vim.api.nvim_buf_set_lines(ctx.buf, 0, -1, false, empty_lines)
+        -- WezCaptureと同じ独自ハイライト処理（UTF-8対応）
+        apply_ansi_highlights(ctx.buf, lines)
+        vim.bo[ctx.buf].modifiable = false
       end,
     })
   end,
