@@ -141,31 +141,7 @@ let
             }
             {
               type = "agent";
-              prompt = builtins.concatStringsSep "\n" [
-                "~/.config/claude/settings.json が Nix 管理の状態から変更されていないか確認し、必要に応じて修正してください。"
-                ""
-                "手順:"
-                "1. diff <(jq -S . ~/.config/claude/settings.json) <(jq -S . ~/.config/claude/.settings.json.nix-managed) を実行して差分を確認"
-                "2. 差分がなければ何もせず終了"
-                "3. 差分がある場合は、変更内容を判別して適切なファイルに反映:"
-                ""
-                "## 振り分けルール"
-                "- まず ~/.config/claude/.private-marketplaces.json を読み、extraKnownMarketplaces のキー一覧からプライベートマーケットプレイス名を取得する"
-                "- プラグイン名の @ 以降がプライベートマーケットプレイス名と一致する enabledPlugins → sops-nix 管理の .private-marketplaces.json を更新"
-                "- extraKnownMarketplaces のキーがプライベートマーケットプレイス名と一致する → 同上"
-                "- 上記以外の enabledPlugins、extraKnownMarketplaces → ~/dotfiles/.config/nix/home-manager/claude-code.nix の publicSettings を更新"
-                "- hooks、permissions、model 等その他の設定変更 → claude-code.nix の publicSettings を更新"
-                "- 一時的な変更（温度、maxTokens の微調整など）は無視してよい"
-                ""
-                "## sops-nix ファイルの編集方法"
-                "sops で暗号化されたファイルは直接編集できません。以下のコマンドで編集してください:"
-                "  sops ~/dotfiles/.config/nix/secrets/user-secrets.yaml"
-                "claude-private-marketplaces キーの値は JSON 文字列です。jq で整形してから編集内容を確認してください。"
-                ""
-                "## 重要"
-                "- darwin-rebuild switch の実行はユーザーに任せること（自動実行しない）"
-                "- 変更後はユーザーに何を変更したか報告すること"
-              ];
+              prompt = "/nix-settings-drift";
             }
             {
               type = "command";
