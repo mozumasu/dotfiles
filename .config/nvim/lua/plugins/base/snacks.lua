@@ -61,6 +61,13 @@ return {
         end,
         desc = "Git Log File (Enter=Browse, o=Checkout)",
       },
+      {
+        "<leader>gD",
+        function()
+          Snacks.picker.git_diff({ base = "main" })
+        end,
+        desc = "Git Diff vs Main",
+      },
     },
     ---@type snacks.Config
     opts = {
