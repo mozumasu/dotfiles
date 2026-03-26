@@ -205,6 +205,34 @@ local keys = {
   { key = "[", mods = "ALT", action = act.ScrollToPrompt(-1) },
   { key = "]", mods = "ALT", action = act.ScrollToPrompt(1) },
 
+  -- Tab rename (tmux: prefix + ,)
+  {
+    key = ",",
+    mods = "LEADER",
+    action = wezterm.action_callback(function(window, pane)
+      local tab = pane:tab()
+      local tab_id = tab:tab_id()
+      local tab_module = require("tab")
+      local current = tab_module.custom_title[tab_id] or ""
+      window:perform_action(
+        act.PromptInputLine({
+          description = "(wezterm) Rename tab (empty to reset):",
+          initial_value = current,
+          action = wezterm.action_callback(function(_, inner_pane, line)
+            if line == nil then return end
+            local t = inner_pane:tab()
+            if line == "" then
+              tab_module.custom_title[t:tab_id()] = nil
+            else
+              tab_module.custom_title[t:tab_id()] = line
+            end
+          end),
+        }),
+        pane
+      )
+    end),
+  },
+
   -- Pane
   { key = ":", mods = "CTRL", action = act.PaneSelect },
   { key = "r", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) }, -- Control+q → r 横分割

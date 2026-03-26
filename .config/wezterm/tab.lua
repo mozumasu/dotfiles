@@ -1,6 +1,9 @@
 local wezterm = require("wezterm")
 local module = {}
 
+-- Custom tab titles (tab_id -> string or nil)
+module.custom_title = {}
+
 -- =============================================================================
 -- 定数
 -- =============================================================================
@@ -11,6 +14,7 @@ local ICONS = {
   neovim = wezterm.nerdfonts.linux_neovim,
   nb = wezterm.nerdfonts.md_notebook,
   ssh = wezterm.nerdfonts.md_lan,
+  claude = "✳",
   fallback = wezterm.nerdfonts.dev_terminal,
   zoom = wezterm.nerdfonts.md_magnify,
 }
@@ -21,6 +25,7 @@ local ICON_COLORS = {
   neovim = "#57A143",
   nb = "#9370DB",
   ssh = "#ff6b6b",
+  claude = "#D97757",
 }
 
 -- Tab colors
@@ -108,6 +113,10 @@ local function get_icon_and_color(process_name, pane_title, cmdline, cwd, is_ssh
     return ICONS.nb, ICON_COLORS.nb
   end
 
+  if is_claude_process(process_name, pane_title) then
+    return ICONS.claude, ICON_COLORS.claude
+  end
+
   if process_name == "docker" or (pane_title and pane_title:find("docker")) then
     return ICONS.docker, ICON_COLORS.docker
   end
@@ -182,9 +191,12 @@ function module.apply_to_config(config)
     local edge_background = "transparent"
     local edge_foreground = background
 
-    -- タイトルテキスト
+    -- タイトルテキスト（カスタムタイトル > SSH > nb > CWD）
     local title_text
-    if is_ssh then
+    local custom = module.custom_title[tab.tab_id]
+    if custom then
+      title_text = custom
+    elseif is_ssh then
       title_text = ssh_host_cache[pane_id] or "ssh"
     elseif is_nb_process(process_name, cmdline, cached_cwd) then
       title_text = "nb"
@@ -192,9 +204,9 @@ function module.apply_to_config(config)
       title_text = title_cache[pane_id] or "-"
     end
 
-    -- Claude Code のタイトル追加
+    -- Claude Code のタイトル追加（カスタムタイトル時はアイコンのみ）
     local claude_suffix = ""
-    if is_claude_process(process_name, pane_title) and pane_title ~= "" then
+    if not custom and is_claude_process(process_name, pane_title) and pane_title ~= "" then
       claude_suffix = " " .. pane_title
     end
 

@@ -34,6 +34,7 @@
     nushell
     pup
     shishoctl
+    vde-layout
   ];
 
   # mocha-specific brews
