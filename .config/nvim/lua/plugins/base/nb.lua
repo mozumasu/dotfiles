@@ -1,3 +1,12 @@
+--- ANSIエスケープシーケンスを除去する
+local function strip_ansi(str)
+  str = str:gsub("\27%[[0-9;:?]*%a", "") -- CSI sequences (SGR, cursor, etc.)
+  str = str:gsub("\27%].-\27\\", "") -- OSC sequences (ESC] ... ESC\)
+  str = str:gsub("\27%].-\7", "") -- OSC sequences (ESC] ... BEL)
+  str = str:gsub("\27[%(%)][A-Z0-9]", "") -- Character set designation
+  return str
+end
+
 -- snacks.nvimでノートをタイトル一覧から検索して開く（全ノートブック対応）
 local function pick_notes()
   local nb = require("config.nb")
@@ -30,6 +39,14 @@ local function pick_notes()
       end
       if not item.file then
         item.file = nb.get_note_path(item.full_id)
+      end
+      if item.file and item.file:match("%.wezesc$") then
+        local lines = vim.fn.readfile(item.file)
+        for i, line in ipairs(lines) do
+          lines[i] = strip_ansi(line)
+        end
+        ctx.preview:set_lines(lines)
+        return
       end
       return Snacks.picker.preview.file(ctx)
     end,
@@ -295,6 +312,14 @@ local function link_item()
       end
       if not item.file then
         item.file = nb.get_note_path(item.full_id)
+      end
+      if item.file and item.file:match("%.wezesc$") then
+        local lines = vim.fn.readfile(item.file)
+        for i, line in ipairs(lines) do
+          lines[i] = strip_ansi(line)
+        end
+        ctx.preview:set_lines(lines)
+        return
       end
       return Snacks.picker.preview.file(ctx)
     end,
