@@ -99,7 +99,7 @@ local function extract_project_name(cwd)
   return cwd:match("([^/]+)$") or cwd
 end
 
-local function get_icon_and_color(process_name, pane_title, cmdline, cwd, is_ssh, is_active)
+local function get_icon_and_color(process_name, pane_title, cmdline, cwd, is_ssh, is_active, is_claude)
   if is_ssh then
     local color = is_active and "#ffffff" or ICON_COLORS.ssh
     return ICONS.ssh, color
@@ -113,7 +113,7 @@ local function get_icon_and_color(process_name, pane_title, cmdline, cwd, is_ssh
     return ICONS.nb, ICON_COLORS.nb
   end
 
-  if is_claude_process(process_name, pane_title) then
+  if is_claude then
     return ICONS.claude, ICON_COLORS.claude
   end
 
@@ -150,6 +150,7 @@ function module.apply_to_config(config)
   local title_cache = {}
   local raw_cwd_cache = {}
   local ssh_host_cache = {}
+  local claude_cache = {} -- pane_id -> bool (Claude Code検出キャッシュ)
 
   -- タイトルキャッシュの更新
   wezterm.on("update-status", function(_, pane)
@@ -186,6 +187,14 @@ function module.apply_to_config(config)
       ssh_host_cache[pane_id] = nil
     end
 
+    -- Claude Code検出（一度検出したらキャッシュ、シェルに戻ったら解除）
+    if is_claude_process(process_name, pane_title) then
+      claude_cache[pane_id] = true
+    elseif process_name == "zsh" or process_name == "bash" or process_name == "fish" then
+      claude_cache[pane_id] = nil
+    end
+    local is_claude = claude_cache[pane_id] or false
+
     -- タブの色
     local background, foreground = get_tab_colors(tab.is_active, is_ssh)
     local edge_background = "transparent"
@@ -206,12 +215,12 @@ function module.apply_to_config(config)
 
     -- Claude Code のタイトル追加（カスタムタイトル時はアイコンのみ）
     local claude_suffix = ""
-    if not custom and is_claude_process(process_name, pane_title) and pane_title ~= "" then
+    if not custom and is_claude and pane_title ~= "" then
       claude_suffix = " " .. pane_title
     end
 
     -- アイコン
-    local icon, icon_color = get_icon_and_color(process_name, pane_title, cmdline, cached_cwd, is_ssh, tab.is_active)
+    local icon, icon_color = get_icon_and_color(process_name, pane_title, cmdline, cached_cwd, is_ssh, tab.is_active, is_claude)
 
     -- ズームインジケーター
     local zoom_indicator = has_zoomed_pane(tab.panes) and (ICONS.zoom .. " ") or ""
