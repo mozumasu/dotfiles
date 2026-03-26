@@ -5,6 +5,7 @@
 }:
 
 writeShellScriptBin "vde-layout" ''
+  export VDE_CONFIG_PATH="''${VDE_CONFIG_PATH:-$HOME/dotfiles/.config/vde}"
   exec ${nodejs}/bin/npx -y vde-layout@1.1.1 "$@"
 ''
 // {

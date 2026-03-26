@@ -23,6 +23,23 @@ presets:
   monitor:
     name: Monitor
     command: htop
+  demo:
+    name: Demo
+    description: nvim, lazygit, fastfetch, cowsay
+    backend: wezterm
+    layout:
+      type: horizontal
+      ratio: [1, 1, 1, 1]
+      panes:
+        - name: editor
+          command: nvim
+          focus: true
+        - name: git
+          command: lazygit
+        - name: fastfetch
+          command: nix run nixpkgs#fastfetch
+        - name: cowsay
+          command: cowsay WezTerm最高
   zenn:
     name: Zenn Workspace
     description: nvim, claude, server
