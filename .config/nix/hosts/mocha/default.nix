@@ -28,6 +28,7 @@
   environment.systemPackages = with pkgs; [
     _1password-cli
     ccplan
+    figlet
     glab
     google-cloud-sdk
     gws
