@@ -27,6 +27,7 @@
   # mocha-specific packages
   environment.systemPackages = with pkgs; [
     _1password-cli
+    btop
     ccplan
     figlet
     glab
