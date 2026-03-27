@@ -675,6 +675,31 @@ wezterm.on("augment-command-palette", function(window, pane)
       action = spawn_overlay_pane_interactive("vpn-connect-with-fzf"),
     },
     {
+      brief = "Layout: vde-layout demo (current tab)",
+      icon = "md_view_column",
+      action = wezterm.action_callback(function(window, pane)
+        local pane_id = pane:pane_id()
+        wezterm.background_child_process({
+          os.getenv("SHELL") or "/bin/zsh",
+          "-lic",
+          string.format("WEZTERM_PANE=%d vde-layout demo --current-window", pane_id),
+        })
+      end),
+    },
+    {
+      brief = "Layout: vde-layout demo (new tab)",
+      icon = "md_view_column",
+      action = wezterm.action_callback(function(window, pane)
+        local cwd = pane:get_current_working_dir()
+        local cwd_path = cwd and cwd.file_path or os.getenv("HOME")
+        wezterm.background_child_process({
+          os.getenv("SHELL") or "/bin/zsh",
+          "-lic",
+          string.format("cd %q && vde-layout demo --new-window", cwd_path),
+        })
+      end),
+    },
+    {
       brief = "Weather: wttr.in",
       icon = "md_weather_cloudy",
       action = spawn_overlay_pane("curl wttr.in | less -R"),
