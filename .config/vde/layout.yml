@@ -37,9 +37,9 @@ presets:
         - name: git
           command: lazygit
         - name: fastfetch
-          command: nix run nixpkgs#fastfetch
+          command: fastfetch
         - name: cowsay
-          command: cowsay WezTerm最高
+          command: ~/dotfiles/mozumasu.sh ~/Pictures/icon/icon-mozumasu.jpeg
   zenn:
     name: Zenn Workspace
     description: nvim, claude, server
