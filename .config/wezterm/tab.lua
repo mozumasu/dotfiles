@@ -205,9 +205,10 @@ function module.apply_to_config(config)
     local edge_background = "transparent"
     local edge_foreground = background
 
-    -- タイトルテキスト（カスタムタイトル > SSH > nb > CWD）
+    -- タイトルテキスト（カスタムタイトル > CLI設定タイトル > SSH > nb > CWD）
     local title_text
     local custom = module.custom_title[tab.tab_id]
+      or (tab.tab_title ~= "" and tab.tab_title or nil)
     if custom then
       title_text = custom
     elseif is_ssh then
