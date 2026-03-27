@@ -167,6 +167,16 @@ function module.apply_to_config(config)
         title_cache[pane_id] = extract_project_name(cwd)
       end
     end
+
+    -- Claude Code検出キャッシュ（update-statusで安定的に判定）
+    local process_name = basename(pane:get_foreground_process_name() or "")
+    local pane_title = pane:get_title() or ""
+    if is_claude_process(process_name, pane_title) then
+      claude_cache[pane_id] = true
+    elseif (process_name == "zsh" or process_name == "bash" or process_name == "fish")
+      and not (pane_title:find("^✳") or pane_title:lower():find("claude")) then
+      claude_cache[pane_id] = nil
+    end
   end)
 
   -- タブタイトルのフォーマット
@@ -187,12 +197,7 @@ function module.apply_to_config(config)
       ssh_host_cache[pane_id] = nil
     end
 
-    -- Claude Code検出（一度検出したらキャッシュ、シェルに戻ったら解除）
-    if is_claude_process(process_name, pane_title) then
-      claude_cache[pane_id] = true
-    elseif process_name == "zsh" or process_name == "bash" or process_name == "fish" then
-      claude_cache[pane_id] = nil
-    end
+    -- Claude Code検出（update-statusでキャッシュ済み）
     local is_claude = claude_cache[pane_id] or false
 
     -- タブの色
