@@ -25,21 +25,34 @@ presets:
     command: htop
   demo:
     name: Demo
-    description: nvim, lazygit, fastfetch, cowsay
+    description: nvim, lazygit, btop, fastfetch, nyancat
     backend: wezterm
     layout:
       type: horizontal
-      ratio: [1, 1, 1, 1]
+      ratio: [1, 1, 2]
       panes:
         - name: editor
           command: nvim
           focus: true
         - name: git
           command: lazygit
-        - name: fastfetch
-          command: fastfetch
-        - name: cowsay
-          command: ~/dotfiles/mozumasu.sh ~/Pictures/icon/icon-mozumasu.jpeg
+        - type: vertical
+          ratio: [1, 1]
+          panes:
+            - name: monitor
+              command: btop
+            - type: horizontal
+              ratio: [1, 1]
+              panes:
+                - name: fastfetch
+                  command: fastfetch
+                - type: vertical
+                  ratio: [1, 1]
+                  panes:
+                    - name: mozumasu
+                      command: ~/dotfiles/mozumasu.sh ~/Pictures/icon/icon-mozumasu.jpeg
+                    - name: nyancat
+                      command: nyancat
   zenn:
     name: Zenn Workspace
     description: nvim, claude, server
