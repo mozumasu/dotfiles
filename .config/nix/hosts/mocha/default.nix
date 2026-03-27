@@ -32,6 +32,7 @@
     glab
     google-cloud-sdk
     gws
+    nyancat
     nushell
     pup
     shishoctl
