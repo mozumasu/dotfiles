@@ -38,6 +38,7 @@
     pup
     shishoctl
     vde-layout
+    vscode
   ];
 
   # mocha-specific brews
