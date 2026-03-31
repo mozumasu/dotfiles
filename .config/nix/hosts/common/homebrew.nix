@@ -33,7 +33,7 @@
       # System utilities
       "aws-vault-binary"
       "karabiner-elements"
-      "monitorcontrol"
+      "betterdisplay"
       "shottr"
 
       # Input methods
