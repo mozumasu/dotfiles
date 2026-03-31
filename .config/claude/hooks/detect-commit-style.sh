@@ -28,9 +28,26 @@ if [ -z "$STYLE" ]; then
   fi
 fi
 
-# 3. 言語を git log から推定（日本語文字の有無）
-[ -z "$RECENT" ] && RECENT=$(git log --oneline -10 2>/dev/null || echo "")
-if printf '%s\n' "$RECENT" | perl -CSD -0777 -ne 'exit(/\p{Hiragana}|\p{Katakana}|\p{Han}/ ? 0 : 1)'; then
+# 3. 言語を git log の subject と body で別々に推定
+SUBJECTS=$(git log --format=%s -10 2>/dev/null || echo "")
+BODIES=$(git log --format=%b -10 2>/dev/null || echo "")
+
+# subject: 過半数が日本語かどうかで判定
+JA_SUBJECT_RATIO=$(printf '%s\n' "$SUBJECTS" | perl -CSD -ne '
+  $total++ if /\S/;
+  $ja++ if /\p{Hiragana}|\p{Katakana}|\p{Han}/;
+  END { printf "%.0f", ($total ? $ja / $total * 100 : 0) }
+')
+HAS_JA_SUBJECT=false
+[ "$JA_SUBJECT_RATIO" -gt 50 ] && HAS_JA_SUBJECT=true
+
+# body: 日本語が1つでもあれば日本語と判定
+HAS_JA_BODY=false
+printf '%s\n' "$BODIES" | perl -CSD -0777 -ne 'exit(/\p{Hiragana}|\p{Katakana}|\p{Han}/ ? 0 : 1)' && HAS_JA_BODY=true
+
+if ! $HAS_JA_SUBJECT && $HAS_JA_BODY; then
+  LANG_LABEL="English subject, Japanese body"
+elif $HAS_JA_SUBJECT; then
   LANG_LABEL="Japanese"
 else
   LANG_LABEL="English"
