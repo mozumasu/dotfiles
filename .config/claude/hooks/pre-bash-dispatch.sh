@@ -28,6 +28,10 @@ run_check() {
 # コマンドとしての git にのみマッチ（ファイルパス中の git* は除外）
 if echo "$COMMAND" | grep -qE '(^|[;&|] *)git\b'; then
   run_check python3 ~/.config/claude/hooks/prevent-git-push.py
+  # git commit 時のみコミットスタイルを検出して注入
+  if echo "$COMMAND" | grep -qE 'git\s+commit\b'; then
+    run_check ~/.config/claude/hooks/detect-commit-style.sh
+  fi
 fi
 
 # terraform / terragrunt コマンドのみ apply チェックと Docker ルーティングを実行

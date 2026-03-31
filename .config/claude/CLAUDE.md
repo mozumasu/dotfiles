@@ -5,32 +5,13 @@
 
 ## Git Commit Message Format
 
-**必須**: Conventional Commits + gitmoji フォーマットを使用
+**必須**: コミットメッセージのスタイルは PreToolUse hook が自動検出する。検出されたスタイルに従うこと。
 
-```
-<type>: <emoji> <description>
+hooks が何も返さない場合のデフォルト:
 
-[optional body]
-```
-
-**Type と Emoji の対応**:
-
-- feat: ✨ (新機能)
-- fix: 🐛 (バグ修正)
-- docs: 📝 (ドキュメント)
-- style: 💄 (フォーマット、コードスタイル)
-- refactor: ♻️ (リファクタリング)
-- perf: ⚡️ (パフォーマンス改善)
-- test: ✅ (テスト)
-- build: 👷 (ビルドシステム)
-- ci: 🎡 (CI/CD)
-- chore: 🔧 (その他、設定ファイルなど)
-
-**例**:
-
-- `feat: ✨ gitleaksによるシークレットスキャンを追加`
-- `fix: 🐛 rumdlの警告を解消`
-- `ci: 🎡 actions/checkoutをv6.0.1に更新`
+- Conventional Commits + gitmoji（日本語）
+- Format: `<type>: <emoji> <description>`
+- Type と Emoji: feat: ✨ / fix: 🐛 / docs: 📝 / style: 💄 / refactor: ♻️ / perf: ⚡️ / test: ✅ / build: 👷 / ci: 🎡 / chore: 🔧
 
 ## Text Processing
 
