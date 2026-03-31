@@ -141,11 +141,26 @@ let
             }
             {
               type = "agent";
-              prompt = "/nix-settings-drift";
+              prompt = ''
+                ~/.config/claude/settings.json が Nix 管理の状態から変更されていないか確認し、差分があれば適切なソースファイルに反映する。
+
+                手順:
+                1. diff <(jq -S . ~/.config/claude/settings.json) <(jq -S . ~/.config/claude/.settings.json.nix-managed) を実行して差分を確認
+                2. 差分がなければ「差分なし」と報告して終了
+                3. 差分がある場合、~/.config/claude/.private-marketplaces.json を読み、extraKnownMarketplaces のキー一覧からプライベートマーケットプレイス名を取得する
+                4. 以下の振り分けルールに従って ~/dotfiles/.config/nix/home-manager/claude-code.nix の publicSettings を編集する:
+                   - プラグイン名の @ 以降がプライベートマーケットプレイス名と一致する enabledPlugins → sops-nix (user-secrets.yaml の claude-private-marketplaces)
+                   - extraKnownMarketplaces のキーがプライベートマーケットプレイス名と一致 → 同上
+                   - 上記以外の enabledPlugins、extraKnownMarketplaces → claude-code.nix の publicSettings
+                   - hooks、permissions、model 等その他の設定変更 → claude-code.nix の publicSettings
+                   - 一時的な変更（temperature、maxTokens の微調整など）→ 無視
+                5. darwin-rebuild switch の実行はユーザーに任せること（自動実行しない）
+                6. 変更後はユーザーに何を変更したかと darwin-rebuild switch の実行が必要であることを報告する
+              '';
             }
             {
               type = "command";
-              command = ''terminal-notifier -title "Claude" -message "$(basename "$PWD")" & \nafplay /System/Library/Sounds/Glass.aiff'';
+              command = ''terminal-notifier -title "Claude" -message "$(basename "$PWD")" & afplay /System/Library/Sounds/Glass.aiff'';
             }
           ];
         }
@@ -156,7 +171,7 @@ let
           hooks = [
             {
               type = "command";
-              command = ''terminal-notifier -title "Claude Notification" -message "$(basename "$PWD")" & \nafplay /System/Library/Sounds/Glass.aiff'';
+              command = ''terminal-notifier -title "Claude Notification" -message "$(basename "$PWD")" & afplay /System/Library/Sounds/Glass.aiff'';
             }
           ];
         }
