@@ -1,5 +1,6 @@
 return {
   "HakonHarnes/img-clip.nvim",
+  event = "VeryLazy",
   opts = {
     default = {
       -- file and directory options
@@ -19,7 +20,8 @@ return {
       },
     },
   },
-  keys = {
-    { "<leader>P", "<cmd>PasteImage<cr>", desc = "Paste image from system clipboard" },
-  },
+  config = function(_, opts)
+    require("img-clip").setup(opts)
+    vim.keymap.set("n", "<leader>P", "<cmd>PasteImage<cr>", { desc = "Paste image from system clipboard" })
+  end,
 }
