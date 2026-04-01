@@ -1,6 +1,5 @@
 return {
   "HakonHarnes/img-clip.nvim",
-  event = "VeryLazy",
   opts = {
     default = {
       -- file and directory options
@@ -12,10 +11,15 @@ return {
       -- prompt options
       prompt_for_file_name = true, ---@type boolean | fun(): boolean
       show_dir_path_in_prompt = false, ---@type boolean | fun(): boolean
+
+      -- avante.nvim integration
+      embed_image_as_base64 = false,
+      drag_and_drop = {
+        insert_mode = true,
+      },
     },
   },
   keys = {
-    -- suggested keymap
     { "<leader>P", "<cmd>PasteImage<cr>", desc = "Paste image from system clipboard" },
   },
 }
