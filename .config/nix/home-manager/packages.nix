@@ -58,6 +58,7 @@
     ffmpeg
     imagemagick
     ghostscript
+    pngpaste # img-clip.nvim で画像をクリップボードから貼り付け
 
     # モニタリング/ユーティリティ
     bottom
