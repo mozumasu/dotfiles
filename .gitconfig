@@ -39,6 +39,7 @@
 	postBuffer = 524288000
 [ghq]
 	root = ~/src
+	user = mozumasu
 [commit]
 	gpgsign = true
 [gpg]
