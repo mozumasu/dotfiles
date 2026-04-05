@@ -38,6 +38,9 @@ snippets:
   - keyword: gaos;
     snippet: gcloud app open-console --project {{PROJECT_ID}} --service {{SERVICE}}
 
+  - keyword: gcopen
+    snippet: open "https://console.cloud.google.com/home/dashboard?project=$(gcloud config get-value project 2>/dev/null)"
+
   - keyword: gsva;
     snippet: gcloud secrets versions access latest --project={{PROJECT_ID}} --secret={{SECRET_NAME}}
 
