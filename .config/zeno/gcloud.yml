@@ -71,6 +71,13 @@ completions:
     options:
       --prompt: "'GCP Config Property> '"
 
+  - name: gcloud configuration
+    patterns:
+      - '^gcloud config configurations activate\s+[A-Za-z0-9._-]*$'
+    sourceCommand: "gcloud config configurations list --format='value(name)' 2>/dev/null"
+    options:
+      --prompt: "'GCP Configuration> '"
+
   - name: gcloud secret
     patterns:
       - '^gcloud\b.*--secret(?:=|\s+)[A-Za-z0-9._-]*$'
