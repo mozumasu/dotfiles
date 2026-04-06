@@ -132,7 +132,6 @@ sudo nix run \
 | App Logins | Authentication |
 | SSH Keys | `~/.ssh/` not managed |
 | AWS/Git Credentials | Sensitive data |
-| Karabiner Permissions | Accessibility permissions |
 
 ### Daily Commands
 
