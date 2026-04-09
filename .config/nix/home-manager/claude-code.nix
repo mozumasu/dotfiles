@@ -96,7 +96,6 @@ let
         "~/src/github.com/mozumasu/zenn/articles"
       ];
     };
-    model = "opus[1m]";
     hooks = {
       PreToolUse = [
         {
@@ -204,7 +203,10 @@ let
     enabledPlugins = {
       "example-skills@anthropic-agent-skills" = true;
       "pyright-lsp@claude-plugins-official" = true;
-    };
+    }
+    // lib.optionalAttrs (builtins.pathExists privateMarketplacesFile) (builtins.fromJSON (
+      builtins.readFile privateMarketplacesFile
+    )).enabledPlugins;
     extraKnownMarketplaces = {
       anthropic-agent-skills = {
         source = {
@@ -212,13 +214,16 @@ let
           repo = "anthropics/skills";
         };
       };
-      # 非公開マーケットプレイスは privateMarketplaces で追加
-    };
-    effortLevel = "high";
+    }
+    // lib.optionalAttrs (builtins.pathExists privateMarketplacesFile) (builtins.fromJSON (
+      builtins.readFile privateMarketplacesFile
+    )).extraKnownMarketplaces;
     plansDirectory = "./plans";
     maxTokens = 8192;
     temperature = 0;
     language = "ja";
+    effortLevel = "medium";
+  };
   };
 
   # 非公開マーケットプレイス設定は sops-nix で管理
