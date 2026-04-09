@@ -41,6 +41,10 @@ config.quick_select_patterns = {
   "\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b",
   -- UUID
   "\\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\b",
+  -- kebab-case / snake_case 識別子（2セグメント以上）
+  "\\b[a-zA-Z][a-zA-Z0-9]*(?:[_-][a-zA-Z0-9]+){1,}\\b",
+  -- メールアドレス
+  "\\b[\\w.+-]+@[\\w.-]+\\.[a-zA-Z]{2,}\\b",
 }
 
 require("keymaps").apply_to_config(config)
