@@ -1,0 +1,13 @@
+#!/usr/bin/env zsh
+
+local ghq_root=$(ghq root)
+local src=$(ghq list | fzf \
+  --disabled \
+  --preview "bat --color=always --style=header,grid --line-range :80 $ghq_root/{}/README.* | rg --color=always --passthru {q}" \
+  --bind "change:reload:test -n {q} && rg -l {q} $ghq_root --glob 'README.*' --max-depth 4 2>/dev/null | perl -pe \"s|^\Q$ghq_root\E/||; s|/README\\..*\$||\" || ghq list" \
+  --bind 'ctrl-/:toggle-preview')
+if [ -n "$src" ]; then
+  BUFFER="cd $ghq_root/$src"
+  zle accept-line
+fi
+zle -R -c

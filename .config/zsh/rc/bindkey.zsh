@@ -16,6 +16,10 @@ zle -N fzf-history-widget
 zle -N ghq-fzf
 bindkey '^g' ghq-fzf
 
+# ghq readme search
+zle -N ghq-fzf-readme
+bindkey '^X^G' ghq-fzf-readme
+
 # custom Ctrl+Z to suspend only when running in terminal
 zle -N fancy-ctrl-z
 bindkey '^Z' fancy-ctrl-z
