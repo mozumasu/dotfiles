@@ -224,7 +224,6 @@ let
     language = "ja";
     effortLevel = "medium";
   };
-  };
 
   # 非公開マーケットプレイス設定は sops-nix で管理
   # sops.nix の claude-private-marketplaces シークレットが
