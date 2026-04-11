@@ -37,6 +37,7 @@
     nushell
     pup
     shishoctl
+    thonny
     vde-layout
     vscode
   ];
