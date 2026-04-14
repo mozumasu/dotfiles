@@ -355,4 +355,19 @@
 
     echo "=== extraActivation: Done ==="
   '';
+
+  # F8キーなどの誤操作で Apple Music (Music.app) が勝手に起動するのを防ぐ。
+  # rcd (Remote Control Daemon) が再生キーをフックして Music.app を起動するため、
+  # ユーザーの launchd から無効化する。
+  # 参考: https://zenn.dev/catnose99/scraps/9c9858cc2d9f70
+  system.activationScripts.disableAppleMusicRcd.text = ''
+    USER_NAME="${config.hostSpec.username}"
+    if [[ -n "$USER_NAME" ]]; then
+      USER_UID="$(/usr/bin/id -u "$USER_NAME")"
+      if [[ -n "$USER_UID" ]]; then
+        echo "Disabling com.apple.rcd for uid=$USER_UID ($USER_NAME)..."
+        /bin/launchctl disable "gui/$USER_UID/com.apple.rcd" || true
+      fi
+    fi
+  '';
 }
