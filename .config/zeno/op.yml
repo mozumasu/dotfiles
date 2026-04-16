@@ -1,0 +1,51 @@
+snippets:
+  - keyword: opg
+    snippet: op item get {{item}} --fields password --reveal
+
+  - keyword: opgu
+    snippet: op item get {{item}} --fields username --reveal
+
+  - keyword: opl
+    snippet: op item list
+
+  - keyword: opvl
+    snippet: op vault list
+
+  - keyword: opsi
+    snippet: eval $(op signin)
+
+
+
+completions:
+  - name: op item
+    patterns:
+      - '^op\s+item\s+(get|edit|delete|share)\s+[A-Za-z0-9._-]*$'
+    sourceCommand: "op item list --format=json 2>/dev/null | jq -r '.[] | [.id, .title, .vault.name] | @tsv' | perl -pe 's/\\t/ : /g'"
+    callback: "awk '{ print $1 }'"
+    options:
+      --prompt: "'1Password Item> '"
+
+  - name: op vault
+    patterns:
+      - '^op\b.*--vault(?:=|\s+)[A-Za-z0-9._-]*$'
+      - '^op\s+vault\s+(get|edit|delete)\s+[A-Za-z0-9._-]*$'
+    sourceCommand: "op vault list --format=json 2>/dev/null | jq -r '.[] | [.id, .name] | @tsv' | perl -pe 's/\\t/ : /g'"
+    callback: "awk '{ print $1 }'"
+    options:
+      --prompt: "'1Password Vault> '"
+
+  - name: op fields
+    patterns:
+      - '^op\b.*--fields(?:=|\s+)[A-Za-z0-9._,-]*$'
+    sourceCommand: "printf '%s\\n' password username email url notesPlain totp title tags"
+    options:
+      --prompt: "'1Password Field> '"
+
+  - name: op account
+    patterns:
+      - '^op\b.*--account(?:=|\s+)[A-Za-z0-9._-]*$'
+      - '^op\s+signin\s+--account(?:=|\s+)[A-Za-z0-9._-]*$'
+    sourceCommand: "op account list --format=json 2>/dev/null | jq -r '.[] | [.shorthand, .url, .email] | @tsv' | perl -pe 's/\\t/ : /g'"
+    callback: "awk '{ print $1 }'"
+    options:
+      --prompt: "'1Password Account> '"
