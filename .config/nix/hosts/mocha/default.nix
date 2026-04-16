@@ -32,6 +32,7 @@
     figlet
     glab
     google-cloud-sdk
+    grafanactl
     gws
     nyancat
     nushell
