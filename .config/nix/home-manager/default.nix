@@ -9,6 +9,7 @@
     ./claude-code.nix
     ./codex.nix
     ./dotfiles.nix
+    ./gh.nix
     ./lazygit.nix
     ./packages.nix
     ./zsh.nix
