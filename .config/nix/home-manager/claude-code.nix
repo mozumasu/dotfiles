@@ -203,6 +203,7 @@ let
     enabledPlugins = {
       "example-skills@anthropic-agent-skills" = true;
       "pyright-lsp@claude-plugins-official" = true;
+      "slack@claude-plugins-official" = true;
     }
     // lib.optionalAttrs (builtins.pathExists privateMarketplacesFile) (builtins.fromJSON (
       builtins.readFile privateMarketplacesFile
