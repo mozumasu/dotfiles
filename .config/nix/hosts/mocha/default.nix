@@ -29,6 +29,7 @@
     _1password-cli
     btop
     ccplan
+    discord
     figlet
     glab
     google-cloud-sdk
