@@ -24,6 +24,7 @@
     git-secrets
     lefthook
     czg
+    mergiraf # syntax-aware git merge driver
 
     # エディタ/ターミナル
     neovim
