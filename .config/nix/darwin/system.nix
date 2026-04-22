@@ -146,8 +146,8 @@
       Clicking = true;
       # 右クリック (二本指タップ)
       TrackpadRightClick = true;
-      # 3本指ドラッグ
-      TrackpadThreeFingerDrag = true;
+      # 3本指ドラッグ (タップ&ホールドでのドラッグと併用不可のため無効)
+      TrackpadThreeFingerDrag = false;
       # 静音クリック (0=静音, 1=通常)
       ActuationStrength = 0;
     };
@@ -286,14 +286,28 @@
       "com.apple.helpviewer" = {
         DevMode = true;
       };
+      # トラックパッドの速度 (UIスライダー最大は3.0、それ以上も設定可)
+      NSGlobalDomain = {
+        "com.apple.trackpad.scaling" = 5.0;
+      };
+      # タップ&ホールドでドラッグ (内蔵トラックパッド)
+      "com.apple.AppleMultitouchTrackpad" = {
+        Dragging = true;
+        DragLock = false;
+      };
+      # タップ&ホールドでドラッグ (Bluetoothトラックパッド)
+      "com.apple.driver.AppleBluetoothMultitouch.trackpad" = {
+        Dragging = true;
+        DragLock = false;
+      };
     };
 
     # --------------------------------------------------------------------------
     # マウス設定
     # --------------------------------------------------------------------------
     ".GlobalPreferences" = {
-      # マウスの速度 (-1 から 3)
-      "com.apple.mouse.scaling" = 3.0;
+      # マウスの速度 (UIスライダー最大は3.0、それ以上も設定可)
+      "com.apple.mouse.scaling" = 5.0;
     };
   };
 
