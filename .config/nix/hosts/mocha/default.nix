@@ -68,6 +68,7 @@
   homebrew.taps = [
     "manaflow-ai/cmux"
     "timac/vpnstatus"
+    "tw93/tap"
   ];
 
   # mocha-specific casks
@@ -76,5 +77,6 @@
     "cmux"
     "docker-desktop"
     "jordanbaird-ice"
+    "kaku"
   ];
 }
