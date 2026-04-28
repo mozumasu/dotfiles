@@ -37,6 +37,7 @@
     gws
     nyancat
     nushell
+    open-policy-agent
     pup
     shishoctl
     thonny
