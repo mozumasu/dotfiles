@@ -84,6 +84,10 @@
         gws = googleworkspace-cli.packages.${system}.default;
         version-lsp = version-lsp.packages.${system}.default;
         plamo-translate = kawarimidoll-nur.packages.${system}.plamo-translate;
+        # Temporary: OPA 1.14.1 has broken test fixtures (compile_handler_test.go)
+        open-policy-agent = prev.open-policy-agent.overrideAttrs (_: {
+          doCheck = false;
+        });
       };
 
       pkgs = import nixpkgs {
