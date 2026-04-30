@@ -52,6 +52,7 @@
   ];
 
   # agent-browser: Chromiumのダウンロード（初回のみ）
+  # gcx: バンドルされた Agent Skills を ~/.agents にインストール（バージョン変更時のみ）
   home-manager.users.${config.hostSpec.username} =
     { lib, ... }:
     {
@@ -61,6 +62,15 @@
         if [ -x "$AGENT_BROWSER" ] && [ ! -d "$PLAYWRIGHT_CACHE" ]; then
           export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
           "$AGENT_BROWSER" install
+        fi
+      '';
+
+      home.activation.gcxSkillsInstall = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        GCX="${pkgs.gcx}/bin/gcx"
+        MARKER="$HOME/.agents/.gcx-version"
+        if [ -x "$GCX" ] && [ "$(cat "$MARKER" 2>/dev/null)" != "${pkgs.gcx.version}" ]; then
+          "$GCX" skills install --all --force
+          echo "${pkgs.gcx.version}" > "$MARKER"
         fi
       '';
     };
