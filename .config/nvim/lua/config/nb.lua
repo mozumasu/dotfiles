@@ -26,52 +26,6 @@ function M.run_cmd(args)
   return #output > 0 and output or nil
 end
 
--- リスト行をパースして構造化データを返す
--- 例: "[1] 🌄 image.png" -> { note_id = "1", name = "image.png", is_image = true }
--- 例: "[2] ノートタイトル" -> { note_id = "2", name = "ノートタイトル", is_image = false }
-function M.parse_list_item(line)
-  local note_id = line:match("^%[(.-)%]")
-  if not note_id then
-    return nil
-  end
-
-  local is_image = line:match("🌄") ~= nil
-  local name
-  if is_image then
-    name = line:match("%[%d+%]%s*🌄%s*(.+)$")
-  else
-    name = line:match("%[%d+%]%s*(.+)$")
-  end
-
-  if not name then
-    return nil
-  end
-
-  return {
-    note_id = note_id,
-    name = vim.trim(name),
-    is_image = is_image,
-    text = line,
-  }
-end
-
--- パース済みアイテム一覧を取得
-function M.list_items()
-  local output = M.run_cmd("list --no-color")
-  if not output then
-    return nil
-  end
-
-  local items = {}
-  for _, line in ipairs(output) do
-    local item = M.parse_list_item(line)
-    if item then
-      table.insert(items, item)
-    end
-  end
-  return items
-end
-
 -- nbノートのタイトルを取得する関数（bufferline用）
 function M.get_title(filepath)
   local nb_dir = M.get_nb_dir()
@@ -192,9 +146,9 @@ function M.import_image(image_path, new_filename)
   return nil, "Could not parse import result"
 end
 
--- ノートを削除
+-- ノートを削除（note_id は "notebook:id" / "notebook:filename" / "id" のいずれも可）
 function M.delete_note(note_id)
-  local output = M.run_cmd("delete --force " .. note_id)
+  local output = M.run_cmd("delete --force " .. vim.fn.shellescape(note_id))
   return output ~= nil
 end
 
@@ -241,153 +195,130 @@ function M.list_notebooks()
   return notebooks
 end
 
--- リスト行をパース（ノートブック情報付き）
--- 例: "[22] タイトル" + notebook="log" -> { full_id = "log:22", notebook = "log", ... }
-function M.parse_list_item_with_notebook(line, notebook)
-  local note_id = line:match("^%[(.-)%]")
-  if not note_id then
+-- 画像拡張子の判定
+local IMAGE_EXTS = {
+  jpg = true,
+  jpeg = true,
+  png = true,
+  gif = true,
+  webp = true,
+  svg = true,
+  bmp = true,
+  heic = true,
+}
+
+local function is_image_file(name)
+  local ext = name:match("%.([^.]+)$")
+  return ext ~= nil and IMAGE_EXTS[ext:lower()] == true
+end
+
+-- markdown ファイルから表示用タイトルを取得（H1 / frontmatter 両対応）
+local function read_md_title(path)
+  local f = io.open(path, "r")
+  if not f then
+    return nil
+  end
+  local first = f:read("*l")
+  if not first then
+    f:close()
     return nil
   end
 
-  local is_image = line:match("🌄") ~= nil
-  local is_folder = line:match("📂") ~= nil
-  local name
-
-  if is_image then
-    name = line:match("%[.-%]%s*🌄%s*(.+)$")
-  elseif is_folder then
-    name = line:match("%[.-%]%s*📂%s*(.+)$")
-  else
-    name = line:match("%[.-%]%s*(.+)$")
+  -- 1 行目が H1 の最頻出ケース
+  local h1 = first:match("^#%s+(.+)")
+  if h1 then
+    f:close()
+    return h1
   end
 
-  if not name then
-    return nil
-  end
-
-  -- full_id は notebook:note_id 形式で構築
-  -- note_id が既に "notebook:id" 形式の場合はそのまま使用
-  local full_id
-  if note_id:find(":") then
-    full_id = note_id
-  else
-    full_id = notebook .. ":" .. note_id
-  end
-
-  return {
-    full_id = full_id,
-    notebook = notebook,
-    name = vim.trim(name),
-    is_image = is_image,
-    is_folder = is_folder,
-    text = line,
-  }
-end
-
--- nbコマンドを非同期実行（callback(lines or nil) を呼ぶ）
-function M.run_cmd_async(args, callback)
-  local cmd = NB_CMD .. " " .. args
-  vim.system({ "sh", "-c", cmd }, { text = true, timeout = 10000 }, function(result)
-    if result.code ~= 0 then
-      vim.schedule(function()
-        callback(nil)
-      end)
-      return
-    end
-    local output = {}
-    for line in result.stdout:gmatch("[^\r\n]+") do
-      table.insert(output, line)
-    end
-    vim.schedule(function()
-      callback(#output > 0 and output or nil)
-    end)
-  end)
-end
-
--- 1ノートブック分のアイテムを再帰展開しつつ非同期で取得
-local function list_items_for_notebook_async(notebook, folder_path, depth, callback)
-  depth = depth or 0
-  if depth > MAX_FOLDER_DEPTH then
-    return callback({})
-  end
-
-  local cmd
-  if folder_path then
-    cmd = notebook .. ":list " .. vim.fn.shellescape(folder_path) .. " --no-color"
-  else
-    cmd = notebook .. ":list --no-color"
-  end
-
-  M.run_cmd_async(cmd, function(output)
-    if not output then
-      return callback({})
-    end
-
-    local items = {}
-    local pending = 0
-    local folder_results = {}
-
-    for _, line in ipairs(output) do
-      local item = M.parse_list_item_with_notebook(line, notebook)
-      if item then
-        if item.is_folder then
-          pending = pending + 1
-          local sub_folder = (folder_path or "") .. item.name .. "/"
-          list_items_for_notebook_async(notebook, sub_folder, depth + 1, function(sub_items)
-            table.insert(folder_results, sub_items)
-            pending = pending - 1
-            if pending == 0 then
-              for _, sub in ipairs(folder_results) do
-                for _, s in ipairs(sub) do
-                  table.insert(items, s)
-                end
-              end
-              callback(items)
-            end
-          end)
-        else
-          if folder_path then
-            item.folder_path = folder_path
-          end
-          table.insert(items, item)
-        end
+  -- frontmatter 形式
+  if first == "---" then
+    for _ = 1, 30 do
+      local line = f:read("*l")
+      if not line or line == "---" then
+        break
+      end
+      local t = line:match('^title:%s*"(.-)"%s*$')
+        or line:match("^title:%s*'(.-)'%s*$")
+        or line:match("^title:%s*(.-)%s*$")
+      if t and t ~= "" then
+        f:close()
+        return t
       end
     end
-
-    if pending == 0 then
-      callback(items)
+    -- frontmatter の後ろに H1 があれば採用
+    for _ = 1, 30 do
+      local line = f:read("*l")
+      if not line then
+        break
+      end
+      local h1_after = line:match("^#%s+(.+)")
+      if h1_after then
+        f:close()
+        return h1_after
+      end
     end
-  end)
+  end
+
+  f:close()
+  return nil
 end
 
--- 全ノートブックのアイテムを並列取得（callback(items or nil) を呼ぶ）
-function M.list_all_items_async(callback)
+-- ノートブック配下を再帰的に walk してアイテムを items に積む
+local function walk_notebook(dir, notebook, folder_path, depth, items)
+  if depth > MAX_FOLDER_DEPTH then
+    return
+  end
+  local handle = vim.uv.fs_scandir(dir)
+  if not handle then
+    return
+  end
+
+  while true do
+    local name, type = vim.uv.fs_scandir_next(handle)
+    if not name then
+      break
+    end
+    if name:sub(1, 1) ~= "." then
+      local entry_path = dir .. "/" .. name
+      if type == "directory" then
+        walk_notebook(entry_path, notebook, folder_path .. name .. "/", depth + 1, items)
+      elseif type == "file" then
+        local title = name
+        if name:match("%.md$") then
+          title = read_md_title(entry_path) or name
+        end
+        local fp = folder_path ~= "" and folder_path or nil
+        table.insert(items, {
+          notebook = notebook,
+          name = title,
+          filename = name,
+          is_image = is_image_file(name),
+          is_folder = false,
+          file = entry_path,
+          folder_path = fp,
+          full_id = notebook .. ":" .. name,
+          -- snacks picker の matcher が参照する検索用文字列
+          text = string.format("[%s] %s%s", notebook, fp or "", title),
+        })
+      end
+    end
+  end
+end
+
+-- 全ノートブックのアイテムをファイルシステムから直接取得（高速）
+function M.list_all_items()
+  local nb_dir = M.get_nb_dir()
   local notebooks = M.list_notebooks()
   if not notebooks then
-    return callback(nil)
+    return nil
   end
 
-  local results = {}
-  local remaining = #notebooks
-  if remaining == 0 then
-    return callback({})
-  end
-
+  local all_items = {}
   for _, notebook in ipairs(notebooks) do
-    list_items_for_notebook_async(notebook, nil, 0, function(items)
-      results[notebook] = items
-      remaining = remaining - 1
-      if remaining == 0 then
-        local all_items = {}
-        for _, nb_name in ipairs(notebooks) do
-          for _, it in ipairs(results[nb_name] or {}) do
-            table.insert(all_items, it)
-          end
-        end
-        callback(all_items)
-      end
-    end)
+    walk_notebook(nb_dir .. "/" .. notebook, notebook, "", 0, all_items)
   end
+  return all_items
 end
 
 return M
