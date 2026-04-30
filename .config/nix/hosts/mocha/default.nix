@@ -31,6 +31,7 @@
     ccplan
     discord
     figlet
+    gcx
     glab
     google-cloud-sdk
     grafanactl

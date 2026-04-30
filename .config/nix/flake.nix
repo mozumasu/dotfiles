@@ -77,6 +77,7 @@
         czg = final.callPackage ./packages/czg.nix { };
         gogcli = final.callPackage ./packages/gogcli.nix { };
         ccplan = final.callPackage ./packages/ccplan.nix { };
+        gcx = final.callPackage ./packages/gcx.nix { };
         pup = final.callPackage ./packages/pup.nix { };
         shishoctl = final.callPackage ./packages/shishoctl.nix { };
         vde-layout = final.callPackage ./packages/vde-layout.nix { };
