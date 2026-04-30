@@ -11,84 +11,93 @@ end
 local function pick_notes()
   local nb = require("config.nb")
   local Snacks = require("snacks")
-  local items = nb.list_all_items()
 
-  if not items or #items == 0 then
-    vim.notify("No notes found", vim.log.levels.WARN)
-    return
-  end
+  local notif_id = "nb_picker_loading"
+  Snacks.notifier.notify("Loading nb notes...", vim.log.levels.INFO, {
+    id = notif_id,
+    timeout = false,
+  })
 
-  Snacks.picker({
-    title = "nb Notes (All Notebooks)",
-    items = items,
-    format = function(item)
-      local prefix = string.format("[%s]", item.notebook)
-      local icon = ""
-      if item.is_image then
-        icon = " 🌄"
-      elseif item.is_folder then
-        icon = " 📂"
-      end
-      local folder_ctx = item.folder_path and (" " .. item.folder_path) or ""
-      return { { prefix .. folder_ctx .. icon .. " " .. item.name } }
-    end,
-    preview = function(ctx)
-      local item = ctx.item
-      if item.is_folder then
-        return nil
-      end
-      if not item.file then
-        item.file = nb.get_note_path(item.full_id)
-      end
-      if item.file and item.file:match("%.wezesc$") then
-        local lines = vim.fn.readfile(item.file)
-        for i, line in ipairs(lines) do
-          lines[i] = strip_ansi(line)
+  nb.list_all_items_async(function(items)
+    Snacks.notifier.hide(notif_id)
+
+    if not items or #items == 0 then
+      vim.notify("No notes found", vim.log.levels.WARN)
+      return
+    end
+
+    Snacks.picker({
+      title = "nb Notes (All Notebooks)",
+      items = items,
+      format = function(item)
+        local prefix = string.format("[%s]", item.notebook)
+        local icon = ""
+        if item.is_image then
+          icon = " 🌄"
+        elseif item.is_folder then
+          icon = " 📂"
         end
-        ctx.preview:set_lines(lines)
-        return
-      end
-      return Snacks.picker.preview.file(ctx)
-    end,
-    confirm = function(picker, item)
-      picker:close()
-      if item and not item.is_folder then
-        local path = nb.get_note_path(item.full_id)
-        if path and path ~= "" then
-          vim.cmd.edit(path)
-        else
-          vim.notify("Failed to get note path: " .. item.full_id, vim.log.levels.ERROR)
+        local folder_ctx = item.folder_path and (" " .. item.folder_path) or ""
+        return { { prefix .. folder_ctx .. icon .. " " .. item.name } }
+      end,
+      preview = function(ctx)
+        local item = ctx.item
+        if item.is_folder then
+          return nil
         end
-      end
-    end,
-    actions = {
-      delete_note = function(picker)
-        local item = picker:current()
-        if item then
-          vim.ui.select({ "Yes", "No" }, {
-            prompt = "Delete: [" .. item.notebook .. "] " .. item.name .. "?",
-          }, function(choice)
-            if choice == "Yes" then
-              if nb.delete_note(item.full_id) then
-                vim.notify("Deleted: " .. item.name, vim.log.levels.INFO)
-                picker:close()
-                pick_notes()
-              else
-                vim.notify("Failed to delete", vim.log.levels.ERROR)
-              end
-            end
-          end)
+        if not item.file then
+          item.file = nb.get_note_path(item.full_id)
+        end
+        if item.file and item.file:match("%.wezesc$") then
+          local lines = vim.fn.readfile(item.file)
+          for i, line in ipairs(lines) do
+            lines[i] = strip_ansi(line)
+          end
+          ctx.preview:set_lines(lines)
+          return
+        end
+        return Snacks.picker.preview.file(ctx)
+      end,
+      confirm = function(picker, item)
+        picker:close()
+        if item and not item.is_folder then
+          local path = nb.get_note_path(item.full_id)
+          if path and path ~= "" then
+            vim.cmd.edit(path)
+          else
+            vim.notify("Failed to get note path: " .. item.full_id, vim.log.levels.ERROR)
+          end
         end
       end,
-    },
-    win = {
-      input = {
-        keys = {
-          ["<C-d>"] = { "delete_note", mode = { "n", "i" }, desc = "Delete note" },
+      actions = {
+        delete_note = function(picker)
+          local item = picker:current()
+          if item then
+            vim.ui.select({ "Yes", "No" }, {
+              prompt = "Delete: [" .. item.notebook .. "] " .. item.name .. "?",
+            }, function(choice)
+              if choice == "Yes" then
+                if nb.delete_note(item.full_id) then
+                  vim.notify("Deleted: " .. item.name, vim.log.levels.INFO)
+                  picker:close()
+                  pick_notes()
+                else
+                  vim.notify("Failed to delete", vim.log.levels.ERROR)
+                end
+              end
+            end)
+          end
+        end,
+      },
+      win = {
+        input = {
+          keys = {
+            ["<C-d>"] = { "delete_note", mode = { "n", "i" }, desc = "Delete note" },
+          },
         },
       },
-    },
-  })
+    })
+  end)
 end
 
 -- snacks.nvimでノートの内容をgrep検索
@@ -283,69 +292,78 @@ end
 local function link_item()
   local nb = require("config.nb")
   local Snacks = require("snacks")
-  local items = nb.list_all_items()
   local current_notebook = get_current_notebook()
 
-  if not items or #items == 0 then
-    vim.notify("No items found", vim.log.levels.WARN)
-    return
-  end
-
-  Snacks.picker({
-    title = "nb Link (All Notebooks)",
-    items = items,
-    format = function(item)
-      local prefix = string.format("[%s]", item.notebook)
-      local icon = ""
-      if item.is_image then
-        icon = " 🌄"
-      elseif item.is_folder then
-        icon = " 📂"
-      end
-      local folder_ctx = item.folder_path and (" " .. item.folder_path) or ""
-      return { { prefix .. folder_ctx .. icon .. " " .. item.name } }
-    end,
-    preview = function(ctx)
-      local item = ctx.item
-      if item.is_folder then
-        return nil
-      end
-      if not item.file then
-        item.file = nb.get_note_path(item.full_id)
-      end
-      if item.file and item.file:match("%.wezesc$") then
-        local lines = vim.fn.readfile(item.file)
-        for i, line in ipairs(lines) do
-          lines[i] = strip_ansi(line)
-        end
-        ctx.preview:set_lines(lines)
-        return
-      end
-      return Snacks.picker.preview.file(ctx)
-    end,
-    confirm = function(picker, item)
-      picker:close()
-      if item then
-        local link
-        -- 異なるノートブックの場合は notebook:name 形式
-        local needs_prefix = current_notebook and item.notebook ~= current_notebook
-        if item.is_image then
-          if needs_prefix then
-            link = string.format("![%s](http://localhost:6789/--original/%s/%s)", item.name, item.notebook, item.name)
-          else
-            link = string.format("![%s](%s)", item.name, item.name)
-          end
-        else
-          if needs_prefix then
-            link = string.format("[[%s:%s]]", item.notebook, item.name)
-          else
-            link = string.format("[[%s]]", item.name)
-          end
-        end
-        vim.api.nvim_put({ link }, "c", true, true)
-      end
-    end,
+  local notif_id = "nb_link_loading"
+  Snacks.notifier.notify("Loading nb notes...", vim.log.levels.INFO, {
+    id = notif_id,
+    timeout = false,
   })
+
+  nb.list_all_items_async(function(items)
+    Snacks.notifier.hide(notif_id)
+
+    if not items or #items == 0 then
+      vim.notify("No items found", vim.log.levels.WARN)
+      return
+    end
+
+    Snacks.picker({
+      title = "nb Link (All Notebooks)",
+      items = items,
+      format = function(item)
+        local prefix = string.format("[%s]", item.notebook)
+        local icon = ""
+        if item.is_image then
+          icon = " 🌄"
+        elseif item.is_folder then
+          icon = " 📂"
+        end
+        local folder_ctx = item.folder_path and (" " .. item.folder_path) or ""
+        return { { prefix .. folder_ctx .. icon .. " " .. item.name } }
+      end,
+      preview = function(ctx)
+        local item = ctx.item
+        if item.is_folder then
+          return nil
+        end
+        if not item.file then
+          item.file = nb.get_note_path(item.full_id)
+        end
+        if item.file and item.file:match("%.wezesc$") then
+          local lines = vim.fn.readfile(item.file)
+          for i, line in ipairs(lines) do
+            lines[i] = strip_ansi(line)
+          end
+          ctx.preview:set_lines(lines)
+          return
+        end
+        return Snacks.picker.preview.file(ctx)
+      end,
+      confirm = function(picker, item)
+        picker:close()
+        if item then
+          local link
+          -- 異なるノートブックの場合は notebook:name 形式
+          local needs_prefix = current_notebook and item.notebook ~= current_notebook
+          if item.is_image then
+            if needs_prefix then
+              link = string.format("![%s](http://localhost:6789/--original/%s/%s)", item.name, item.notebook, item.name)
+            else
+              link = string.format("![%s](%s)", item.name, item.name)
+            end
+          else
+            if needs_prefix then
+              link = string.format("[[%s:%s]]", item.notebook, item.name)
+            else
+              link = string.format("[[%s]]", item.name)
+            end
+          end
+          vim.api.nvim_put({ link }, "c", true, true)
+        end
+      end,
+    })
+  end)
 end
 
 return {

@@ -284,11 +284,31 @@ function M.parse_list_item_with_notebook(line, notebook)
   }
 end
 
--- 特定ノートブックのアイテム一覧を取得（フォルダ内を再帰展開）
-function M.list_items_for_notebook(notebook, folder_path, depth)
+-- nbコマンドを非同期実行（callback(lines or nil) を呼ぶ）
+function M.run_cmd_async(args, callback)
+  local cmd = NB_CMD .. " " .. args
+  vim.system({ "sh", "-c", cmd }, { text = true, timeout = 10000 }, function(result)
+    if result.code ~= 0 then
+      vim.schedule(function()
+        callback(nil)
+      end)
+      return
+    end
+    local output = {}
+    for line in result.stdout:gmatch("[^\r\n]+") do
+      table.insert(output, line)
+    end
+    vim.schedule(function()
+      callback(#output > 0 and output or nil)
+    end)
+  end)
+end
+
+-- 1ノートブック分のアイテムを再帰展開しつつ非同期で取得
+local function list_items_for_notebook_async(notebook, folder_path, depth, callback)
   depth = depth or 0
   if depth > MAX_FOLDER_DEPTH then
-    return {}
+    return callback({})
   end
 
   local cmd
@@ -298,48 +318,76 @@ function M.list_items_for_notebook(notebook, folder_path, depth)
     cmd = notebook .. ":list --no-color"
   end
 
-  local output = M.run_cmd(cmd)
-  if not output then
-    return {}
-  end
+  M.run_cmd_async(cmd, function(output)
+    if not output then
+      return callback({})
+    end
 
-  local items = {}
-  for _, line in ipairs(output) do
-    local item = M.parse_list_item_with_notebook(line, notebook)
-    if item then
-      if item.is_folder then
-        -- フォルダ自体はリストに含めず、中身を再帰的に取得
-        local sub_folder = (folder_path or "") .. item.name .. "/"
-        local sub_items = M.list_items_for_notebook(notebook, sub_folder, depth + 1)
-        for _, sub_item in ipairs(sub_items) do
-          table.insert(items, sub_item)
+    local items = {}
+    local pending = 0
+    local folder_results = {}
+
+    for _, line in ipairs(output) do
+      local item = M.parse_list_item_with_notebook(line, notebook)
+      if item then
+        if item.is_folder then
+          pending = pending + 1
+          local sub_folder = (folder_path or "") .. item.name .. "/"
+          list_items_for_notebook_async(notebook, sub_folder, depth + 1, function(sub_items)
+            table.insert(folder_results, sub_items)
+            pending = pending - 1
+            if pending == 0 then
+              for _, sub in ipairs(folder_results) do
+                for _, s in ipairs(sub) do
+                  table.insert(items, s)
+                end
+              end
+              callback(items)
+            end
+          end)
+        else
+          if folder_path then
+            item.folder_path = folder_path
+          end
+          table.insert(items, item)
         end
-      else
-        if folder_path then
-          item.folder_path = folder_path
-        end
-        table.insert(items, item)
       end
     end
-  end
-  return items
+
+    if pending == 0 then
+      callback(items)
+    end
+  end)
 end
 
--- 全ノートブックのアイテムを取得
-function M.list_all_items()
+-- 全ノートブックのアイテムを並列取得（callback(items or nil) を呼ぶ）
+function M.list_all_items_async(callback)
   local notebooks = M.list_notebooks()
   if not notebooks then
-    return nil
+    return callback(nil)
   end
 
-  local all_items = {}
-  for _, notebook in ipairs(notebooks) do
-    local items = M.list_items_for_notebook(notebook)
-    for _, item in ipairs(items) do
-      table.insert(all_items, item)
-    end
+  local results = {}
+  local remaining = #notebooks
+  if remaining == 0 then
+    return callback({})
   end
-  return all_items
+
+  for _, notebook in ipairs(notebooks) do
+    list_items_for_notebook_async(notebook, nil, 0, function(items)
+      results[notebook] = items
+      remaining = remaining - 1
+      if remaining == 0 then
+        local all_items = {}
+        for _, nb_name in ipairs(notebooks) do
+          for _, it in ipairs(results[nb_name] or {}) do
+            table.insert(all_items, it)
+          end
+        end
+        callback(all_items)
+      end
+    end)
+  end
 end
 
 return M
