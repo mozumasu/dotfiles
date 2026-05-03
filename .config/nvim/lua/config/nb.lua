@@ -57,35 +57,33 @@ function M.get_note_path(note_id)
   return ""
 end
 
--- ノートを追加してIDを返す（notebook指定可能）
+-- ノートを追加して作成されたファイルパスを返す（notebook指定可能）
 function M.add_note(title, notebook)
   local timestamp = os.date("%Y%m%d%H%M%S")
   local note_title = title and title ~= "" and title or os.date("%Y-%m-%d %H:%M:%S")
   local escaped_title = note_title:gsub('"', '\\"')
+  local filename = timestamp .. ".md"
 
   local cmd_prefix = notebook and (notebook .. ":") or ""
-  local args = string.format('%sadd --no-color --filename "%s.md" --title "%s"', cmd_prefix, timestamp, escaped_title)
+  local args = string.format('%sadd --no-color --filename "%s" --title "%s"', cmd_prefix, filename, escaped_title)
 
   local output = M.run_cmd(args)
   if not output then
     return nil
   end
 
-  -- 追加されたノートのIDを取得
-  -- 出力形式: "Added: [85] file.md" または "Added: [log:41] log:file.md"
+  -- パスを直接構築（nb show --path への余分なシェルアウトを回避）
+  local nb_dir = M.get_nb_dir()
+  if notebook then
+    return nb_dir .. "/" .. notebook .. "/" .. filename
+  end
+
+  -- notebook 未指定時は出力からノートブック名を推定
+  -- 出力形式例: "Added: [home:42] home:filename.md"
   for _, line in ipairs(output) do
-    -- [notebook:数字] または [数字] 形式をサポート
-    local note_id = line:match("%[([%w]+:%d+)%]") or line:match("%[(%d+)%]")
-    if note_id then
-      -- 既に notebook:id 形式ならそのまま返す
-      if note_id:find(":") then
-        return note_id
-      end
-      -- notebook指定時は notebook:id 形式で返す
-      if notebook then
-        return notebook .. ":" .. note_id
-      end
-      return note_id
+    local nb_name = line:match("%[(%w+):%w+%]")
+    if nb_name then
+      return nb_dir .. "/" .. nb_name .. "/" .. filename
     end
   end
   return nil

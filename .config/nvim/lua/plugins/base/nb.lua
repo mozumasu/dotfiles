@@ -118,15 +118,12 @@ local function add_note_to_notebook(notebook)
     if title == nil then
       return -- cancelled
     end
-    local note_id = nb.add_note(title, notebook)
-    if note_id then
-      local path = nb.get_note_path(note_id)
-      if path and path ~= "" then
-        vim.cmd.edit(path)
-        -- ファイル末尾に移動してインサートモードに入る
-        vim.cmd("normal! G")
-        vim.cmd.startinsert({ bang = true })
-      end
+    local path = nb.add_note(title, notebook)
+    if path and path ~= "" then
+      vim.cmd.edit(path)
+      -- ファイル末尾に移動してインサートモードに入る
+      vim.cmd("normal! G")
+      vim.cmd.startinsert({ bang = true })
     else
       vim.notify("Failed to add note", vim.log.levels.ERROR)
     end
