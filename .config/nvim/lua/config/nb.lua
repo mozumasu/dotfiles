@@ -6,6 +6,75 @@ local NB_CMD = "TERM=dumb NB_EDITOR=: NO_COLOR=1 nb"
 -- フォルダ再帰展開の最大深度（無限再帰防止）
 local MAX_FOLDER_DEPTH = 5
 
+-- 画像拡張子の判定
+local IMAGE_EXTS = {
+  jpg = true,
+  jpeg = true,
+  png = true,
+  gif = true,
+  webp = true,
+  svg = true,
+  bmp = true,
+  heic = true,
+}
+
+local function is_image_file(name)
+  local ext = name:match("%.([^.]+)$")
+  return ext ~= nil and IMAGE_EXTS[ext:lower()] == true
+end
+
+-- markdown ファイルから表示用タイトルを取得（H1 / frontmatter 両対応）
+local function read_md_title(path)
+  local f = io.open(path, "r")
+  if not f then
+    return nil
+  end
+  local first = f:read("*l")
+  if not first then
+    f:close()
+    return nil
+  end
+
+  -- 1 行目が H1 の最頻出ケース
+  local h1 = first:match("^#%s+(.+)")
+  if h1 then
+    f:close()
+    return h1
+  end
+
+  -- frontmatter 形式
+  if first == "---" then
+    for _ = 1, 30 do
+      local line = f:read("*l")
+      if not line or line == "---" then
+        break
+      end
+      local t = line:match('^title:%s*"(.-)"%s*$')
+        or line:match("^title:%s*'(.-)'%s*$")
+        or line:match("^title:%s*(.-)%s*$")
+      if t and t ~= "" then
+        f:close()
+        return t
+      end
+    end
+    -- frontmatter の後ろに H1 があれば採用
+    for _ = 1, 30 do
+      local line = f:read("*l")
+      if not line then
+        break
+      end
+      local h1_after = line:match("^#%s+(.+)")
+      if h1_after then
+        f:close()
+        return h1_after
+      end
+    end
+  end
+
+  f:close()
+  return nil
+end
+
 -- nbのノートディレクトリパスを取得
 function M.get_nb_dir()
   -- nbのディレクトリパスに合わせて変更してください
@@ -26,25 +95,13 @@ function M.run_cmd(args)
   return #output > 0 and output or nil
 end
 
--- nbノートのタイトルを取得する関数（bufferline用）
+-- nbノートのタイトルを取得する関数（bufferline用、H1 / frontmatter 両対応）
 function M.get_title(filepath)
   local nb_dir = M.get_nb_dir()
-  if not filepath:match("^" .. nb_dir) then
+  if not filepath:match("^" .. vim.pesc(nb_dir)) then
     return nil
   end
-
-  local file = io.open(filepath, "r")
-  if not file then
-    return nil
-  end
-
-  local first_line = file:read("*l")
-  file:close()
-
-  if first_line then
-    return first_line:match("^#%s+(.+)")
-  end
-  return nil
+  return read_md_title(filepath)
 end
 
 -- ノートIDからファイルパスを取得
@@ -191,75 +248,6 @@ function M.list_notebooks()
   end
   table.sort(notebooks)
   return notebooks
-end
-
--- 画像拡張子の判定
-local IMAGE_EXTS = {
-  jpg = true,
-  jpeg = true,
-  png = true,
-  gif = true,
-  webp = true,
-  svg = true,
-  bmp = true,
-  heic = true,
-}
-
-local function is_image_file(name)
-  local ext = name:match("%.([^.]+)$")
-  return ext ~= nil and IMAGE_EXTS[ext:lower()] == true
-end
-
--- markdown ファイルから表示用タイトルを取得（H1 / frontmatter 両対応）
-local function read_md_title(path)
-  local f = io.open(path, "r")
-  if not f then
-    return nil
-  end
-  local first = f:read("*l")
-  if not first then
-    f:close()
-    return nil
-  end
-
-  -- 1 行目が H1 の最頻出ケース
-  local h1 = first:match("^#%s+(.+)")
-  if h1 then
-    f:close()
-    return h1
-  end
-
-  -- frontmatter 形式
-  if first == "---" then
-    for _ = 1, 30 do
-      local line = f:read("*l")
-      if not line or line == "---" then
-        break
-      end
-      local t = line:match('^title:%s*"(.-)"%s*$')
-        or line:match("^title:%s*'(.-)'%s*$")
-        or line:match("^title:%s*(.-)%s*$")
-      if t and t ~= "" then
-        f:close()
-        return t
-      end
-    end
-    -- frontmatter の後ろに H1 があれば採用
-    for _ = 1, 30 do
-      local line = f:read("*l")
-      if not line then
-        break
-      end
-      local h1_after = line:match("^#%s+(.+)")
-      if h1_after then
-        f:close()
-        return h1_after
-      end
-    end
-  end
-
-  f:close()
-  return nil
 end
 
 -- ノートブック配下を再帰的に walk してアイテムを items に積む
