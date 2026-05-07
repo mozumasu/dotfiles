@@ -75,6 +75,18 @@ local function read_md_title(path)
   return nil
 end
 
+-- 指定 notebook の git に変更をコミット（バックグラウンド非同期）
+local function git_commit_async(notebook_dir, filename, message)
+  if not vim.uv.fs_stat(notebook_dir .. "/.git") then
+    return
+  end
+  vim.system({ "git", "-C", notebook_dir, "add", filename }, { text = true }, function(add_result)
+    if add_result.code == 0 then
+      vim.system({ "git", "-C", notebook_dir, "commit", "-m", message }, { text = true })
+    end
+  end)
+end
+
 -- nbのノートディレクトリパスを取得
 function M.get_nb_dir()
   -- nbのディレクトリパスに合わせて変更してください
@@ -135,15 +147,7 @@ function M.add_note(title, notebook)
   f:write("# " .. note_title .. "\n")
   f:close()
 
-  -- 非同期: notebook が git 管理されていればコミットを走らせる
-  if vim.uv.fs_stat(notebook_dir .. "/.git") then
-    vim.system({ "git", "-C", notebook_dir, "add", filename }, { text = true }, function(add_result)
-      if add_result.code == 0 then
-        vim.system({ "git", "-C", notebook_dir, "commit", "-m", "Add: " .. note_title }, { text = true })
-      end
-    end)
-  end
-
+  git_commit_async(notebook_dir, filename, "Add: " .. note_title)
   return path
 end
 
@@ -202,29 +206,43 @@ function M.import_image(image_path, new_filename)
   return nil, "Could not parse import result"
 end
 
--- ノートを削除（note_id は "notebook:id" / "notebook:filename" / "id" のいずれも可）
+-- ノートを削除（note_id は "notebook:filename" 形式）
+-- ファイル削除は同期、git commit はバックグラウンド非同期
 function M.delete_note(note_id)
-  local output = M.run_cmd("delete --force " .. vim.fn.shellescape(note_id))
-  return output ~= nil
+  local notebook, filename = note_id:match("^([^:]+):(.+)$")
+  if not notebook or not filename then
+    return false
+  end
+  local notebook_dir = M.get_nb_dir() .. "/" .. notebook
+  local path = notebook_dir .. "/" .. filename
+
+  if not vim.uv.fs_unlink(path) then
+    return false
+  end
+
+  git_commit_async(notebook_dir, filename, "Delete: " .. filename)
+  return true
 end
 
--- ノートを別のノートブックに移動
+-- ノートを別のノートブックに移動（note_id は "src_notebook:filename" 形式）
+-- ファイル rename は同期、両 repo の git commit はバックグラウンド非同期
 function M.move_note(note_id, dest_notebook)
-  local escaped_id = vim.fn.shellescape(note_id)
-  local output = M.run_cmd("move --force " .. escaped_id .. " " .. dest_notebook .. ":")
-  if not output then
+  local src_notebook, filename = note_id:match("^([^:]+):(.+)$")
+  if not src_notebook or not filename or not dest_notebook then
+    return nil
+  end
+  local nb_dir = M.get_nb_dir()
+  local src_dir = nb_dir .. "/" .. src_notebook
+  local dst_dir = nb_dir .. "/" .. dest_notebook
+
+  if not vim.uv.fs_rename(src_dir .. "/" .. filename, dst_dir .. "/" .. filename) then
     return nil
   end
 
-  -- 移動後のノートIDを取得
-  for _, line in ipairs(output) do
-    local new_id = line:match("%[([%w:]+%d+)%]")
-    if new_id then
-      return new_id
-    end
-  end
-  -- IDが取得できなくても成功とみなす
-  return dest_notebook
+  git_commit_async(src_dir, filename, "Move out: " .. filename)
+  git_commit_async(dst_dir, filename, "Move in: " .. filename)
+
+  return dest_notebook .. ":" .. filename
 end
 
 -- ノートブック一覧を取得
