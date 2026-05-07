@@ -22,11 +22,42 @@ local source_profile
 source_profile=$(aws configure get source_profile --profile "${selected_profile}" 2>/dev/null)
 local login_profile="${source_profile:-$selected_profile}"
 
-# aws sso login は有効セッションがあればブラウザを開かず終了するので毎回呼ぶ
-# (aws sts などで先に precheck すると AWS CLI v2 の自動再ログインで余計にブラウザが開く)
-if ! aws sso login --profile "${login_profile}"; then
-  echo "SSO login failed for profile '${login_profile}'"
-  return 1
+# 認証方式を判定する
+# - SSO: sso_session (新形式) または sso_start_url (レガシー形式) → aws sso login
+# - aws-vault: aws-vault list --credentials に登録されている長期 IAM credentials
+#              → aws-vault export で短期 STS credentials を環境変数に展開
+local sso_session sso_start_url
+sso_session=$(aws configure get sso_session --profile "${login_profile}" 2>/dev/null)
+sso_start_url=$(aws configure get sso_start_url --profile "${login_profile}" 2>/dev/null)
+
+local has_aws_vault_creds=false
+if command -v aws-vault &>/dev/null; then
+  if aws-vault list --credentials 2>/dev/null | grep -qx "${login_profile}"; then
+    has_aws_vault_creds=true
+  fi
+fi
+
+if [[ -n "$sso_session" || -n "$sso_start_url" ]]; then
+  # aws sso login は有効セッションがあればブラウザを開かず終了するので毎回呼ぶ
+  # (aws sts などで先に precheck すると AWS CLI v2 の自動再ログインで余計にブラウザが開く)
+  if ! aws sso login --profile "${login_profile}"; then
+    echo "SSO login failed for profile '${login_profile}'"
+    return 1
+  fi
+elif [[ "$has_aws_vault_creds" == true ]]; then
+  # aws-vault プロファイルは Keychain の長期 credentials から短期 STS セッションを取得し、
+  # 環境変数として現在のシェルにエクスポートする
+  echo "Loading credentials from aws-vault for '${login_profile}'..."
+  local creds_output
+  if ! creds_output=$(aws-vault export --format=env "${login_profile}" 2>&1); then
+    echo "aws-vault export failed for profile '${login_profile}':"
+    echo "$creds_output"
+    return 1
+  fi
+  while IFS='=' read -r key value; do
+    [[ -z "$key" ]] && continue
+    export "${key}=${value}"
+  done <<< "$creds_output"
 fi
 
 aws sts get-caller-identity
