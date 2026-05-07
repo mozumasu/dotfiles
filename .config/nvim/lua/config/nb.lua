@@ -294,6 +294,7 @@ local function walk_notebook(dir, notebook, folder_path, depth, items)
           title = read_md_title(entry_path) or name
         end
         local fp = folder_path ~= "" and folder_path or nil
+        local stat = vim.uv.fs_stat(entry_path)
         table.insert(items, {
           notebook = notebook,
           name = title,
@@ -303,6 +304,7 @@ local function walk_notebook(dir, notebook, folder_path, depth, items)
           file = entry_path,
           folder_path = fp,
           full_id = notebook .. ":" .. name,
+          mtime = stat and stat.mtime.sec or 0,
           -- snacks picker の matcher が参照する検索用文字列
           text = string.format("[%s] %s%s", notebook, fp or "", title),
         })
@@ -312,6 +314,7 @@ local function walk_notebook(dir, notebook, folder_path, depth, items)
 end
 
 -- 全ノートブックのアイテムをファイルシステムから直接取得（高速）
+-- 結果は mtime 降順（最近編集したノートが上）
 function M.list_all_items()
   local nb_dir = M.get_nb_dir()
   local notebooks = M.list_notebooks()
@@ -323,6 +326,9 @@ function M.list_all_items()
   for _, notebook in ipairs(notebooks) do
     walk_notebook(nb_dir .. "/" .. notebook, notebook, "", 0, all_items)
   end
+  table.sort(all_items, function(a, b)
+    return a.mtime > b.mtime
+  end)
   return all_items
 end
 
