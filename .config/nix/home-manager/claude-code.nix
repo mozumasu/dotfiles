@@ -13,7 +13,7 @@ let
     env = {
       MAX_THINKING_TOKENS = "31999";
     };
-    includeCoAuthoredBy = false;
+    includeCoAuthoredBy = true;
     permissions = {
       allow = [
         "Bash"
