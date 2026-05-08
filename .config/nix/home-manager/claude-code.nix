@@ -204,6 +204,8 @@ let
       "example-skills@anthropic-agent-skills" = true;
       "pyright-lsp@claude-plugins-official" = true;
       "slack@claude-plugins-official" = true;
+      "aws-core@agent-toolkit-for-aws" = true;
+      "aws-data-analytics@agent-toolkit-for-aws" = true;
     }
     // lib.optionalAttrs (builtins.pathExists privateMarketplacesFile) (builtins.fromJSON (
       builtins.readFile privateMarketplacesFile
@@ -213,6 +215,12 @@ let
         source = {
           source = "github";
           repo = "anthropics/skills";
+        };
+      };
+      agent-toolkit-for-aws = {
+        source = {
+          source = "github";
+          repo = "aws/agent-toolkit-for-aws";
         };
       };
     }
