@@ -470,10 +470,11 @@ return {
   "folke/snacks.nvim",
   keys = {
     { "<leader>na", add_note, desc = "nb add" },
-    { "<leader>nA", adopt_buffer, desc = "nb adopt current buffer" },
+    { "<leader>nA", add_note_select, desc = "nb add (select notebook)" },
     { "<leader>ni", import_image, desc = "nb import image" },
     { "<leader>nl", link_item, desc = "nb link" },
     { "<leader>nm", move_note, desc = "nb move to notebook" },
+    { "<leader>nM", adopt_buffer, desc = "nb adopt current buffer" },
     { "<leader>np", pick_notes, desc = "nb picker" },
     { "<leader>ng", grep_notes, desc = "nb grep" },
     { "<leader>nP", plans_picker, desc = "nb plans picker" },
