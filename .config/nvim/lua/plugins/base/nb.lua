@@ -183,25 +183,54 @@ local function add_note()
 end
 
 -- 画像をインポートしてマークダウンリンクを挿入
+-- クリップボードに画像があればそれを優先、なければファイルパスを聞く
 local function import_image()
   local nb = require("config.nb")
-  vim.ui.input({ prompt = "Image path: ", completion = "file" }, function(image_path)
-    if not image_path or image_path == "" then
-      return
-    end
+  local current_notebook = get_current_notebook()
+  if not current_notebook then
+    vim.notify("Not in nb directory", vim.log.levels.WARN)
+    return
+  end
 
-    -- 新しいファイル名を入力（空ならそのまま）
-    vim.ui.input({ prompt = "New filename (empty to keep original): " }, function(new_filename)
-      local note_id, result = nb.import_image(image_path, new_filename)
-      if note_id then
-        local filename = result
+  -- ファイル名プロンプト → import → リンク挿入の共通処理
+  local function complete_import(image_path, cleanup_src, default_filename)
+    local prompt = default_filename and "Filename (empty for timestamp): " or "Filename (empty to keep original): "
+    vim.ui.input({ prompt = prompt }, function(new_filename)
+      if (not new_filename or new_filename == "") and default_filename then
+        new_filename = default_filename
+      end
+      local filename, err = nb.import_image(image_path, current_notebook, new_filename)
+      if cleanup_src then
+        os.remove(image_path)
+      end
+      if filename then
         local link = string.format("![%s](%s)", filename, filename)
         vim.api.nvim_put({ link }, "c", true, true)
         vim.notify("Imported: " .. filename, vim.log.levels.INFO)
       else
-        vim.notify(result or "Failed to import image", vim.log.levels.ERROR)
+        vim.notify(err or "Failed to import image", vim.log.levels.ERROR)
       end
     end)
+  end
+
+  -- クリップボードに画像があれば一時ファイル経由で取り込む
+  local ok, clipboard = pcall(require, "img-clip.clipboard")
+  if ok and clipboard.content_is_image() then
+    local tmp_path = vim.fn.tempname() .. ".png"
+    if not clipboard.save_image(tmp_path) then
+      vim.notify("Failed to save clipboard image", vim.log.levels.ERROR)
+      return
+    end
+    complete_import(tmp_path, true, os.date("%Y%m%d%H%M%S") .. ".png")
+    return
+  end
+
+  -- クリップボードに画像がなければファイルパスを聞く
+  vim.ui.input({ prompt = "Image path: ", completion = "file" }, function(image_path)
+    if not image_path or image_path == "" then
+      return
+    end
+    complete_import(image_path, false, nil)
   end)
 end
 
@@ -334,15 +363,125 @@ local function link_item()
   })
 end
 
+-- Claude Code が出力した plansDirectory 配下の最新ファイルを開く
+local function plan_latest()
+  local nb = require("config.nb")
+  local plans = nb.list_plans()
+  if #plans == 0 then
+    vim.notify("No plans found in " .. nb.get_plans_dir(), vim.log.levels.WARN)
+    return
+  end
+  vim.cmd.edit(plans[1].file)
+end
+
+-- plansDirectory のファイルを picker から選択して開く
+local function plans_picker()
+  local nb = require("config.nb")
+  local Snacks = require("snacks")
+  local items = nb.list_plans()
+  if #items == 0 then
+    vim.notify("No plans found in " .. nb.get_plans_dir(), vim.log.levels.WARN)
+    return
+  end
+
+  Snacks.picker({
+    title = "Plans",
+    items = items,
+    format = function(item)
+      return { { "📋 " .. item.title }, { "  " .. item.name, "Comment" } }
+    end,
+    preview = function(ctx)
+      return Snacks.picker.preview.file(ctx)
+    end,
+    confirm = function(picker, item)
+      picker:close()
+      if item and item.file then
+        vim.cmd.edit(item.file)
+      end
+    end,
+  })
+end
+
+-- 現在のバッファのファイルを nb 配下の notebook へ移動（plansDirectory 等の外部ファイル想定）
+local function adopt_buffer()
+  local nb = require("config.nb")
+  local Snacks = require("snacks")
+
+  local current_file = vim.fn.expand("%:p")
+  if current_file == "" or not vim.uv.fs_stat(current_file) then
+    vim.notify("No file in current buffer", vim.log.levels.WARN)
+    return
+  end
+
+  local nb_dir = nb.get_nb_dir()
+  if current_file:match("^" .. vim.pesc(nb_dir)) then
+    vim.notify("Already in nb directory — use <leader>nm to move between notebooks", vim.log.levels.WARN)
+    return
+  end
+
+  -- 未保存変更があれば書き込んでから移動
+  if vim.bo.modified then
+    vim.cmd.write()
+  end
+
+  local notebooks = nb.list_notebooks()
+  if not notebooks or #notebooks == 0 then
+    vim.notify("No notebooks found", vim.log.levels.WARN)
+    return
+  end
+
+  local items = {}
+  for _, name in ipairs(notebooks) do
+    table.insert(items, { text = name, notebook = name })
+  end
+
+  Snacks.picker({
+    title = "Adopt to Notebook",
+    items = items,
+    format = function(item)
+      return { { "📓 " .. item.notebook } }
+    end,
+    confirm = function(picker, item)
+      picker:close()
+      if not item then
+        return
+      end
+      vim.ui.input({ prompt = "Title (empty to keep filename): " }, function(title)
+        if title == nil then
+          return -- cancelled
+        end
+        local old_buf = vim.api.nvim_get_current_buf()
+        local new_path, err = nb.adopt_file(current_file, item.notebook, title)
+        if not new_path then
+          vim.notify("Adopt failed: " .. (err or "unknown"), vim.log.levels.ERROR)
+          return
+        end
+        vim.cmd.edit(new_path)
+        if vim.api.nvim_buf_is_valid(old_buf) and old_buf ~= vim.api.nvim_get_current_buf() then
+          pcall(vim.api.nvim_buf_delete, old_buf, { force = true })
+        end
+        vim.notify("Adopted to " .. item.notebook, vim.log.levels.INFO)
+      end)
+    end,
+  })
+end
+
 return {
   "folke/snacks.nvim",
   keys = {
     { "<leader>na", add_note, desc = "nb add" },
-    { "<leader>nA", add_note_select, desc = "nb add (select notebook)" },
+    { "<leader>nA", adopt_buffer, desc = "nb adopt current buffer" },
     { "<leader>ni", import_image, desc = "nb import image" },
     { "<leader>nl", link_item, desc = "nb link" },
     { "<leader>nm", move_note, desc = "nb move to notebook" },
     { "<leader>np", pick_notes, desc = "nb picker" },
     { "<leader>ng", grep_notes, desc = "nb grep" },
+    { "<leader>nP", plans_picker, desc = "nb plans picker" },
+    { "<leader>nL", plan_latest, desc = "nb open latest plan" },
   },
+  init = function()
+    vim.api.nvim_create_user_command("NbAdopt", adopt_buffer, { desc = "Move current buffer into nb notebook" })
+    vim.api.nvim_create_user_command("Plans", plans_picker, { desc = "Pick a plan from plansDirectory" })
+    vim.api.nvim_create_user_command("PlanLatest", plan_latest, { desc = "Open the latest plan" })
+  end,
 }
