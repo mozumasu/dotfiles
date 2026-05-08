@@ -240,6 +240,11 @@ let
   # ~/.config/claude/.private-marketplaces.json に復号配置される
   privateMarketplacesFile = "${config.xdg.configHome}/claude/.private-marketplaces.json";
 
+  # Findy AI+ MCP サーバー設定も sops-nix で管理
+  # sops.nix の claude-mcp-findy-ai-plus シークレットが
+  # ~/.config/claude/.findy-mcp.json に復号配置される
+  findyMcpFile = "${config.xdg.configHome}/claude/.findy-mcp.json";
+
   settingsFile = pkgs.writeText "claude-settings.json" (builtins.toJSON publicSettings);
 in
 {
@@ -268,10 +273,12 @@ in
     # settings.json は書き込み可能なファイルとしてコピー
     # Claude Code の /config エディタが書き戻せるようにするため
     PRIVATE_FILE="${privateMarketplacesFile}"
-    if [ -f "$PRIVATE_FILE" ]; then
-      ${pkgs.jq}/bin/jq -s '.[0] * .[1]' \
-        "${settingsFile}" \
-        "$PRIVATE_FILE" \
+    FINDY_MCP_FILE="${findyMcpFile}"
+    files=("${settingsFile}")
+    [ -f "$PRIVATE_FILE" ] && files+=("$PRIVATE_FILE")
+    [ -f "$FINDY_MCP_FILE" ] && files+=("$FINDY_MCP_FILE")
+    if [ "''${#files[@]}" -gt 1 ]; then
+      ${pkgs.jq}/bin/jq -s 'reduce .[] as $x ({}; . * $x)' "''${files[@]}" \
         > "$CLAUDE_DIR/settings.json"
       chmod 644 "$CLAUDE_DIR/settings.json"
     else

@@ -15,6 +15,11 @@
       claude-private-marketplaces = {
         path = "${config.xdg.configHome}/claude/.private-marketplaces.json";
       };
+
+      # Findy AI+ MCP サーバー設定（JSON形式、トークン含む）
+      claude-mcp-findy-ai-plus = {
+        path = "${config.xdg.configHome}/claude/.findy-mcp.json";
+      };
     };
   };
 
