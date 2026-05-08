@@ -287,11 +287,12 @@ in
     # Stop hook での差分検出に使用
     cp "$CLAUDE_DIR/settings.json" "$CLAUDE_DIR/.settings.json.nix-managed"
 
-    # MCP サーバー設定は ~/.claude.json の mcpServers にマージする
-    # Claude Code は settings.json の mcpServers を読まないため
+    # MCP サーバー設定は user scope (~/.config/claude/.claude.json) の
+    # mcpServers にマージする。settings.json や ~/.claude.json では認識されない
     FINDY_MCP_FILE="${findyMcpFile}"
-    USER_CLAUDE_JSON="$HOME/.claude.json"
-    if [ -f "$FINDY_MCP_FILE" ] && [ -f "$USER_CLAUDE_JSON" ]; then
+    USER_CLAUDE_JSON="$CLAUDE_DIR/.claude.json"
+    if [ -f "$FINDY_MCP_FILE" ]; then
+      [ -f "$USER_CLAUDE_JSON" ] || echo '{}' > "$USER_CLAUDE_JSON"
       TMP=$(mktemp)
       ${pkgs.jq}/bin/jq --slurpfile mcp "$FINDY_MCP_FILE" \
         '.mcpServers = ((.mcpServers // {}) * $mcp[0].mcpServers)' \
