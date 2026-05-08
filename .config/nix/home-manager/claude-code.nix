@@ -273,12 +273,10 @@ in
     # settings.json は書き込み可能なファイルとしてコピー
     # Claude Code の /config エディタが書き戻せるようにするため
     PRIVATE_FILE="${privateMarketplacesFile}"
-    FINDY_MCP_FILE="${findyMcpFile}"
-    files=("${settingsFile}")
-    [ -f "$PRIVATE_FILE" ] && files+=("$PRIVATE_FILE")
-    [ -f "$FINDY_MCP_FILE" ] && files+=("$FINDY_MCP_FILE")
-    if [ "''${#files[@]}" -gt 1 ]; then
-      ${pkgs.jq}/bin/jq -s 'reduce .[] as $x ({}; . * $x)' "''${files[@]}" \
+    if [ -f "$PRIVATE_FILE" ]; then
+      ${pkgs.jq}/bin/jq -s '.[0] * .[1]' \
+        "${settingsFile}" \
+        "$PRIVATE_FILE" \
         > "$CLAUDE_DIR/settings.json"
       chmod 644 "$CLAUDE_DIR/settings.json"
     else
@@ -288,6 +286,22 @@ in
     # Nix 生成時の settings.json を参照コピーとして保存
     # Stop hook での差分検出に使用
     cp "$CLAUDE_DIR/settings.json" "$CLAUDE_DIR/.settings.json.nix-managed"
+
+    # MCP サーバー設定は ~/.claude.json の mcpServers にマージする
+    # Claude Code は settings.json の mcpServers を読まないため
+    FINDY_MCP_FILE="${findyMcpFile}"
+    USER_CLAUDE_JSON="$HOME/.claude.json"
+    if [ -f "$FINDY_MCP_FILE" ] && [ -f "$USER_CLAUDE_JSON" ]; then
+      TMP=$(mktemp)
+      ${pkgs.jq}/bin/jq --slurpfile mcp "$FINDY_MCP_FILE" \
+        '.mcpServers = ((.mcpServers // {}) * $mcp[0].mcpServers)' \
+        "$USER_CLAUDE_JSON" > "$TMP"
+      if ! cmp -s "$TMP" "$USER_CLAUDE_JSON"; then
+        mv "$TMP" "$USER_CLAUDE_JSON"
+      else
+        rm -f "$TMP"
+      fi
+    fi
   '';
 
   # ~/.claude/skills → dotfiles のスキルディレクトリ
