@@ -20,6 +20,11 @@
       claude-mcp-findy-ai-plus = {
         path = "${config.xdg.configHome}/claude/.findy-mcp.json";
       };
+
+      # Findy AI+ Prompt & Session Log 用 OpenTelemetry 設定（JSON形式、トークン含む）
+      claude-otel-env = {
+        path = "${config.xdg.configHome}/claude/.otel-env.json";
+      };
     };
   };
 

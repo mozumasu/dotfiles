@@ -12,6 +12,8 @@ let
   publicSettings = {
     env = {
       MAX_THINKING_TOKENS = "31999";
+      # Findy AI+ Prompt & Session Log (OpenTelemetry) の env 一式は
+      # sops の claude-otel-env シークレットから activation 時にマージされる
     };
     includeCoAuthoredBy = true;
     permissions = {
@@ -245,6 +247,11 @@ let
   # ~/.config/claude/.findy-mcp.json に復号配置される
   findyMcpFile = "${config.xdg.configHome}/claude/.findy-mcp.json";
 
+  # Findy AI+ Prompt & Session Log 用 OTel トークンも sops-nix で管理
+  # sops.nix の claude-otel-env シークレットが
+  # ~/.config/claude/.otel-env.json に復号配置される
+  otelEnvFile = "${config.xdg.configHome}/claude/.otel-env.json";
+
   settingsFile = pkgs.writeText "claude-settings.json" (builtins.toJSON publicSettings);
 in
 {
@@ -272,11 +279,14 @@ in
 
     # settings.json は書き込み可能なファイルとしてコピー
     # Claude Code の /config エディタが書き戻せるようにするため
+    # privateMarketplaces と OTel env を順に deep merge する
     PRIVATE_FILE="${privateMarketplacesFile}"
-    if [ -f "$PRIVATE_FILE" ]; then
-      ${pkgs.jq}/bin/jq -s '.[0] * .[1]' \
-        "${settingsFile}" \
-        "$PRIVATE_FILE" \
+    OTEL_ENV_FILE="${otelEnvFile}"
+    settings_files=("${settingsFile}")
+    [ -f "$PRIVATE_FILE" ] && settings_files+=("$PRIVATE_FILE")
+    [ -f "$OTEL_ENV_FILE" ] && settings_files+=("$OTEL_ENV_FILE")
+    if [ "''${#settings_files[@]}" -gt 1 ]; then
+      ${pkgs.jq}/bin/jq -s 'reduce .[] as $x ({}; . * $x)' "''${settings_files[@]}" \
         > "$CLAUDE_DIR/settings.json"
       chmod 644 "$CLAUDE_DIR/settings.json"
     else
