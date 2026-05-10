@@ -413,9 +413,14 @@ handle_fork_mode() {
 
   echo "Fork mode: Creating fork of $repo"
 
-  # Create fork
-  if ! gh repo fork "$repo" --remote=false >/dev/null 2>&1; then
-    echo "Skip fork creation - may already exist" >&2
+  # Create fork (skip if already exists)
+  if gh repo view "$me/$name" >/dev/null 2>&1; then
+    echo "Fork already exists: $me/$name"
+  else
+    if ! gh repo fork "$repo" --clone=false; then
+      echo "Failed to create fork of $repo" >&2
+      return 1
+    fi
   fi
 
   local dst="$root/github.com/$me/$name"
