@@ -3,6 +3,7 @@
   "LuaSnip": { "branch": "master", "commit": "dae4f5aaa3574bd0c2b9dd20fb9542a02c10471c" },
   "SchemaStore.nvim": { "branch": "main", "commit": "157fa3f37a3be55ceb375274e2f3ea2d7d2f9ef6" },
   "Vim-Jinja2-Syntax": { "branch": "master", "commit": "2c17843b074b06a835f88587e1023ceff7e2c7d1" },
+  "auto-save.nvim": { "branch": "main", "commit": "979b6c82f60cfa80f4cf437d77446d0ded0addf0" },
   "avante.nvim": { "branch": "main", "commit": "9a7793461549939f1d52b2b309a1aa44680170c8" },
   "baleia.nvim": { "branch": "main", "commit": "880e97c02edf3148ba2bdc6305ac03eb3c3711e0" },
   "blink-copilot": { "branch": "main", "commit": "7ad8209b2f880a2840c94cdcd80ab4dc511d4f39" },
