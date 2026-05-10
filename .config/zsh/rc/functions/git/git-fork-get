@@ -26,16 +26,20 @@ check_dependencies() {
 # Show help message
 show_help() {
   cat <<EOF
-Usage: git-fork-get [--private|-p] [OWNER/REPO | GITHUB_URL]
+Usage: git-fork-get [--private|-p] [--sync|-s] [OWNER/REPO | GITHUB_URL]
 
 Fork or create private copy of a GitHub repository and manage with ghq.
 
 Options:
   --private, -p    Create a private copy instead of forking
+  --sync, -s       Sync existing fork with upstream (skip prompt, fast-forward
+                   local default branch). Fork mode only.
   --help, -h       Show this help message
 
 Examples:
   git-fork-get owner/repo              # Fork the repository
+  git-fork-get --sync owner/repo       # Sync existing fork with upstream
+  git-fork-get --sync                  # Sync current fork
   git-fork-get --private owner/repo    # Create private copy
   git-fork-get https://github.com/owner/repo
   git-fork-get                         # Fork current repository
@@ -45,12 +49,17 @@ EOF
 # Parse command line arguments
 parse_arguments() {
   local private_mode=false
+  local sync_mode=false
   local repo=""
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --private|-p)
         private_mode=true
+        shift
+        ;;
+      --sync|-s)
+        sync_mode=true
         shift
         ;;
       --help|-h)
@@ -69,7 +78,7 @@ parse_arguments() {
     esac
   done
 
-  echo "$private_mode $repo"
+  echo "$private_mode $sync_mode $repo"
 }
 
 # Normalize GitHub URL to OWNER/REPO format
@@ -159,8 +168,8 @@ suggest_private_repo_name() {
       suffix_num=$((suffix_num + 1))
     done
     suggested_name="$base_name-private-$suffix_num"
-    echo ""
-    echo "⚠️  Repository '$me/$base_name' already exists on GitHub"
+    echo "" >&2
+    echo "⚠️  Repository '$me/$base_name' already exists on GitHub" >&2
   fi
 
   echo "$suggested_name"
@@ -171,10 +180,10 @@ prompt_for_repo_name() {
   local suggested="$1"
   local me="$2"
 
-  echo ""
-  echo "Repository name: $suggested"
-  echo -n "Use this name? (y/Enter to accept, or type a new name): "
-  read -r user_input
+  echo "" >&2
+  echo "Repository name: $suggested" >&2
+  echo -n "Use this name? (y/Enter to accept, or type a new name): " >&2
+  read -r user_input </dev/tty
 
   if [[ -z "$user_input" ]] || [[ "$user_input" == "y" ]] || [[ "$user_input" == "Y" ]]; then
     echo "$suggested"
@@ -188,8 +197,8 @@ prompt_for_repo_name() {
     # Check if the new name already exists
     if repo_exists_on_github "$me/$user_input"; then
       echo "⚠️  Repository '$me/$user_input' already exists on GitHub" >&2
-      echo -n "Do you want to continue anyway? (y/n): "
-      read -r confirm
+      echo -n "Do you want to continue anyway? (y/n): " >&2
+      read -r confirm </dev/tty
       if [[ "$confirm" != "y" ]] && [[ "$confirm" != "Y" ]]; then
         echo "Cancelled" >&2
         return 1
@@ -205,22 +214,22 @@ handle_existing_local_repo() {
   local dst="$1"
   local mode="$2"  # "private" or "fork"
 
-  echo ""
-  echo "⚠️  Repository already exists: $dst"
-  echo ""
-  echo "What would you like to do?"
-  echo "  1) Update existing repository"
+  echo "" >&2
+  echo "⚠️  Repository already exists: $dst" >&2
+  echo "" >&2
+  echo "What would you like to do?" >&2
+  echo "  1) Update existing repository" >&2
 
   if [[ "$mode" == "fork" ]]; then
-    echo "  2) Replace with fresh fork"
+    echo "  2) Replace with fresh fork" >&2
   else
-    echo "  2) Use a different name"
+    echo "  2) Use a different name" >&2
   fi
 
-  echo "  3) Cancel"
-  echo ""
-  echo -n "Enter your choice (1-3): "
-  read -r choice
+  echo "  3) Cancel" >&2
+  echo "" >&2
+  echo -n "Enter your choice (1-3): " >&2
+  read -r choice </dev/tty
 
   echo "$choice"
 }
@@ -404,12 +413,54 @@ handle_private_mode() {
   echo "✓ Location: $dst"
 }
 
+# Sync local fork with upstream: refresh GitHub fork via gh repo sync,
+# then fast-forward the local default branch when safe.
+sync_fork_with_upstream() {
+  local me="$1"
+  local name="$2"
+
+  local default_branch
+  default_branch=$(gh repo view "$me/$name" --json defaultBranchRef -q '.defaultBranchRef.name' 2>/dev/null)
+  [[ -z "$default_branch" ]] && default_branch="main"
+
+  echo ""
+  echo "Syncing fork with upstream (branch: $default_branch)..."
+
+  if gh repo sync "$me/$name" -b "$default_branch"; then
+    echo "✓ GitHub fork synced with upstream"
+  else
+    echo "⚠️  Failed to sync GitHub fork (likely diverged; resolve manually)" >&2
+  fi
+
+  git fetch origin --prune
+
+  local current_branch
+  current_branch=$(git branch --show-current)
+
+  if [[ "$current_branch" != "$default_branch" ]]; then
+    echo "ℹ️  Currently on '$current_branch'; switch to '$default_branch' to fast-forward locally"
+    return 0
+  fi
+
+  if ! git diff --quiet || ! git diff --cached --quiet; then
+    echo "⚠️  Working tree has uncommitted changes; skipping local fast-forward" >&2
+    return 0
+  fi
+
+  if git merge --ff-only "origin/$default_branch"; then
+    echo "✓ Local $default_branch fast-forwarded"
+  else
+    echo "⚠️  Local $default_branch could not be fast-forwarded (diverged)" >&2
+  fi
+}
+
 # Handle fork mode
 handle_fork_mode() {
   local repo="$1"
   local me="$2"
   local name="$3"
   local root="$4"
+  local sync_mode="$5"
 
   echo "Fork mode: Creating fork of $repo"
 
@@ -427,7 +478,12 @@ handle_fork_mode() {
 
   # Handle existing local repository
   if [[ -d "$dst/.git" ]]; then
-    local choice=$(handle_existing_local_repo "$dst" "fork")
+    local choice
+    if [[ "$sync_mode" == "true" ]]; then
+      choice="1"  # auto-update
+    else
+      choice=$(handle_existing_local_repo "$dst" "fork")
+    fi
 
     case "$choice" in
       1)  # Update existing
@@ -486,6 +542,11 @@ handle_fork_mode() {
   git fetch upstream --prune
   gh repo set-default "$me/$name" >/dev/null 2>&1 || true
 
+  # Optional: sync fork with upstream
+  if [[ "$sync_mode" == "true" ]]; then
+    sync_fork_with_upstream "$me" "$name"
+  fi
+
   # Show confirmation
   echo ""
   echo "✓ Fork created/updated: $me/$name"
@@ -503,9 +564,18 @@ check_dependencies || return $?
 local args_result
 args_result=$(parse_arguments "$@") || return 0
 
-local private_mode="${args_result%% *}"
-local repo_arg="${args_result#* }"
-[[ "$repo_arg" == "$private_mode" ]] && repo_arg=""
+# args_result format: "<private_mode> <sync_mode> <repo>"
+local -a args_parts
+args_parts=(${=args_result})
+local private_mode="${args_parts[1]}"
+local sync_mode="${args_parts[2]}"
+local repo_arg="${args_parts[3]:-}"
+
+# Reject incompatible combination
+if [[ "$private_mode" == "true" && "$sync_mode" == "true" ]]; then
+  echo "Error: --sync cannot be used with --private" >&2
+  return 2
+fi
 
 # Determine repository
 local repo
@@ -525,7 +595,7 @@ root="$(ghq root)"
 if [[ "$private_mode" == "true" ]]; then
   handle_private_mode "$repo" "$me" "$name" "$root"
 else
-  handle_fork_mode "$repo" "$me" "$name" "$root"
+  handle_fork_mode "$repo" "$me" "$name" "$root" "$sync_mode"
 fi
 
 # Show remote configuration
