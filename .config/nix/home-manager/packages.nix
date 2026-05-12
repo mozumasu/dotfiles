@@ -40,6 +40,7 @@
     rumdl # Markdown linter
     nodejs # for Mason LSP servers
     go # for gopls etc.
+    rustup # for building sniprun.nvim, etc.
 
     # ビルドツール
     cmake
