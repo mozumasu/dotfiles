@@ -10,6 +10,7 @@
       # macOS specific
       "felixkratz/formulae/borders"
       "terminal-notifier"
+      "ical-buddy" # for Raycast calendar copy script
 
       # Container runtime
       "docker"

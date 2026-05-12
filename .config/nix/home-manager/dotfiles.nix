@@ -23,6 +23,7 @@ in
     "zeno".source = mkLink ".config/zeno";
     "gomi".source = mkLink ".config/gomi";
     "mise".source = mkLink ".config/mise";
+    "raycast/scripts".source = mkLink ".config/raycast/scripts";
     # claude は claude-code.nix で個別管理
     # settings.json は書き込み可能コピー、それ以外はシンボリックリンク
   };
