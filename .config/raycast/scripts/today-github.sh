@@ -16,6 +16,9 @@
 
 set -euo pipefail
 
+# Raycast の最小 PATH では nix 管理の gh が見えないため明示的に追加する
+export PATH="/etc/profiles/per-user/$USER/bin:/run/current-system/sw/bin:$HOME/.nix-profile/bin:$PATH"
+
 if ! command -v gh >/dev/null 2>&1; then
   echo "gh CLI が見つかりません。home-manager switch を実行してください。"
   exit 1

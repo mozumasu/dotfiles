@@ -135,6 +135,13 @@ icalBuddy eventsToday
 
 `gh auth login` を実行。Raycast から起動する場合も同じ認証状態が共有される。
 
+### Raycast 経由でだけ `(github fetch failed)` が出る
+
+Raycast Script Commands は launchd 由来の最小 PATH で起動するため、nix 管理の `gh`
+(`/etc/profiles/per-user/$USER/bin/gh`) が見つからずに落ちることがある。`today-github.sh`
+では冒頭で `PATH` に nix 関連ディレクトリを明示追加しているため、新しく nix-managed
+バイナリに依存するスクリプトを増やすときは同じ prelude を入れる必要がある。
+
 ### 重複した予定が出る
 
 `INCLUDE_CALS` でフィルタしたいカレンダー名を絞る。利用可能なカレンダー名は `icalBuddy calendars` で一覧できる。

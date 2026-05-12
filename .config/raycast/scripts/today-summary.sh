@@ -18,8 +18,19 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-calendar=$(NO_PBCOPY=1 "$SCRIPT_DIR/today-calendar.sh") || calendar="(calendar fetch failed)"
-github=$(NO_PBCOPY=1 "$SCRIPT_DIR/today-github.sh") || github="(github fetch failed)"
+if calendar=$(NO_PBCOPY=1 "$SCRIPT_DIR/today-calendar.sh" 2>&1); then
+  :
+else
+  calendar="(calendar fetch failed)
+${calendar}"
+fi
+
+if github=$(NO_PBCOPY=1 "$SCRIPT_DIR/today-github.sh" 2>&1); then
+  :
+else
+  github="(github fetch failed)
+${github}"
+fi
 
 output=$(printf '%s\n\n%s' "$calendar" "$github")
 
