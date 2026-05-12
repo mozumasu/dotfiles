@@ -208,6 +208,7 @@ let
       "slack@claude-plugins-official" = true;
       "aws-core@agent-toolkit-for-aws" = true;
       "aws-data-analytics@agent-toolkit-for-aws" = true;
+      "codex@openai-codex" = true;
     }
     // lib.optionalAttrs (builtins.pathExists privateMarketplacesFile) (builtins.fromJSON (
       builtins.readFile privateMarketplacesFile
@@ -223,6 +224,12 @@ let
         source = {
           source = "github";
           repo = "aws/agent-toolkit-for-aws";
+        };
+      };
+      openai-codex = {
+        source = {
+          source = "github";
+          repo = "openai/codex-plugin-cc";
         };
       };
     }
