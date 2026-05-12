@@ -11,10 +11,9 @@ return {
       { "<leader><CR>q", "<cmd>SnipClose<cr>", desc = "SnipRun close" },
     },
     opts = {
-      display = { "VirtualTextOk", "TerminalWithCode" },
+      display = { "VirtualTextOk", "TempFloatingWindow" },
       display_options = {
-        terminal_width = 60,
-        terminal_position = "vertical",
+        notification_timeout = 5,
       },
       live_mode_toggle = "off",
       selected_interpreters = {},
