@@ -33,6 +33,10 @@
 
 - [💘How to setup wezterm](https://zenn.dev/mozumasu/articles/mozumasu-wezterm-customization)
 
+## Scripts
+
+- [📅 Raycast Today Suite](docs/raycast-today-suite.md) — 今日の予定 / close した issue / サマリをクリップボードにコピー
+
 ```text
 
 
@@ -109,14 +113,14 @@ sudo nix run \
 ### Available Hosts
 
 | Host | Description |
-|------|-------------|
+| ------ | ------------- |
 | `geisha` | Main Mac |
 | `bourbon` | Second Mac |
 
 ### What's Managed by Nix
 
 | Category | Description |
-|----------|-------------|
+| ---------- | ------------- |
 | **Homebrew** | Auto-installed via nix-homebrew |
 | **CLI Tools** | 75+ packages via home-manager |
 | **GUI Apps** | 43 Casks via Homebrew |
@@ -127,7 +131,7 @@ sudo nix run \
 ### Manual Setup Required
 
 | Item | Reason |
-|------|--------|
+| ------ | -------- |
 | Apple ID | Security |
 | App Logins | Authentication |
 | SSH Keys | `~/.ssh/` not managed |
