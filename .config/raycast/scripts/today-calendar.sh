@@ -68,5 +68,9 @@ if [ -z "$output" ]; then
   output="今日と明日の予定はありません。"
 fi
 
-printf '%s' "$output" | pbcopy
-printf '%s\n\n—— クリップボードにコピーしました ——\n' "$output"
+if [ "${NO_PBCOPY:-}" = "1" ]; then
+  printf '%s\n' "$output"
+else
+  printf '%s' "$output" | pbcopy
+  printf '%s\n\n—— クリップボードにコピーしました ——\n' "$output"
+fi
