@@ -1,4 +1,9 @@
-{ config, ... }:
+{ config, hostSpec, ... }:
+let
+  # Raycast today-calendar.sh 用 conf を host 別に切り替える
+  todayCalendarConfKey =
+    if hostSpec.isWork then "today-calendar-conf-work" else "today-calendar-conf-personal";
+in
 {
   # sops-nix configuration for user-level secrets
   sops = {
@@ -24,6 +29,11 @@
       # Findy AI+ Prompt & Session Log 用 OpenTelemetry 設定（JSON形式、トークン含む）
       claude-otel-env = {
         path = "${config.xdg.configHome}/claude/.otel-env.json";
+      };
+
+      # Raycast today-calendar.sh 用ローカル設定（host 別に切り替え）
+      ${todayCalendarConfKey} = {
+        path = "${config.xdg.configHome}/local/today-calendar.conf";
       };
     };
   };
