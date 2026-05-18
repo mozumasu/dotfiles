@@ -87,6 +87,7 @@
 
     # ノート
     nb
+    ntn # Notion CLI
 
     # その他
     translate-shell

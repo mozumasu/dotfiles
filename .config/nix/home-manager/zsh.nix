@@ -245,6 +245,19 @@ in
         fi
 
         # ----------------------------------------------------
+        # ntn (Notion CLI) completions
+        # ----------------------------------------------------
+        if type ntn &>/dev/null; then
+          _ntn_cache="''${XDG_CACHE_HOME:-$HOME/.cache}/ntn.zsh"
+          if [[ ! -r "$_ntn_cache" || "$(command -v ntn)" -nt "$_ntn_cache" ]]; then
+            ntn completions zsh > "$_ntn_cache"
+            zcompile "$_ntn_cache"
+          fi
+          source "$_ntn_cache"
+          unset _ntn_cache
+        fi
+
+        # ----------------------------------------------------
         # Alias (additional)
         # ----------------------------------------------------
         # ls with eza
