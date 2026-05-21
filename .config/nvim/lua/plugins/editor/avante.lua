@@ -24,7 +24,10 @@ return {
       -- Make sure to set this up properly if you have lazy=true
       "MeanderingProgrammer/render-markdown.nvim",
       opts = {
-        file_types = { "markdown", "Avante" },
+        -- octo は octo.lua 側で先読みロード + markdown parser register して描画する。
+        -- ft には octo を入れない: FileType=octo 遅延ロードが octo の非同期バッファ
+        -- 生成中に発火し race (Invalid buffer id) を誘発するため。
+        file_types = { "markdown", "Avante", "octo" },
       },
       ft = { "markdown", "Avante" },
     },
