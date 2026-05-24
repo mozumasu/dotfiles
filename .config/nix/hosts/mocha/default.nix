@@ -43,6 +43,7 @@
     thonny
     vde-layout
     vscode
+    subversion
   ];
 
   # mocha-specific brews
