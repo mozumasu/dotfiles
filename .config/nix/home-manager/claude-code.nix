@@ -262,6 +262,11 @@ let
   settingsFile = pkgs.writeText "claude-settings.json" (builtins.toJSON publicSettings);
 in
 {
+  # Claude Code 本体は llm-agents.nix で管理（自動アップデータは wrapper 側で無効化済み）
+  home.packages = with pkgs; [
+    llm-agents.claude-code
+  ];
+
   # ~/.config/claude/ は activation script で管理
   # xdg.configFile + mkOutOfStoreSymlink だと home-manager が
   # nix store 経由で dotfiles に解決した後、dotfiles 内のファイルを
