@@ -73,6 +73,7 @@
     version-lsp # Package version checker LSP
     yaskkserv2 # SKK server
     safe-chain # Block malicious packages
+    ccsession # claude --resume の fzf フロントエンド
 
     # ネタ系
     cowsay
