@@ -85,6 +85,9 @@
     # Google Workspace CLI
     gogcli
 
+    # Slack
+    slack-cli # Official Slack platform CLI
+
     # ノート
     nb
     ntn # Notion CLI
