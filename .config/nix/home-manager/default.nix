@@ -19,6 +19,7 @@
   home.username = hostSpec.username;
   home.homeDirectory = lib.mkForce "/Users/${hostSpec.username}";
   home.stateVersion = "24.11";
+  home.enableNixpkgsReleaseCheck = false;
 
   programs.home-manager.enable = true;
 
