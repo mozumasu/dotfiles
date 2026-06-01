@@ -83,11 +83,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1779860320,
-        "narHash": "sha256-le7+RZIHM6xCHMgIrnNO8se86C9pDzC9ciW132U8UDo=",
+        "lastModified": 1780118086,
+        "narHash": "sha256-6FHnouIx60LfvrPQNT5ywzW5NUC4URcSbnzDEEO9tbI=",
         "owner": "sorafujitani",
         "repo": "ccsession",
-        "rev": "a46f51f5ecada57f379b4e0d6de37ff4cc729401",
+        "rev": "46461afd2984651e83523bd31e060ba41151282b",
         "type": "github"
       },
       "original": {

@@ -15,7 +15,7 @@
     tlrc # tldr
 
     # Git 関連
-    git
+    gitSVN
     gh
     ghq
     delta # git-delta
