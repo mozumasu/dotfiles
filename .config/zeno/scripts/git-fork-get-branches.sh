@@ -19,9 +19,8 @@ repo=$(echo "$cmdline" | perl -ne '
 ')
 
 list_remote_branches() {
-  git ${1:+-C "$1"} branch -r --format='%(refname:short)' \
-    | perl -ne 'next if m{^[^/]+$}; s|^[^/]+/||; next if /^HEAD$/; print' \
-    | sort -u
+  git ${1:+-C "$1"} branch -r --sort=-committerdate --format='%(refname:short)' \
+    | perl -ne 'next if m{^[^/]+$}; s|^[^/]+/||; next if /^HEAD$/; print unless $seen{$_}++'
 }
 
 if [ -z "$repo" ]; then
@@ -38,5 +37,12 @@ if [ -d "$local_path/.git" ]; then
   git -C "$local_path" fetch --all --quiet 2>/dev/null
   list_remote_branches "$local_path"
 else
-  gh api "repos/$repo/branches" --paginate -q '.[].name' 2>/dev/null
+  gh api graphql -f owner="${repo%%/*}" -f name="${repo##*/}" -f query='
+    query($owner: String!, $name: String!) {
+      repository(owner: $owner, name: $name) {
+        refs(refPrefix: "refs/heads/", first: 100, orderBy: {field: TAG_COMMIT_DATE, direction: DESC}) {
+          nodes { name }
+        }
+      }
+    }' -q '.data.repository.refs.nodes[].name' 2>/dev/null
 fi
