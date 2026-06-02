@@ -26,7 +26,7 @@ check_dependencies() {
 # Show help message
 show_help() {
   cat <<EOF
-Usage: git-fork-get [--private|-p] [--sync|-s] [OWNER/REPO | GITHUB_URL]
+Usage: git-fork-get [--private|-p] [--sync|-s] [-b BRANCH] [OWNER/REPO | GITHUB_URL]
 
 Fork or create private copy of a GitHub repository and manage with ghq.
 
@@ -34,13 +34,18 @@ Options:
   --private, -p    Create a private copy instead of forking
   --sync, -s       Sync existing fork with upstream (skip prompt, fast-forward
                    local default branch). Fork mode only.
+  -b, --branch     Checkout the specified branch after fork/clone.
+                   In private mode, only push this branch instead of all.
   --help, -h       Show this help message
 
 Examples:
   git-fork-get owner/repo              # Fork the repository
+  git-fork-get -b feature owner/repo   # Fork and checkout 'feature' branch
   git-fork-get --sync owner/repo       # Sync existing fork with upstream
+  git-fork-get --sync -b dev repo      # Sync and checkout 'dev' branch
   git-fork-get --sync                  # Sync current fork
   git-fork-get --private owner/repo    # Create private copy
+  git-fork-get --private -b main repo  # Private copy of 'main' branch only
   git-fork-get https://github.com/owner/repo
   git-fork-get                         # Fork current repository
 EOF
@@ -50,6 +55,7 @@ EOF
 parse_arguments() {
   local private_mode=false
   local sync_mode=false
+  local branch=""
   local repo=""
 
   while [[ $# -gt 0 ]]; do
@@ -61,6 +67,14 @@ parse_arguments() {
       --sync|-s)
         sync_mode=true
         shift
+        ;;
+      --branch|-b)
+        if [[ -z "${2:-}" ]]; then
+          echo "Error: --branch requires a branch name" >&2
+          return 2
+        fi
+        branch="$2"
+        shift 2
         ;;
       --help|-h)
         show_help
@@ -78,7 +92,7 @@ parse_arguments() {
     esac
   done
 
-  echo "$private_mode $sync_mode $repo"
+  echo "${private_mode}|${sync_mode}|${branch}|${repo}"
 }
 
 # Normalize GitHub URL to OWNER/REPO format
@@ -260,11 +274,20 @@ clone_and_push_to_private() {
   local target_repo="$2"
   local tmp_dir="$3"
 
+  local branch="$4"
+
   echo "Cloning original repository..."
-  git clone "https://github.com/$source_repo" "$tmp_dir" || {
-    echo "Failed to clone original repository" >&2
-    return 1
-  }
+  if [[ -n "$branch" ]]; then
+    git clone --branch "$branch" --single-branch "https://github.com/$source_repo" "$tmp_dir" || {
+      echo "Failed to clone original repository (branch: $branch)" >&2
+      return 1
+    }
+  else
+    git clone "https://github.com/$source_repo" "$tmp_dir" || {
+      echo "Failed to clone original repository" >&2
+      return 1
+    }
+  fi
 
   cd "$tmp_dir" || {
     echo "Failed to enter temporary directory" >&2
@@ -275,10 +298,17 @@ clone_and_push_to_private() {
   git remote add upstream "https://github.com/$source_repo"
 
   echo "Pushing to private repository..."
-  git push origin --all || {
-    echo "Failed to push branches" >&2
-    return 1
-  }
+  if [[ -n "$branch" ]]; then
+    git push origin "$branch" || {
+      echo "Failed to push branch: $branch" >&2
+      return 1
+    }
+  else
+    git push origin --all || {
+      echo "Failed to push branches" >&2
+      return 1
+    }
+  fi
 
   git push origin --tags 2>/dev/null || {
     echo "Note: No tags to push or failed to push tags" >&2
@@ -312,6 +342,7 @@ handle_private_mode() {
   local me="$2"
   local name="$3"
   local root="$4"
+  local branch="$5"
 
   echo "Private mode: Creating private copy of $repo"
 
@@ -332,7 +363,7 @@ handle_private_mode() {
   }
 
   # Clone and push
-  clone_and_push_to_private "$repo" "$me/$private_name" "$tmp_dir" || {
+  clone_and_push_to_private "$repo" "$me/$private_name" "$tmp_dir" "$branch" || {
     cleanup_temp_dir "$tmp_dir" "$original_dir"
     return 1
   }
@@ -411,6 +442,7 @@ handle_private_mode() {
   echo ""
   echo "✓ Private repository created: $me/$private_name"
   echo "✓ Location: $dst"
+  [[ -n "$branch" ]] && echo "✓ Branch: $branch"
 }
 
 # Sync local fork with upstream: refresh GitHub fork via gh repo sync,
@@ -461,6 +493,7 @@ handle_fork_mode() {
   local name="$3"
   local root="$4"
   local sync_mode="$5"
+  local branch="$6"
 
   echo "Fork mode: Creating fork of $repo"
 
@@ -479,8 +512,8 @@ handle_fork_mode() {
   # Handle existing local repository
   if [[ -d "$dst/.git" ]]; then
     local choice
-    if [[ "$sync_mode" == "true" ]]; then
-      choice="1"  # auto-update
+    if [[ "$sync_mode" == "true" ]] || [[ -n "$branch" ]]; then
+      choice="1"  # auto-update (skip prompt for --sync or -b)
     else
       choice=$(handle_existing_local_repo "$dst" "fork")
     fi
@@ -524,10 +557,17 @@ handle_fork_mode() {
     esac
   else
     # Get fresh fork
-    ghq get "$me/$name" || {
-      echo "ghq get failed" >&2
-      return 1
-    }
+    if [[ -n "$branch" ]]; then
+      ghq get -b "$branch" "$me/$name" || {
+        echo "ghq get failed" >&2
+        return 1
+      }
+    else
+      ghq get "$me/$name" || {
+        echo "ghq get failed" >&2
+        return 1
+      }
+    fi
     cd "$dst" || {
       echo "Failed to cd to $dst" >&2
       return 1
@@ -547,10 +587,28 @@ handle_fork_mode() {
     sync_fork_with_upstream "$me" "$name"
   fi
 
+  # Checkout specified branch (for existing repos or after sync)
+  if [[ -n "$branch" ]]; then
+    local current_branch
+    current_branch=$(git branch --show-current)
+    if [[ "$current_branch" != "$branch" ]]; then
+      if git show-ref --verify --quiet "refs/heads/$branch"; then
+        git checkout "$branch"
+      elif git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+        git checkout -b "$branch" "origin/$branch"
+      elif git show-ref --verify --quiet "refs/remotes/upstream/$branch"; then
+        git checkout -b "$branch" "upstream/$branch"
+      else
+        echo "⚠️  Branch '$branch' not found in origin or upstream" >&2
+      fi
+    fi
+  fi
+
   # Show confirmation
   echo ""
   echo "✓ Fork created/updated: $me/$name"
   echo "✓ Location: $dst"
+  [[ -n "$branch" ]] && echo "✓ Branch: $branch"
 }
 
 # ============================================
@@ -564,12 +622,11 @@ check_dependencies || return $?
 local args_result
 args_result=$(parse_arguments "$@") || return 0
 
-# args_result format: "<private_mode> <sync_mode> <repo>"
-local -a args_parts
-args_parts=(${=args_result})
-local private_mode="${args_parts[1]}"
-local sync_mode="${args_parts[2]}"
-local repo_arg="${args_parts[3]:-}"
+# args_result format: "<private_mode>|<sync_mode>|<branch>|<repo>"
+local private_mode="${args_result%%|*}"; args_result="${args_result#*|}"
+local sync_mode="${args_result%%|*}"; args_result="${args_result#*|}"
+local branch="${args_result%%|*}"; args_result="${args_result#*|}"
+local repo_arg="$args_result"
 
 # Reject incompatible combination
 if [[ "$private_mode" == "true" && "$sync_mode" == "true" ]]; then
@@ -593,9 +650,9 @@ root="$(ghq root)"
 
 # Execute based on mode
 if [[ "$private_mode" == "true" ]]; then
-  handle_private_mode "$repo" "$me" "$name" "$root"
+  handle_private_mode "$repo" "$me" "$name" "$root" "$branch"
 else
-  handle_fork_mode "$repo" "$me" "$name" "$root" "$sync_mode"
+  handle_fork_mode "$repo" "$me" "$name" "$root" "$sync_mode" "$branch"
 fi
 
 # Show remote configuration
