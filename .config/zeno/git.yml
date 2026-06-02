@@ -117,3 +117,11 @@ completions:
       --prompt: "'Project> '"
       --preview: "OWNER=$(echo \"${LBUFFER}${RBUFFER}\" | perl -ne 'print $1 if /--owner(?:=|\\s+)([A-Za-z0-9._-]+)/'); echo {} | awk '{print $1}' | xargs -I NUM gh project view NUM --owner ${OWNER:-@me} 2>/dev/null"
     callback: "awk '{print $1}'"
+
+  - name: git-fork-get branch
+    patterns:
+      - "^git-fork-get .*-b $"
+    sourceCommand: "$ZENO_HOME/scripts/git-fork-get-branches.sh \"${LBUFFER}${RBUFFER}\""
+    options:
+      --prompt: "'Branch> '"
+      --preview: "$ZENO_HOME/scripts/git-fork-get-branch-preview.sh {} \"${LBUFFER}${RBUFFER}\""
