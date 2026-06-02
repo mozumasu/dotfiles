@@ -27,6 +27,19 @@ LOCAL_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/local/today-calendar.conf"
 # shellcheck disable=SC1090
 [ -f "$LOCAL_CONFIG" ] && . "$LOCAL_CONFIG"
 
+dow=$(date +%u)
+if [ "$dow" -eq 5 ]; then
+  range=3
+  next_label="Monday $(date -v+3d +'%b %-d')"
+  next_date=$(date -v+3d +'%Y-%m-%d')
+else
+  range=1
+  next_label="Tomorrow $(date -v+1d +'%b %-d')"
+  next_date=$(date -v+1d +'%Y-%m-%d')
+fi
+today_date=$(date +'%Y-%m-%d')
+today_label="Today $(date +'%b %-d')"
+
 ical_args=(
   --bullet ""
   --noCalendarNames
@@ -34,22 +47,29 @@ ical_args=(
   --includeEventProps "title,datetime"
   --timeFormat "%H:%M"
   --separateByDate
+  --noRelativeDates
+  --dateFormat "%Y-%m-%d"
 )
 [ -n "${INCLUDE_CALS:-}" ] && ical_args+=(--includeCals "$INCLUDE_CALS")
 
-raw=$(icalBuddy "${ical_args[@]}" eventsToday+1)
-
-today_label="Today $(date +'%b %-d')"
-tomorrow_label="Tomorrow $(date -v+1d +'%b %-d')"
+raw=$(icalBuddy "${ical_args[@]}" "eventsToday+${range}")
 
 output=$(printf '%s\n' "$raw" | awk \
   -v today_label="$today_label" \
-  -v tomorrow_label="$tomorrow_label" '
-  BEGIN { title = ""; last_section = ""; section = "" }
-  /^today:/        { section = today_label; next }
-  /^tomorrow:/     { section = tomorrow_label; next }
+  -v next_label="$next_label" \
+  -v today_date="$today_date" \
+  -v next_date="$next_date" '
+  BEGIN { title = ""; last_section = ""; section = ""; skip = 0 }
+  /^[0-9]{4}-[0-9]{2}-[0-9]{2}:/ {
+    d = $0; sub(/:$/, "", d)
+    if (d == today_date) { section = today_label; skip = 0 }
+    else if (d == next_date) { section = next_label; skip = 0 }
+    else { skip = 1 }
+    next
+  }
   /^-{3,}/         { next }
   /^[[:space:]]*$/ { next }
+  skip { next }
   /^[[:space:]]/ {
     line = $0
     sub(/^[[:space:]]+/, "", line)
