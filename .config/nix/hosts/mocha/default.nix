@@ -29,7 +29,7 @@
     _1password-cli
     btop
     ccplan
-    discord
+
     figlet
     gcx
     glab
@@ -87,6 +87,7 @@
   homebrew.casks = [
     "1password"
     "cmux"
+    "discord"
     "docker-desktop"
     "jordanbaird-ice"
     "kaku"
