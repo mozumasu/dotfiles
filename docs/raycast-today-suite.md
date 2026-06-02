@@ -9,6 +9,7 @@ Raycast から「今日の自分の動き」をクリップボードにコピー
 | **Today's Calendar** | 今日と明日の Calendar.app 予定 | `today-calendar.sh` |
 | **Today's GitHub** | 今日 close した issue (assignee:@me) | `today-github.sh` |
 | **Today's Summary** | 上記2つを結合 | `today-summary.sh` |
+| **Free Time Slots** | 指定日の空き時間スロット | `free-time-slots.sh` |
 
 `Summary` は内部で `NO_PBCOPY=1` を立てて他 2 つを呼び出し、結合した結果を一度だけ `pbcopy` する。
 
