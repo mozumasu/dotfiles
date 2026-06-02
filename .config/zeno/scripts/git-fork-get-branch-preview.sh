@@ -24,7 +24,7 @@ show_local_log() {
   local remote
   for remote in upstream origin; do
     if git -C "$dir" show-ref --verify --quiet "refs/remotes/$remote/$branch" 2>/dev/null; then
-      git -C "$dir" log "$remote/$branch" --oneline --format="%C(yellow)%h %C(green)%ad %C(blue)%an%C(reset) %s" --date=short -10
+      git -C "$dir" log "$remote/$branch" --color=always --format="%C(yellow)%h %C(green)%ad %C(blue)%an%C(reset) %s" --date=short -10
       return
     fi
   done
