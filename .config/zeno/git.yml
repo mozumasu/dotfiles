@@ -123,5 +123,7 @@ completions:
       - "^git-fork-get .*-b $"
     sourceCommand: "$ZENO_HOME/scripts/git-fork-get-branches.sh \"${LBUFFER}${RBUFFER}\""
     options:
+      --ansi: ""
       --prompt: "'Branch> '"
       --preview: "$ZENO_HOME/scripts/git-fork-get-branch-preview.sh {} \"${LBUFFER}${RBUFFER}\""
+      --preview-window: "'right:60%'"

@@ -44,6 +44,8 @@ if [ -d "$local_path/.git" ]; then
   show_local_log "$local_path"
 else
   gh api "repos/$repo/commits?sha=$branch&per_page=10" \
-    -q '.[] | "\(.sha[0:7]) \(.commit.author.date[0:10]) \(.commit.author.name) \(.commit.message | split("\n")[0])"' \
-    2>/dev/null || echo "Failed to fetch commits"
+    -q '.[] | "\(.sha[0:7])\t\(.commit.author.date[0:10])\t\(.commit.author.name)\t\(.commit.message | split("\n")[0])"' \
+    2>/dev/null \
+    | perl -pe 's/^(\S+)\t(\S+)\t([^\t]+)\t(.*)$/\e[33m$1 \e[32m$2 \e[34m$3\e[0m $4/' \
+    || echo "Failed to fetch commits"
 fi

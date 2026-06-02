@@ -1,0 +1,4 @@
+[keybindings]
+grep  = "ctrl-r"
+dir   = "ctrl-o"
+fuzzy = "alt-f"
