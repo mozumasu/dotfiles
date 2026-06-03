@@ -86,11 +86,12 @@
         shishoctl = final.callPackage ./packages/shishoctl.nix { };
         vde-layout = final.callPackage ./packages/vde-layout.nix { };
         ntn = final.callPackage ./packages/ntn.nix { };
+        playwright-cli = final.callPackage ./packages/playwright-cli.nix { };
         slack-cli = final.callPackage ./packages/slack-cli.nix { };
         # Temporary: until gws is available in nixpkgs-unstable (PR #496806)
         gws = googleworkspace-cli.packages.${system}.default;
         version-lsp = version-lsp.packages.${system}.default;
-        ccsession = ccsession.packages.${system}.default;
+        ccsession = final.callPackage ./packages/ccsession.nix { src = ccsession; };
         plamo-translate = kawarimidoll-nur.packages.${system}.plamo-translate;
         # Temporary: OPA 1.14.1 has broken test fixtures (compile_handler_test.go)
         open-policy-agent = prev.open-policy-agent.overrideAttrs (_: {

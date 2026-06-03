@@ -39,6 +39,7 @@
     deno
     rumdl # Markdown linter
     nodejs # for Mason LSP servers
+    playwright-cli
     go # for gopls etc.
     rustup # for building sniprun.nvim, etc.
 
