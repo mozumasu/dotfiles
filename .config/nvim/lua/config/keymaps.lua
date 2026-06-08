@@ -127,6 +127,36 @@ keymap("n", "gx", function()
   end
 end, { desc = "Open URL or AWS ARN" })
 
+-- Open PR for current line
+keymap("n", "<leader>gp", function()
+  local line = vim.fn.line(".")
+  local file = vim.fn.expand("%:.")
+  local result = vim.system(
+    { "git", "blame", "-l", "-L", line .. "," .. line, file },
+    { text = true, timeout = 3000 }
+  ):wait()
+  if result.code ~= 0 then
+    vim.notify("git blame failed", vim.log.levels.ERROR)
+    return
+  end
+  local commit = vim.trim(result.stdout):match("^(%x+)")
+  if not commit or commit:match("^0+$") then
+    vim.notify("この行はまだコミットされていません", vim.log.levels.WARN)
+    return
+  end
+  local upstream = vim.system({ "git", "remote", "get-url", "upstream" }, { text = true, timeout = 3000 }):wait()
+  local cmd = { "gh", "pr", "list", "--search", commit, "--state", "merged", "--web" }
+  if upstream.code == 0 then
+    local repo = vim.trim(upstream.stdout):match("github%.com[:/](.+)%.git$")
+      or vim.trim(upstream.stdout):match("github%.com[:/](.+)$")
+    if repo then
+      table.insert(cmd, "--repo")
+      table.insert(cmd, repo)
+    end
+  end
+  vim.system(cmd)
+end, { desc = "Open PR for current line" })
+
 -- browse github repogitory
 keymap("n", "<leader>gR", function()
   local github_repogitory_name = vim.fn.expand("<cfile>")
