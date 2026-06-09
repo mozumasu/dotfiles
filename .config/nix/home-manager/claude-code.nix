@@ -245,6 +245,7 @@ let
     language = "ja";
     effortLevel = "medium";
     skipAutoPermissionPrompt = true;
+    skipWorkflowUsageWarning = true;
   };
 
   # 非公開マーケットプレイス設定は sops-nix で管理
