@@ -218,7 +218,8 @@ vim.api.nvim_create_autocmd("FocusGained", {
   group = vim.api.nvim_create_augroup("clipboard_to_unnamed", { clear = true }),
   callback = function()
     local clip = vim.fn.getreg("+")
-    if clip ~= "" and clip ~= _last_vim_yank then
+    local unnamed = vim.fn.getreg('"')
+    if clip ~= "" and clip ~= _last_vim_yank and unnamed == _last_vim_yank then
       vim.fn.setreg('"', clip)
     end
   end,
