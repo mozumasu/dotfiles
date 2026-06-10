@@ -46,8 +46,8 @@ return {
 
     -- gh project item-list を非同期実行してIssueのみ返す
     local function fetch_project_items(owner, project_number, callback)
-      local stdout = vim.loop.new_pipe(false)
-      local stderr = vim.loop.new_pipe(false)
+      local stdout = vim.uv.new_pipe(false)
+      local stderr = vim.uv.new_pipe(false)
       local stdout_data = ""
       local stderr_data = ""
 
@@ -160,8 +160,8 @@ return {
 
     -- vim.uv.spawn() で gh project list を非同期実行
     local function spawn_gh_project_list(owner, callback)
-      local stdout = vim.loop.new_pipe(false)
-      local stderr = vim.loop.new_pipe(false)
+      local stdout = vim.uv.new_pipe(false)
+      local stderr = vim.uv.new_pipe(false)
       local stdout_data = ""
       local stderr_data = ""
 
@@ -169,7 +169,7 @@ return {
       handle = vim.uv.spawn("gh", {
         args = { "project", "list", "--owner", owner, "--limit", "100", "--format", "json" },
         stdio = { nil, stdout, stderr }
-      }, function(code, signal)
+      }, function(code, _signal)
         -- クリーンアップ
         stdout:close()
         stderr:close()
@@ -195,11 +195,11 @@ return {
       end)
 
       -- stdout/stderr を読み込む
-      stdout:read_start(function(err, data)
+      stdout:read_start(function(_err, data)
         if data then stdout_data = stdout_data .. data end
       end)
 
-      stderr:read_start(function(err, data)
+      stderr:read_start(function(_err, data)
         if data then stderr_data = stderr_data .. data end
       end)
     end

@@ -370,14 +370,14 @@ end
 function M.list_notebooks()
   -- nbディレクトリ内のサブディレクトリを直接読み取る（より確実）
   local nb_dir = M.get_nb_dir()
-  local handle = vim.loop.fs_scandir(nb_dir)
+  local handle = vim.uv.fs_scandir(nb_dir)
   if not handle then
     return nil
   end
 
   local notebooks = {}
   while true do
-    local name, type = vim.loop.fs_scandir_next(handle)
+    local name, type = vim.uv.fs_scandir_next(handle)
     if not name then
       break
     end

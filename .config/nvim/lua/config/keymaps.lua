@@ -203,12 +203,12 @@ local zz_state = { pos = 0, last_time = 0 }
 
 keymap("n", "zz", function()
   zz_state.pos = 1
-  zz_state.last_time = vim.loop.now()
+  zz_state.last_time = vim.uv.now()
   vim.cmd("normal! zz")
 end, { desc = "Scroll center (then z to cycle)" })
 
 keymap("n", "z", function()
-  local now = vim.loop.now()
+  local now = vim.uv.now()
   -- 1秒以内かつzzの後なら次の位置へ
   if zz_state.pos > 0 and (now - zz_state.last_time) < 1000 then
     zz_state.last_time = now
