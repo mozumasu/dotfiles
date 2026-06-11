@@ -36,6 +36,22 @@ return {
       vim.bo.undolevels = old_undolevels
     end
 
+    -- octo の load_buffer は gh の非同期応答後に nvim_buf_call(bufnr, ...) を
+    -- バッファ有効性チェックなしで呼ぶため、応答前にプレビューバッファが
+    -- 掃除されると "Invalid buffer id" エラーになる (octo 上流の race)。
+    -- バッファ消滅由来のエラーだけ握りつぶす。
+    local octo = require("octo")
+    local orig_load = octo.load
+    ---@diagnostic disable-next-line: duplicate-set-field
+    octo.load = function(repo, kind, id, hostname, cb)
+      return orig_load(repo, kind, id, hostname, function(obj)
+        local ok, err = pcall(cb, obj)
+        if not ok and not tostring(err):match("Invalid buffer id") then
+          error(err)
+        end
+      end)
+    end
+
     -- render-markdown を octo ロード時(=安全なタイミング)に先読みしておく。
     -- FileType=octo での遅延ロードを避けることで、ピッカーのプレビューバッファ
     -- 生成中に同期ロードがストールして起きる race (Invalid buffer id) を防ぐ。
