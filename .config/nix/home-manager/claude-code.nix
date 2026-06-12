@@ -239,7 +239,8 @@ let
     plansDirectory = "./plans";
     # issue #49747 (Opus 4.7 が MCP tool 呼び出しに legacy XML を混入させる regression)
     # 回避のため Opus 4.6 に固定。修正版が出たらこの行を削除して 4.7 に戻す。
-    model = "claude-opus-4-6";
+    # 2024-12-19: claude-fable-5[1m] に変更
+    model = "claude-fable-5[1m]";
     maxTokens = 8192;
     temperature = 0;
     language = "ja";
