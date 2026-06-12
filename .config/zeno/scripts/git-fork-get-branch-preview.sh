@@ -31,6 +31,31 @@ show_local_log() {
   echo "Branch '$branch' not found in remotes"
 }
 
+show_api_log() {
+  local target="$1" ref="$2"
+  gh api "repos/$target/commits?sha=$ref&per_page=10" \
+    -q '.[] | "\(.sha[0:7])\t\(.commit.author.date[0:10])\t\(.commit.author.name)\t\(.commit.message | split("\n")[0])"' \
+    2>/dev/null \
+    | perl -pe 's/^(\S+)\t(\S+)\t([^\t]+)\t(.*)$/\e[33m$1 \e[32m$2 \e[34m$3\e[0m $4/' \
+    || echo "Failed to fetch commits"
+}
+
+# "owner:branch" (PR head on another fork): fetch the log from that fork
+if [ "${branch#*:}" != "$branch" ]; then
+  fork_owner="${branch%%:*}"
+  ref="${branch#*:}"
+  name=""
+  if [ -n "$repo" ]; then
+    name="${repo##*/}"
+  elif git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    name=$(git remote get-url origin 2>/dev/null \
+      | perl -ne 's|\.git$||; chomp; print +(split m{/})[-1]')
+  fi
+  [ -z "$name" ] && exit 0
+  show_api_log "$fork_owner/$name" "$ref"
+  exit 0
+fi
+
 if [ -z "$repo" ]; then
   if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     show_local_log
@@ -43,9 +68,5 @@ local_path="$(ghq root 2>/dev/null)/github.com/$repo"
 if [ -d "$local_path/.git" ]; then
   show_local_log "$local_path"
 else
-  gh api "repos/$repo/commits?sha=$branch&per_page=10" \
-    -q '.[] | "\(.sha[0:7])\t\(.commit.author.date[0:10])\t\(.commit.author.name)\t\(.commit.message | split("\n")[0])"' \
-    2>/dev/null \
-    | perl -pe 's/^(\S+)\t(\S+)\t([^\t]+)\t(.*)$/\e[33m$1 \e[32m$2 \e[34m$3\e[0m $4/' \
-    || echo "Failed to fetch commits"
+  show_api_log "$repo" "$branch"
 fi

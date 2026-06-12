@@ -35,12 +35,15 @@ Options:
   --sync, -s       Sync existing fork with upstream (skip prompt, fast-forward
                    local default branch). Fork mode only.
   -b, --branch     Checkout the specified branch after fork/clone.
+                   Accepts "owner:branch" to fetch a PR head branch from
+                   another user's fork (fork mode only).
                    In private mode, only push this branch instead of all.
   --help, -h       Show this help message
 
 Examples:
   git-fork-get owner/repo              # Fork the repository
   git-fork-get -b feature owner/repo   # Fork and checkout 'feature' branch
+  git-fork-get -b user:feature repo    # Checkout PR head branch from user's fork
   git-fork-get --sync owner/repo       # Sync existing fork with upstream
   git-fork-get --sync -b dev repo      # Sync and checkout 'dev' branch
   git-fork-get --sync                  # Sync current fork
@@ -486,6 +489,65 @@ sync_fork_with_upstream() {
   fi
 }
 
+# Checkout a branch after fork/clone.
+# Supports "owner:branch" (PR head style): fetches the branch from that
+# owner's fork, adding it as a remote when needed.
+checkout_branch() {
+  local branch="$1"
+  local name="$2"
+
+  local remote="" ref="$branch"
+  if [[ "$branch" == *:* ]]; then
+    local fork_owner="${branch%%:*}"
+    ref="${branch#*:}"
+
+    # Reuse an existing remote that already points at the fork
+    local r url
+    for r in $(git remote); do
+      url="$(git remote get-url "$r" 2>/dev/null)"
+      url="${url%.git}"
+      if [[ "${(L)url}" == *github.com[:/]"${(L)fork_owner}/${(L)name}" ]]; then
+        remote="$r"
+        break
+      fi
+    done
+
+    local added_remote=false
+    if [[ -z "$remote" ]]; then
+      remote="${(L)fork_owner}"
+      git remote add "$remote" "https://github.com/$fork_owner/$name"
+      added_remote=true
+    fi
+
+    git fetch "$remote" "$ref" || {
+      echo "⚠️  Failed to fetch '$ref' from $fork_owner/$name" >&2
+      [[ "$added_remote" == "true" ]] && git remote remove "$remote"
+      return 1
+    }
+  fi
+
+  local current_branch
+  current_branch=$(git branch --show-current)
+  [[ "$current_branch" == "$ref" ]] && return 0
+
+  if [[ -n "$remote" ]]; then
+    if git show-ref --verify --quiet "refs/heads/$ref"; then
+      git checkout "$ref"
+      git branch --set-upstream-to="$remote/$ref" "$ref" 2>/dev/null || true
+    else
+      git checkout -b "$ref" "$remote/$ref"
+    fi
+  elif git show-ref --verify --quiet "refs/heads/$ref"; then
+    git checkout "$ref"
+  elif git show-ref --verify --quiet "refs/remotes/origin/$ref"; then
+    git checkout -b "$ref" "origin/$ref"
+  elif git show-ref --verify --quiet "refs/remotes/upstream/$ref"; then
+    git checkout -b "$ref" "upstream/$ref"
+  else
+    echo "⚠️  Branch '$ref' not found in origin or upstream" >&2
+  fi
+}
+
 # Handle fork mode
 handle_fork_mode() {
   local repo="$1"
@@ -556,8 +618,8 @@ handle_fork_mode() {
         ;;
     esac
   else
-    # Get fresh fork
-    if [[ -n "$branch" ]]; then
+    # Get fresh fork ("owner:branch" is checked out later, after the clone)
+    if [[ -n "$branch" && "$branch" != *:* ]]; then
       ghq get -b "$branch" "$me/$name" || {
         echo "ghq get failed" >&2
         return 1
@@ -589,19 +651,7 @@ handle_fork_mode() {
 
   # Checkout specified branch (for existing repos or after sync)
   if [[ -n "$branch" ]]; then
-    local current_branch
-    current_branch=$(git branch --show-current)
-    if [[ "$current_branch" != "$branch" ]]; then
-      if git show-ref --verify --quiet "refs/heads/$branch"; then
-        git checkout "$branch"
-      elif git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
-        git checkout -b "$branch" "origin/$branch"
-      elif git show-ref --verify --quiet "refs/remotes/upstream/$branch"; then
-        git checkout -b "$branch" "upstream/$branch"
-      else
-        echo "⚠️  Branch '$branch' not found in origin or upstream" >&2
-      fi
-    fi
+    checkout_branch "$branch" "$name"
   fi
 
   # Show confirmation
@@ -631,6 +681,11 @@ local repo_arg="$args_result"
 # Reject incompatible combination
 if [[ "$private_mode" == "true" && "$sync_mode" == "true" ]]; then
   echo "Error: --sync cannot be used with --private" >&2
+  return 2
+fi
+
+if [[ "$private_mode" == "true" && "$branch" == *:* ]]; then
+  echo "Error: \"owner:branch\" form is not supported with --private" >&2
   return 2
 fi
 
