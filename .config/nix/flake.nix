@@ -91,7 +91,27 @@
         # Temporary: until gws is available in nixpkgs-unstable (PR #496806)
         gws = googleworkspace-cli.packages.${system}.default;
         version-lsp = version-lsp.packages.${system}.default;
-        ccsession = ccsession.packages.${system}.default;
+        # 上流 flake が pin する vendorHash が、こちらの nixpkgs (Go toolchain)
+        # でビルドすると一致しない (上流の hash が stale)。上流修正までは
+        # ここで正しい vendorHash を使って再ビルドする。
+        ccsession = final.buildGoModule {
+          pname = "ccsession";
+          version = "0.1.0";
+          src = ccsession;
+          vendorHash = "sha256-87X5go1iG4gqUTHXbZoxWuAhk+jWv6OBIQVb5UfFfzs=";
+          subPackages = [ "cmd/ccsession" ];
+          ldflags = [
+            "-s"
+            "-w"
+            "-X main.version=0.1.0"
+            "-X main.commit=nix"
+          ];
+          meta = {
+            description = "claude --resume frontend with fzf";
+            mainProgram = "ccsession";
+            license = final.lib.licenses.mit;
+          };
+        };
         plamo-translate = kawarimidoll-nur.packages.${system}.plamo-translate;
         # Temporary: OPA 1.14.1 has broken test fixtures (compile_handler_test.go)
         open-policy-agent = prev.open-policy-agent.overrideAttrs (_: {
