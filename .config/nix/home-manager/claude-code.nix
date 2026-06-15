@@ -283,7 +283,7 @@ in
     mkdir -p "$CLAUDE_DIR"
 
     # 読み取り専用ファイルは dotfiles へのシンボリンク
-    for item in CLAUDE.md hooks scripts skills plugins; do
+    for item in CLAUDE.md hooks scripts skills plugins commands; do
       if [ -L "$CLAUDE_DIR/$item" ] || [ -e "$CLAUDE_DIR/$item" ]; then
         rm -f "$CLAUDE_DIR/$item"
       fi
