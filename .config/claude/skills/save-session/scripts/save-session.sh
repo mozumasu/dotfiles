@@ -5,8 +5,9 @@
 # モデルによる改変・捏造（ハルシネーション）が構造的に発生しない。
 # （save-answer.sh と同じ思想の「セッション全体版」）
 #
-# Usage: save-session.sh [-n <notebook>] [<label>]
+# Usage: save-session.sh [-n <notebook>] [-o] [<label>]
 #   -n <notebook>  保存先 nb notebook (default: log)
+#   -o             保存後に新しい WezTerm タブでノートを開く
 #   <label>        タイトル/ファイル名に付与するラベル（省略時は最初の
 #                  ユーザー入力から機械生成）
 #
@@ -18,9 +19,11 @@
 set -euo pipefail
 
 NOTEBOOK="log"
-while getopts ":n:" opt; do
+OPEN=0
+while getopts ":n:o" opt; do
   case "$opt" in
     n) NOTEBOOK="$OPTARG" ;;
+    o) OPEN=1 ;;
     :) echo "save-session: オプション -$OPTARG には引数が必要です" >&2; exit 1 ;;
     \?) echo "save-session: 不明なオプション -$OPTARG" >&2; exit 1 ;;
   esac
@@ -127,3 +130,13 @@ EOF
 
 nb "${NOTEBOOK}:add" --folder "$FOLDER" --filename "${ts}.md" --content "$note" >/dev/null
 echo "保存しました: ${NOTEBOOK}:${FOLDER}/${ts}.md  「${TITLE}」（${count}ターン）"
+
+# -o 指定時は保存したノートを新しい WezTerm タブで開く
+if [ "$OPEN" -eq 1 ]; then
+  nbdir="$(nb notebooks --paths 2>/dev/null | grep -E "/${NOTEBOOK}\$" | head -1)"
+  if [ -n "$nbdir" ]; then
+    bash "$CFG/scripts/open-note-in-wezterm.sh" "${nbdir}/${FOLDER}/${ts}.md"
+  else
+    echo "save-session: notebook '${NOTEBOOK}' のパスを解決できず、新規タブ表示をスキップしました" >&2
+  fi
+fi

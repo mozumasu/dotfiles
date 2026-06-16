@@ -3,11 +3,12 @@
 # 機械抽出して nb に保存する。本文をモデルに再生成させないことで
 # ハルシネーション（内容の改変・捏造）を構造的に防ぐ。
 #
-# Usage: save-answer.sh [-n <notebook>] [-c <count>] [<title>...]
+# Usage: save-answer.sh [-n <notebook>] [-c <count>] [-o] [<title>...]
 #   -n <notebook>  保存先 nb notebook (default: log)
 #   -c <count>     直近いくつの回答を保存するか (default: 1)
 #                  2 以上を指定すると、直近 count 件の回答を時系列順
 #                  （古い→新しい）で 1 つのノートに "---" 区切りで保存する。
+#   -o             保存後に新しい WezTerm タブでノートを開く
 #   <title...>     タイトル（省略時は本文の見出し/先頭行から機械生成）
 #
 # 注意: トランスクリプト JSONL の内部スキーマは Claude Code の公式ドキュメントで
@@ -17,10 +18,12 @@ set -euo pipefail
 
 NOTEBOOK="log"
 COUNT=1
-while getopts ":n:c:" opt; do
+OPEN=0
+while getopts ":n:c:o" opt; do
   case "$opt" in
     n) NOTEBOOK="$OPTARG" ;;
     c) COUNT="$OPTARG" ;;
+    o) OPEN=1 ;;
     :) echo "save-answer: オプション -$OPTARG には引数が必要です" >&2; exit 1 ;;
     \?) echo "save-answer: 不明なオプション -$OPTARG" >&2; exit 1 ;;
   esac
@@ -118,3 +121,13 @@ note="$(printf '# %s - %s\n\n`#answer-log`\n\n%s\n' "$TITLE" "$disp" "$body")"
 
 nb "${NOTEBOOK}:add" --filename "${ts}.md" --content "$note" >/dev/null
 echo "保存しました: ${NOTEBOOK}:${ts}.md  「${TITLE}」（${nsaved}件）"
+
+# -o 指定時は保存したノートを新しい WezTerm タブで開く
+if [ "$OPEN" -eq 1 ]; then
+  nbdir="$(nb notebooks --paths 2>/dev/null | grep -E "/${NOTEBOOK}\$" | head -1)"
+  if [ -n "$nbdir" ]; then
+    bash "$(dirname "${BASH_SOURCE[0]}")/open-note-in-wezterm.sh" "${nbdir}/${ts}.md"
+  else
+    echo "save-answer: notebook '${NOTEBOOK}' のパスを解決できず、新規タブ表示をスキップしました" >&2
+  fi
+fi
