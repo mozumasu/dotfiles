@@ -178,7 +178,11 @@
   },
   "enabledPlugins": {
     "example-skills@anthropic-agent-skills": true,
-    "pyright-lsp@claude-plugins-official": true
+    "pyright-lsp@claude-plugins-official": true,
+    "slack@claude-plugins-official": true,
+    "aws-core@agent-toolkit-for-aws": true,
+    "aws-data-analytics@agent-toolkit-for-aws": true,
+    "codex@openai-codex": true
   },
   "extraKnownMarketplaces": {
     "anthropic-agent-skills": {
@@ -186,9 +190,21 @@
         "source": "github",
         "repo": "anthropics/skills"
       }
+    },
+    "agent-toolkit-for-aws": {
+      "source": {
+        "source": "github",
+        "repo": "aws/agent-toolkit-for-aws"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
     }
   },
-  "effortLevel": "high",
+  "effortLevel": "medium",
   "plansDirectory": "./plans",
   "maxTokens": 8192,
   "temperature": 0,
