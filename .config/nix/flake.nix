@@ -21,14 +21,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
-    homebrew-core = {
-      url = "github:homebrew/homebrew-core";
-      flake = false;
-    };
-    homebrew-cask = {
-      url = "github:homebrew/homebrew-cask";
-      flake = false;
-    };
     version-lsp = {
       url = "github:skanehira/version-lsp";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -59,8 +51,6 @@
       darwin,
       treefmt-nix,
       nix-homebrew,
-      homebrew-core,
-      homebrew-cask,
       version-lsp,
       kawarimidoll-nur,
       kanata-darwin-nix,
@@ -190,10 +180,7 @@
               enableRosetta = true;
               user = config.hostSpec.username;
               autoMigrate = true;
-              taps = {
-                "homebrew/homebrew-core" = homebrew-core;
-                "homebrew/homebrew-cask" = homebrew-cask;
-              };
+              taps = { };
               mutableTaps = true;
             };
           }

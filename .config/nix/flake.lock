@@ -247,38 +247,6 @@
         "type": "github"
       }
     },
-    "homebrew-cask": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1781503758,
-        "narHash": "sha256-YQVmfcthv6D4R3DvvYgd3dKBotkscj3Cko1DJIFvTX4=",
-        "owner": "homebrew",
-        "repo": "homebrew-cask",
-        "rev": "6edeb6806b22118ed8d983686831e9606d88ecf0",
-        "type": "github"
-      },
-      "original": {
-        "owner": "homebrew",
-        "repo": "homebrew-cask",
-        "type": "github"
-      }
-    },
-    "homebrew-core": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1781499148,
-        "narHash": "sha256-GXA2+GATthMidgJMP79f0C/6bfZpFnP4Ns81Js2jK40=",
-        "owner": "homebrew",
-        "repo": "homebrew-core",
-        "rev": "f20b1dfbafbfdb974db1b27b7c75bbc3cbf15d13",
-        "type": "github"
-      },
-      "original": {
-        "owner": "homebrew",
-        "repo": "homebrew-core",
-        "type": "github"
-      }
-    },
     "kanata-darwin-nix": {
       "inputs": {
         "nixpkgs": "nixpkgs"
@@ -427,8 +395,6 @@
         "darwin": "darwin",
         "googleworkspace-cli": "googleworkspace-cli",
         "home-manager": "home-manager",
-        "homebrew-cask": "homebrew-cask",
-        "homebrew-core": "homebrew-core",
         "kanata-darwin-nix": "kanata-darwin-nix",
         "kawarimidoll-nur": "kawarimidoll-nur",
         "llm-agents": "llm-agents",
