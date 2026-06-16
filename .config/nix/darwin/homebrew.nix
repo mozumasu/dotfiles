@@ -5,7 +5,13 @@
     enable = true;
     onActivation = {
       autoUpdate = true;
-      cleanup = "uninstall";
+      # cleanup は無効化。新しい Homebrew では `brew bundle --cleanup` が
+      # 対話確認つき dry-run に変わり、非対話の activation では毎回
+      # `Do you want to proceed with the cleanup? [y/n]` で Invalid input と
+      # なり機能していなかった（=プロンプトの煩わしさだけで効果ゼロ）。
+      # Brewfile 外パッケージを削除したいときは手動で
+      # `brew bundle cleanup --force` を実行する。
+      cleanup = "none";
       # auto-update は有効のまま、rebuild ログのノイズだけ抑制する。
       # activation は隔離環境で brew を実行するため、shell の環境変数は
       # 継承されない。nix-darwin が `env KEY=VALUE brew bundle` に注入する
