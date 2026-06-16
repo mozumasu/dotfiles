@@ -1,6 +1,6 @@
 ---
 name: capture-session
-description: WezTermペインのバッファをキャプチャして.wezescファイルに保存する。Markdown変換なしの生データ保存のみ
+description: WezTermペインのバッファをANSIカラー付きで.wezescファイルにキャプチャする単体ツール。Markdown変換なしの生データ保存のみ
 argument-hint: [label]
 disable-model-invocation: true
 user-invocable: true
@@ -9,7 +9,10 @@ allowed-tools: Bash(bash *)
 
 # セッションバッファのキャプチャ
 
-`save-session` のステップ1（バッファ取得）のみを実行する軽量版。
+WezTermペインのバッファを `--escapes`（ANSIカラー付き）で取得し、`.wezesc` ファイルに生のまま保存する単体ツール。
+Markdown変換はせず、後から `nvim` 等でカラー付きのまま振り返る用途に使う。
+
+（会話内容を整形して残したい場合は、トランスクリプト(JSONL)から機械抽出する `save-session` を使う。こちらは WezTerm に依存しない別系統。）
 
 ## 手順
 
