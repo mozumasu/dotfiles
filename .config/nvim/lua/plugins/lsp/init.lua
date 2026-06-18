@@ -34,6 +34,33 @@ return {
         end,
         desc = "Line Diagnostics (Translated)",
       },
+      {
+        "<leader>cK",
+        function()
+          local params = vim.lsp.util.make_position_params(0, "utf-16")
+          vim.lsp.buf_request(0, "textDocument/hover", params, function(_, result)
+            if not result or not result.contents then
+              vim.notify("No hover info", vim.log.levels.INFO)
+              return
+            end
+            local lines = vim.lsp.util.convert_input_to_markdown_lines(result.contents)
+            if vim.tbl_isempty(lines) then
+              vim.notify("No hover info", vim.log.levels.INFO)
+              return
+            end
+            local text = table.concat(lines, "\n")
+
+            require("plamo-translate.translate").translate(text, function(translated, err)
+              if err or not translated then
+                vim.lsp.buf.hover()
+                return
+              end
+              require("plamo-translate.ui").show(translated, { position = "cursor" })
+            end)
+          end)
+        end,
+        desc = "Hover (Translated)",
+      },
     },
     opts = {
       diagnostics = {
