@@ -1,5 +1,6 @@
 return {
   "mozumasu/plamo-translate.nvim",
+  dir = vim.fn.expand("~/src/github.com/mozumasu/plamo-translate.nvim"),
   cmd = {
     "PlamoTranslate",
     "PlamoTranslateReplace",
@@ -7,6 +8,9 @@ return {
     "PlamoTranslateWord",
     "PlamoTranslateBuffer",
     "PlamoTranslateBufferReplace",
+    "PlamoTranslateComments",
+    "PlamoTranslateCommentsClear",
+    "PlamoTranslateCommentsToggle",
   },
   keys = {
     -- Normal mode: interactive window
@@ -20,6 +24,8 @@ return {
     -- Normal mode: buffer
     { "<leader>tb", "<cmd>PlamoTranslateBuffer<cr>", mode = "n", desc = "Translate entire buffer (split)" },
     { "<leader>tB", "<cmd>PlamoTranslateBufferReplace<cr>", mode = "n", desc = "Replace buffer with translation" },
+    -- Normal mode: comment virtual text
+    { "<leader>tv", "<cmd>PlamoTranslateCommentsToggle<cr>", mode = "n", desc = "Toggle comment translations" },
   },
   config = function()
     require("plamo-translate").setup({
