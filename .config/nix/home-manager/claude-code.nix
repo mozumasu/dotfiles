@@ -237,6 +237,8 @@ let
       builtins.readFile privateMarketplacesFile
     )).extraKnownMarketplaces;
     plansDirectory = "./plans";
+    # 4.8 が 不調なので一時的に 4.7 にダウングレード
+    model = "claude-opus-4-7";
     maxTokens = 8192;
     temperature = 0;
     language = "ja";
