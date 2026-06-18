@@ -56,5 +56,51 @@ return {
         },
       },
     })
+
+    -- Give the translation popup a solid background even though we
+    -- keep NormalFloat globally transparent in autocmds.lua.
+    local function apply_highlights()
+      vim.api.nvim_set_hl(0, "PlamoTranslateNormal", { link = "Pmenu", default = true })
+      vim.api.nvim_set_hl(0, "PlamoTranslateBorder", { link = "Pmenu", default = true })
+      vim.api.nvim_set_hl(0, "PlamoTranslateTitle", { link = "Title", default = true })
+    end
+    apply_highlights()
+
+    local group = vim.api.nvim_create_augroup("PlamoTranslateOpaque", { clear = true })
+    vim.api.nvim_create_autocmd("ColorScheme", {
+      group = group,
+      callback = apply_highlights,
+    })
+
+    local wh = table.concat({
+      "Normal:PlamoTranslateNormal",
+      "NormalFloat:PlamoTranslateNormal",
+      "FloatBorder:PlamoTranslateBorder",
+      "FloatTitle:PlamoTranslateTitle",
+    }, ",")
+
+    vim.api.nvim_create_autocmd("WinNew", {
+      group = group,
+      callback = function()
+        vim.schedule(function()
+          local win = vim.api.nvim_get_current_win()
+          if not vim.api.nvim_win_is_valid(win) then return end
+          local cfg = vim.api.nvim_win_get_config(win)
+          if cfg.relative == "" then return end
+
+          local title = cfg.title
+          if type(title) == "table" then
+            local s = ""
+            for _, part in ipairs(title) do
+              s = s .. (part[1] or "")
+            end
+            title = s
+          end
+          if type(title) == "string" and title:find("Translation", 1, true) then
+            vim.wo[win].winhighlight = wh
+          end
+        end)
+      end,
+    })
   end,
 }
