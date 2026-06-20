@@ -7,11 +7,17 @@ FILE_PATH=$(jq -r '.tool_input.file_path // empty' <<<"$INPUT")
 [ -z "$FILE_PATH" ] && exit 0
 
 case "$FILE_PATH" in
-  *.js|*.ts)
-    prettier --write "$FILE_PATH"
+  *.js|*.ts|*.jsx|*.tsx)
+    # グローバル prettier → プロジェクトローカル prettier の順で試行
+    if command -v prettier >/dev/null 2>&1; then
+      prettier --write "$FILE_PATH" 2>/dev/null || true
+    elif command -v npx >/dev/null 2>&1; then
+      # --no-install: 未インストール時にネットワーク経由でインストールしない
+      npx --no-install prettier --write "$FILE_PATH" 2>/dev/null || true
+    fi
     ;;
   *.md)
-    rumdl fmt "$FILE_PATH"
+    command -v rumdl >/dev/null 2>&1 && rumdl fmt "$FILE_PATH"
     ;;
   *.nix)
     echo "$INPUT" | ~/.config/claude/scripts/format-nix.sh
