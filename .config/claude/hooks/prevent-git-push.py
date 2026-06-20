@@ -75,8 +75,11 @@ for part in split_commands(cmd):
         tokens = part.split()
     if is_git_push(tokens):
         print(json.dumps({
-            "decision": "block",
-            "reason": "git pushは自動実行できません。手動でpushしてください。",
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": "deny",
+                "permissionDecisionReason": "git pushは自動実行できません。手動でpushしてください。",
+            }
         }))
         sys.exit(0)
 
