@@ -21,5 +21,5 @@ else
 fi
 
 if [ "$CURRENT_NORMALIZED" != "$REFERENCE_NORMALIZED" ]; then
-  echo '{"systemMessage": "⚠️ settings.json が Nix 管理状態から逸脱しています。`diff <(jq -S . ~/.config/claude/settings.json) <(jq -S . ~/.config/claude/.settings.json.nix-managed)` で差分を確認し、~/dotfiles/.config/nix/home-manager/claude-code.nix に反映してください"}'
+  echo '{"systemMessage": "⚠️ settings.json の Nix ドリフトを検出 - agent hook が自動修正を試みます"}'
 fi
