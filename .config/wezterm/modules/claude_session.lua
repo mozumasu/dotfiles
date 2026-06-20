@@ -77,6 +77,94 @@ local function get_claude_status(pane)
   return "idle"
 end
 
+-- `claude agents --json` の結果を取得してパース
+-- 戻り値: agents 配列（失敗時は nil）
+local function get_claude_agents()
+  -- claude のパス解決のため PATH を明示しつつ shell 経由で実行
+  local homebrew_prefix = os.getenv("HOMEBREW_PREFIX") or "/opt/homebrew"
+  local home = os.getenv("HOME") or ""
+  local path_prefix = string.format(
+    "%s/bin:%s/.nix-profile/bin:/etc/profiles/per-user/%s/bin:/usr/local/bin",
+    homebrew_prefix,
+    home,
+    os.getenv("USER") or ""
+  )
+
+  local cmd = string.format(
+    [[PATH=%s:$PATH claude agents --json 2>/dev/null]],
+    path_prefix
+  )
+
+  local handle = io.popen(cmd)
+  if not handle then
+    wezterm.log_warn("claude agents --json: io.popen failed")
+    return nil
+  end
+
+  local output = handle:read("*all")
+  handle:close()
+
+  if not output or output == "" then
+    wezterm.log_info("claude agents --json: empty output")
+    return nil
+  end
+
+  local ok, parsed = pcall(wezterm.json_parse, output)
+  if not ok or type(parsed) ~= "table" then
+    wezterm.log_warn("claude agents --json: parse failed: " .. tostring(parsed))
+    return nil
+  end
+
+  return parsed
+end
+
+-- pane から foreground プロセスの pid を取得（取れなければ nil）
+local function get_pane_pid(pane)
+  local ok, info = pcall(function()
+    return pane:get_foreground_process_info()
+  end)
+  if ok and type(info) == "table" and info.pid then
+    return info.pid
+  end
+  return nil
+end
+
+-- pane に対応する agent を返す
+-- マッチ戦略: 1) pid 一致, 2) cwd 一致（先着順で claim）
+local function find_matching_agent(pane, pane_cwd, agents, claimed)
+  if not agents or #agents == 0 then
+    return nil
+  end
+
+  -- 1) pid マッチ
+  local pid = get_pane_pid(pane)
+  if pid then
+    for i, agent in ipairs(agents) do
+      if agent.pid == pid and not claimed[i] then
+        claimed[i] = true
+        return agent
+      end
+    end
+  end
+
+  -- 2) cwd マッチ（先着順）
+  if pane_cwd and pane_cwd ~= "" then
+    -- 末尾の / を取り除いて比較
+    local normalized = pane_cwd:gsub("/$", "")
+    for i, agent in ipairs(agents) do
+      if not claimed[i] then
+        local agent_cwd = (agent.cwd or ""):gsub("/$", "")
+        if agent_cwd == normalized then
+          claimed[i] = true
+          return agent
+        end
+      end
+    end
+  end
+
+  return nil
+end
+
 -- ペインタイトルからセッション内容を取得
 local function get_session_content(pane)
   local success, title = pcall(function()
@@ -112,9 +200,29 @@ local function get_session_content(pane)
   return title
 end
 
+-- agent.status (idle/busy) を fzf 表示用の status (idle/waiting/running) に変換
+-- agent ステータスが取れない場合のフォールバックは title 由来の heuristic を使う
+local function map_agent_status(agent_status, fallback_status)
+  if agent_status == "busy" then
+    return "running"
+  elseif agent_status == "idle" then
+    -- agent が idle と言っていても、タイトルが "waiting" を示していれば
+    -- 入力待ち（プロンプト表示中）として尊重する
+    if fallback_status == "waiting" then
+      return "waiting"
+    end
+    return "idle"
+  end
+  return fallback_status
+end
+
 -- 現在実行中のClaude Codeセッションをスキャン
 local function scan_active_claude_sessions()
   local sessions = {}
+
+  -- claude agents --json から harness 由来の情報を取得（失敗しても続行）
+  local agents = get_claude_agents()
+  local claimed = {}
 
   -- 全ウィンドウを走査
   for _, mux_window in ipairs(wezterm.mux.all_windows()) do
@@ -139,17 +247,33 @@ local function scan_active_claude_sessions()
           -- セッションの内容を取得
           local content = get_session_content(pane)
 
+          -- 既存の heuristic status（フォールバック用）
+          local heuristic_status = get_claude_status(pane)
+
+          -- agent とマッチング → status を上書き
+          local agent = find_matching_agent(pane, cwd, agents, claimed)
+          local status = heuristic_status
+          local session_id = nil
+          local agent_pid = nil
+          if agent then
+            status = map_agent_status(agent.status, heuristic_status)
+            session_id = agent.sessionId
+            agent_pid = agent.pid
+          end
+
           table.insert(sessions, {
             pane = pane,
             workspace = workspace,
             tab_title = tab_title,
             cwd = cwd,
             content = content,
-            status = get_claude_status(pane),
+            status = status,
             pane_id = pane:pane_id(),
             mux_window = mux_window,
             tab = tab,
             tab_id = tab_id,
+            session_id = session_id,
+            agent_pid = agent_pid,
           })
         end
       end
