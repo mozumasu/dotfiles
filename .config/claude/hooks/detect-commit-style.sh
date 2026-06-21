@@ -53,11 +53,38 @@ else
   LANG_LABEL="English"
 fi
 
-# additionalContext で注入
+# 4. scope 使用率を推定（`fix(ui):` のようなパターン）
+SCOPE_RATIO=$(printf '%s\n' "$SUBJECTS" | perl -ne '
+  $total++ if /\S/;
+  $scoped++ if /^\w+\([^)]+\)!?:/;
+  END { printf "%.0f", ($total ? $scoped / $total * 100 : 0) }
+')
+USES_SCOPE=false
+[ "$SCOPE_RATIO" -gt 50 ] && USES_SCOPE=true
+
+# 5. フォーマット文字列を組み立て
 if [ "$STYLE" = "gitmoji" ]; then
-  MSG="Commit style: Conventional Commits + gitmoji ($LANG_LABEL). Format: <type>: <emoji> <description>"
+  STYLE_LABEL="Conventional Commits + gitmoji"
+  if $USES_SCOPE; then
+    FORMAT="<type>(<scope>): <emoji> <description>"
+  else
+    FORMAT="<type>: <emoji> <description>"
+  fi
 else
-  MSG="Commit style: plain Conventional Commits ($LANG_LABEL). Format: <type>: <description> (NO emoji)"
+  STYLE_LABEL="plain Conventional Commits (NO emoji)"
+  if $USES_SCOPE; then
+    FORMAT="<type>(<scope>): <description>"
+  else
+    FORMAT="<type>: <description>"
+  fi
 fi
 
-echo "{\"hookSpecificOutput\":{\"additionalContext\":\"$MSG\"}}"
+# 6. 直近 3 件の subject を例として添える（検出ルールでは拾えないニュアンスを伝える）
+EXAMPLES=$(printf '%s\n' "$SUBJECTS" | grep -v '^[[:space:]]*$' | head -3 | perl -pe 's/^/- /')
+
+MSG="Commit style: $STYLE_LABEL ($LANG_LABEL). Format: $FORMAT
+Recent examples (mirror this style):
+$EXAMPLES"
+
+# additionalContext で注入（jq で安全に JSON 化）
+jq -n --arg ctx "$MSG" '{hookSpecificOutput: {additionalContext: $ctx}}'
