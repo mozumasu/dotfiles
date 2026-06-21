@@ -85,21 +85,26 @@ def detect_style() -> dict | None:
 
     gitmoji = "gitmoji" in ctx
     uses_scope = "<scope>" in ctx
-    if "(Japanese)" in ctx:
-        lang_subject = "japanese"
-    else:
-        # "(English)" or "(English subject, Japanese body)" both require English subject.
+    if "English subject, Japanese body" in ctx:
         lang_subject = "english"
+        lang_body = "japanese"
+    elif "(Japanese)" in ctx:
+        lang_subject = "japanese"
+        lang_body = "japanese"
+    else:  # "(English)" — fully English repo
+        lang_subject = "english"
+        lang_body = "english"
 
     return {
         "gitmoji": gitmoji,
         "uses_scope": uses_scope,
         "lang_subject": lang_subject,
+        "lang_body": lang_body,
         "context": ctx,
     }
 
 
-def validate_subject(subject: str, style: dict) -> list[str]:
+def validate(subject: str, body: str, style: dict) -> list[str]:
     errors: list[str] = []
 
     m = TYPE_PREFIX_RE.match(subject)
@@ -116,14 +121,21 @@ def validate_subject(subject: str, style: dict) -> list[str]:
     if style["gitmoji"] and not EMOJI_RE.search(rest):
         errors.append("subject must include a gitmoji right after the type (e.g. ✨ / 🐛 / ♻️)")
 
-    has_ja = bool(JA_RE.search(subject))
-    if style["lang_subject"] == "english" and has_ja:
-        errors.append(
-            "subject must be in English (the body can still be Japanese — "
-            "this repo uses English subject, Japanese body)"
-        )
-    elif style["lang_subject"] == "japanese" and not has_ja:
+    has_ja_subject = bool(JA_RE.search(subject))
+    if style["lang_subject"] == "english" and has_ja_subject:
+        if style["lang_body"] == "japanese":
+            hint = "the body can still be Japanese — this repo uses English subject + Japanese body"
+        else:
+            hint = "this repo uses fully English commit messages"
+        errors.append(f"subject must be in English ({hint})")
+    elif style["lang_subject"] == "japanese" and not has_ja_subject:
         errors.append("subject must be in Japanese")
+
+    if body and JA_RE.search(body) and style["lang_body"] == "english":
+        errors.append(
+            "body must be in English (this repo uses fully English commit messages; "
+            "the subject says so too)"
+        )
 
     return errors
 
@@ -148,11 +160,13 @@ def main() -> None:
         return
 
     full = "\n\n".join(msgs)
-    subject = full.split("\n", 1)[0].strip()
+    parts = full.split("\n", 1)
+    subject = parts[0].strip()
+    body = parts[1].strip() if len(parts) > 1 else ""
     if not subject:
         return
 
-    errors = validate_subject(subject, style)
+    errors = validate(subject, body, style)
     if not errors:
         return
 
