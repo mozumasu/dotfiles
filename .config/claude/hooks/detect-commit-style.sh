@@ -30,7 +30,6 @@ fi
 
 # 3. 言語を git log の subject と body で別々に推定
 SUBJECTS=$(git log --format=%s -10 2>/dev/null || echo "")
-BODIES=$(git log --format=%b -10 2>/dev/null || echo "")
 
 # subject: 過半数が日本語かどうかで判定
 JA_SUBJECT_RATIO=$(printf '%s\n' "$SUBJECTS" | perl -CSD -ne '
@@ -41,9 +40,20 @@ JA_SUBJECT_RATIO=$(printf '%s\n' "$SUBJECTS" | perl -CSD -ne '
 HAS_JA_SUBJECT=false
 [ "$JA_SUBJECT_RATIO" -gt 50 ] && HAS_JA_SUBJECT=true
 
-# body: 日本語が1つでもあれば日本語と判定
-HAS_JA_BODY=false
-printf '%s\n' "$BODIES" | perl -CSD -0777 -ne 'exit(/\p{Hiragana}|\p{Katakana}|\p{Han}/ ? 0 : 1)' && HAS_JA_BODY=true
+# body: NUL 区切りで commit ごとに分割し、非空 body のうち過半数が日本語を含めば日本語と判定
+# （単発の日本語混入で fully-English のリポジトリが誤判定されないようにする）
+HAS_JA_BODY=$(git log -z --format=%b -10 2>/dev/null | perl -CSD -0 -ne '
+  $non_empty++ if /\S/;
+  $ja++ if /\S/ && /\p{Hiragana}|\p{Katakana}|\p{Han}/;
+  END {
+    if ($non_empty && $ja * 100 / $non_empty > 50) {
+      print "true"
+    } else {
+      print "false"
+    }
+  }
+')
+[ -z "$HAS_JA_BODY" ] && HAS_JA_BODY=false
 
 if ! $HAS_JA_SUBJECT && $HAS_JA_BODY; then
   LANG_LABEL="English subject, Japanese body"
