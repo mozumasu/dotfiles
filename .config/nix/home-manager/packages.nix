@@ -32,6 +32,7 @@
     tmux
 
     # 開発ツール
+    lua # wezterm の preview スクリプト等で使用
     stylua
     typos
     actionlint

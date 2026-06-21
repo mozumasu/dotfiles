@@ -303,14 +303,15 @@ local function export_sessions_to_file(sessions, filepath)
   for _, session in ipairs(sessions) do
     local project_name = get_project_name(session.cwd)
     local json = string.format(
-      '{"pane_id":"%s","workspace":"%s","project":"%s","cwd":"%s","content":"%s","tab_title":"%s","status":"%s"}',
+      '{"pane_id":"%s","workspace":"%s","project":"%s","cwd":"%s","content":"%s","tab_title":"%s","status":"%s","session_id":"%s"}',
       json_escape(tostring(session.pane_id)),
       json_escape(session.workspace or "default"),
       json_escape(project_name),
       json_escape(session.cwd or ""),
       json_escape(session.content or ""),
       json_escape(session.tab_title or ""),
-      json_escape(session.status or "idle")
+      json_escape(session.status or "idle"),
+      json_escape(session.session_id or "")
     )
     table.insert(lines, json)
   end
