@@ -28,9 +28,10 @@ run_check() {
 # コマンドとしての git にのみマッチ（ファイルパス中の git* は除外）
 if echo "$COMMAND" | grep -qE '(^|[;&|] *)git\b'; then
   run_check python3 ~/.config/claude/hooks/prevent-git-push.py
-  # git commit 時のみコミットスタイルを検出して注入
+  # git commit 時はスタイルを検出してヒント注入、さらに subject を検証して逸脱を block
   if echo "$COMMAND" | grep -qE 'git\s+commit\b'; then
     run_check ~/.config/claude/hooks/detect-commit-style.sh
+    run_check python3 ~/.config/claude/hooks/validate-commit-style.py
   fi
 fi
 
