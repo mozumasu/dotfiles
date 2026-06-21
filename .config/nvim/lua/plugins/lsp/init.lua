@@ -55,7 +55,24 @@ return {
                 vim.lsp.buf.hover()
                 return
               end
-              require("plamo-translate.ui").show(translated, { position = "cursor" })
+
+              -- Size the popup to the translated content so short hovers
+              -- stay compact and long docs are readable.
+              local out_lines = vim.split(translated, "\n", { plain = true })
+              local max_w = 0
+              for _, l in ipairs(out_lines) do
+                local w = vim.fn.strdisplaywidth(l)
+                if w > max_w then max_w = w end
+              end
+              local screen_w = vim.o.columns
+              local screen_h = vim.o.lines
+              local width_ratio = math.min(0.8, math.max(0.3, (max_w + 4) / screen_w))
+              local height_ratio = math.min(0.6, math.max(0.15, (#out_lines + 2) / screen_h))
+
+              require("plamo-translate.ui").show(translated, {
+                position = "cursor",
+                positions = { cursor = { width = width_ratio, height = height_ratio } },
+              })
             end)
           end)
         end,
