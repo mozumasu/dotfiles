@@ -97,4 +97,4 @@ Recent examples (mirror this style):
 $EXAMPLES"
 
 # additionalContext で注入（jq で安全に JSON 化）
-jq -n --arg ctx "$MSG" '{hookSpecificOutput: {additionalContext: $ctx}}'
+jq -n --arg ctx "$MSG" '{hookSpecificOutput: {hookEventName: "PreToolUse", additionalContext: $ctx}}'
