@@ -16,6 +16,7 @@ let
       # sops の claude-otel-env シークレットから activation 時にマージされる
     };
     includeCoAuthoredBy = true;
+    tui = "fullscreen";
     permissions = {
       allow = [
         "Bash"
