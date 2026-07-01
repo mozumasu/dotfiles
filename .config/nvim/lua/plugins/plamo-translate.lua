@@ -35,6 +35,7 @@ return {
         to = "Auto", -- Target language
       },
       window = {
+        default_display = "virtual", -- "popup" (default) | "virtual"
         position = "cursor", -- "center" | "cursor" | "right"
         border = "rounded", -- "single" | "double" | "rounded" | "solid" | "shadow"
         wrap = true, -- Wrap long lines
