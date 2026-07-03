@@ -35,6 +35,7 @@
       "aws-vault-binary"
       "karabiner-elements"
       "betterdisplay"
+      "keycastr"
       "shottr"
 
       # Input methods

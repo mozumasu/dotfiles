@@ -100,7 +100,6 @@
 
       # System utilities
       "istat-menus"
-      "keycastr"
       "session-manager-plugin"
       "sf-symbols"
       "timac/vpnstatus/vpnstatus"
