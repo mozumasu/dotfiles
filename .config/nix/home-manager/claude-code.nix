@@ -258,7 +258,6 @@ let
       builtins.readFile privateMarketplacesFile
     )).extraKnownMarketplaces;
     plansDirectory = "./plans";
-    model = "claude-fable-5[1m]";
     maxTokens = 8192;
     temperature = 0;
     language = "ja";
