@@ -16,6 +16,7 @@ let
       # sops の claude-otel-env シークレットから activation 時にマージされる
     };
     includeCoAuthoredBy = true;
+    model = "claude-fable-5[1m]";
     tui = "fullscreen";
     permissions = {
       allow = [
@@ -257,8 +258,7 @@ let
       builtins.readFile privateMarketplacesFile
     )).extraKnownMarketplaces;
     plansDirectory = "./plans";
-    # 4.8 が 不調なので一時的に 4.7 にダウングレード
-    model = "claude-opus-4-7";
+    model = "claude-fable-5[1m]";
     maxTokens = 8192;
     temperature = 0;
     language = "ja";
@@ -305,7 +305,7 @@ in
     mkdir -p "$CLAUDE_DIR"
 
     # 読み取り専用ファイルは dotfiles へのシンボリンク
-    for item in CLAUDE.md hooks scripts skills plugins commands; do
+    for item in CLAUDE.md rules hooks scripts skills plugins commands; do
       if [ -L "$CLAUDE_DIR/$item" ] || [ -e "$CLAUDE_DIR/$item" ]; then
         rm -f "$CLAUDE_DIR/$item"
       fi
