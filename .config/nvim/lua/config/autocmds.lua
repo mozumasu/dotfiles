@@ -172,6 +172,47 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
+-- nb 配下のノートを「保存してから閉じた」タイミングでコミット & リモート同期
+do
+  local nb_pattern = vim.fn.expand("~/src/github.com/mozumasu/nb") .. "/*"
+  local pending = {} -- bufnr -> filepath（保存済み・未同期のバッファ）
+  local group = vim.api.nvim_create_augroup("NbCommitAndSync", { clear = true })
+
+  vim.api.nvim_create_autocmd("BufWritePost", {
+    group = group,
+    pattern = nb_pattern,
+    callback = function(args)
+      pending[args.buf] = vim.api.nvim_buf_get_name(args.buf)
+    end,
+  })
+
+  local function flush(buf)
+    local filepath = pending[buf]
+    if filepath then
+      pending[buf] = nil
+      require("config.nb").commit_and_sync(filepath)
+    end
+  end
+
+  vim.api.nvim_create_autocmd({ "BufUnload", "BufDelete" }, {
+    group = group,
+    pattern = nb_pattern,
+    callback = function(args)
+      flush(args.buf)
+    end,
+  })
+
+  -- :wq や :qa で Vim ごと終了した場合の取りこぼし防止
+  vim.api.nvim_create_autocmd("VimLeavePre", {
+    group = group,
+    callback = function()
+      for buf in pairs(pending) do
+        flush(buf)
+      end
+    end,
+  })
+end
+
 -- nb形式のリンク（notebook:note）のMarksman警告を無視
 local original_diagnostics_handler = vim.lsp.handlers["textDocument/publishDiagnostics"]
 vim.lsp.handlers["textDocument/publishDiagnostics"] = function(err, result, ctx, config)

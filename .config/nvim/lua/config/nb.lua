@@ -205,6 +205,34 @@ function M.adopt_file(src_path, dest_notebook, title)
   return dst_path
 end
 
+-- nb 配下のファイルをコミットし、リモートとも同期（pull --rebase + push）
+-- detach 付きで起動するため Vim 終了後も処理が継続する
+function M.commit_and_sync(filepath)
+  local nb_dir = M.get_nb_dir()
+  if not filepath:match("^" .. vim.pesc(nb_dir) .. "/") then
+    return
+  end
+  local rel = filepath:sub(#nb_dir + 2)
+  local notebook, filename = rel:match("^([^/]+)/(.+)$")
+  if not notebook then
+    return
+  end
+  local notebook_dir = nb_dir .. "/" .. notebook
+  if not vim.uv.fs_stat(notebook_dir .. "/.git") then
+    return
+  end
+
+  local script = table.concat({
+    "git add -- " .. vim.fn.shellescape(filename),
+    "git diff --cached --quiet -- " .. vim.fn.shellescape(filename) .. " || git commit -m " .. vim.fn.shellescape(
+      "Edit: " .. filename
+    ),
+    -- upstream が設定されている場合のみリモート同期
+    "if git rev-parse --abbrev-ref @{u} >/dev/null 2>&1; then git pull --rebase --autostash --quiet; git push --quiet; fi",
+  }, "\n")
+  vim.system({ "sh", "-c", script }, { cwd = notebook_dir, text = true, detach = true })
+end
+
 -- nbコマンドを実行（タイムアウト10秒でハング防止）
 function M.run_cmd(args)
   local cmd = NB_CMD .. " " .. args
