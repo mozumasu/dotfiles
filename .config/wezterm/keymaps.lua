@@ -112,7 +112,9 @@ end
 -- ペインの最小化前の高さを記憶するテーブル (pane_id -> percent)
 local pane_height_store = {}
 
-local leader = { key = "q", mods = "CTRL", timeout_milliseconds = 2000 }
+-- Ctrl+; は端末エンコーディングに存在せず TUI アプリに届かないため、
+-- shell/nvim/herdr のキーバインドと競合しない
+local leader = { key = ";", mods = "CTRL", timeout_milliseconds = 2000 }
 
 local keys = {
   -- AltキーをMetaキーとして扱いつつ、バックスラッシュ機能（Alt+¥）は維持する
@@ -235,9 +237,9 @@ local keys = {
 
   -- Pane
   { key = ":", mods = "CTRL", action = act.PaneSelect },
-  { key = "r", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) }, -- Control+q → r 横分割
-  { key = "d", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) }, -- Control+q → d 縦分割
-  { key = "x", mods = "LEADER", action = act({ CloseCurrentPane = { confirm = true } }) }, -- Control+q → x ペインを閉じる
+  { key = "r", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) }, -- Control+; → r 横分割
+  { key = "d", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) }, -- Control+; → d 縦分割
+  { key = "x", mods = "LEADER", action = act({ CloseCurrentPane = { confirm = true } }) }, -- Control+; → x ペインを閉じる
   -- Ctrl+Shift+C: 現在のペインを最大化（他ペインを1行に最小化）
   -- { key = "C", mods = "CTRL|SHIFT", action = set_pane_height_percent(0) },
 
