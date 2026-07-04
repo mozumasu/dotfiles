@@ -49,7 +49,7 @@
                         ]
                     },
                     {
-                        "description": "Left ctrl + f/b to arrow keys",
+                        "description": "Left ctrl + f/n/p to arrow keys",
                         "manipulators": [
                             {
                                 "from": {
@@ -60,17 +60,6 @@
                                     }
                                 },
                                 "to": [{ "key_code": "right_arrow" }],
-                                "type": "basic"
-                            },
-                            {
-                                "from": {
-                                    "key_code": "b",
-                                    "modifiers": {
-                                        "mandatory": ["left_control"],
-                                        "optional": ["any"]
-                                    }
-                                },
-                                "to": [{ "key_code": "left_arrow" }],
                                 "type": "basic"
                             },
                             {
@@ -280,7 +269,7 @@
                         ]
                     },
                     {
-                        "description": "Left ctrl + f/b to arrow keys",
+                        "description": "Left ctrl + f/n/p to arrow keys",
                         "manipulators": [
                             {
                                 "from": {
@@ -291,17 +280,6 @@
                                     }
                                 },
                                 "to": [{ "key_code": "right_arrow" }],
-                                "type": "basic"
-                            },
-                            {
-                                "from": {
-                                    "key_code": "b",
-                                    "modifiers": {
-                                        "mandatory": ["left_control"],
-                                        "optional": ["any"]
-                                    }
-                                },
-                                "to": [{ "key_code": "left_arrow" }],
                                 "type": "basic"
                             },
                             {
