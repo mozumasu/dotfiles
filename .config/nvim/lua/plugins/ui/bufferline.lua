@@ -1,7 +1,7 @@
 return {
   "akinsho/bufferline.nvim",
   opts = function(_, opts)
-    local nb = require("config.nb")
+    local nb = require("nb")
     opts.options = opts.options or {}
     opts.options.name_formatter = function(buf)
       local title = nb.get_title(buf.path)

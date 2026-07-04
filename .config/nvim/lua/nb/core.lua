@@ -1,3 +1,5 @@
+local config = require("nb.config")
+
 local M = {}
 
 -- nbコマンドのプレフィックス（TERM=dumbでANSIエスケープを完全無効化）
@@ -23,8 +25,12 @@ local function is_image_file(name)
   return ext ~= nil and IMAGE_EXTS[ext:lower()] == true
 end
 
+function M.dir()
+  return config.dir()
+end
+
 -- markdown ファイルから表示用タイトルを取得（H1 / frontmatter 両対応）
-local function read_md_title(path)
+function M.md_title(path)
   local f = io.open(path, "r")
   if not f then
     return nil
@@ -75,6 +81,39 @@ local function read_md_title(path)
   return nil
 end
 
+-- nbノートのタイトルを取得（bufferline 等の表示用。nb 配下のファイルのみ対象）
+function M.get_title(filepath)
+  if not filepath:match("^" .. vim.pesc(M.dir())) then
+    return nil
+  end
+  return M.md_title(filepath)
+end
+
+-- ファイルパスから所属 notebook 名を返す（nb 配下でなければ nil）
+function M.notebook_of(filepath)
+  local nb_dir = M.dir()
+  if not filepath:match("^" .. vim.pesc(nb_dir) .. "/") then
+    return nil
+  end
+  local relative = filepath:sub(#nb_dir + 2)
+  return relative:match("^([^/]+)/")
+end
+
+-- `nb browse` の --original URL を実ファイルパスに変換（対象外なら nil）
+function M.resolve_browse_url(src)
+  local pattern = "^http://localhost:" .. config.options.browse_port .. "/%-%-original/([^/]+)/(.+)$"
+  local notebook, filename = src:match(pattern)
+  if notebook and filename then
+    return M.dir() .. "/" .. notebook .. "/" .. filename
+  end
+  return nil
+end
+
+-- 別 notebook の画像を参照するための `nb browse` URL を生成
+function M.browse_url(notebook, filename)
+  return string.format("http://localhost:%d/--original/%s/%s", config.options.browse_port, notebook, filename)
+end
+
 -- 指定 notebook の git に変更をコミット（バックグラウンド非同期）
 local function git_commit_async(notebook_dir, filename, message)
   if not vim.uv.fs_stat(notebook_dir .. "/.git") then
@@ -87,128 +126,10 @@ local function git_commit_async(notebook_dir, filename, message)
   end)
 end
 
--- nbのノートディレクトリパスを取得
-function M.get_nb_dir()
-  -- nbのディレクトリパスに合わせて変更してください
-  return vim.fn.expand("~/src/github.com/mozumasu/nb")
-end
-
--- Claude Code の plansDirectory（claude-code.nix で `./plans` を設定）
-function M.get_plans_dir()
-  return vim.fn.expand("~/dotfiles/plans")
-end
-
--- plans/*.md を mtime 降順で取得
-function M.list_plans()
-  local dir = M.get_plans_dir()
-  local handle = vim.uv.fs_scandir(dir)
-  if not handle then
-    return {}
-  end
-  local items = {}
-  while true do
-    local name, type = vim.uv.fs_scandir_next(handle)
-    if not name then
-      break
-    end
-    if type == "file" and name:match("%.md$") then
-      local path = dir .. "/" .. name
-      local stat = vim.uv.fs_stat(path)
-      table.insert(items, {
-        name = name,
-        file = path,
-        title = read_md_title(path) or name,
-        mtime = stat and stat.mtime.sec or 0,
-        text = name,
-      })
-    end
-  end
-  table.sort(items, function(a, b)
-    return a.mtime > b.mtime
-  end)
-  return items
-end
-
--- 任意のファイルを nb 配下の notebook へ移動
--- title を渡すとファイル名は <timestamp>.md、H1 をその title に書き換える
--- title が nil なら元ファイル名を維持
--- 戻り値: 新パス、エラーメッセージ
-function M.adopt_file(src_path, dest_notebook, title)
-  if not src_path or src_path == "" then
-    return nil, "No source path"
-  end
-  if not dest_notebook or dest_notebook == "" then
-    return nil, "Notebook required"
-  end
-  if not vim.uv.fs_stat(src_path) then
-    return nil, "Source not found: " .. src_path
-  end
-
-  local nb_dir = M.get_nb_dir()
-  local notebook_dir = nb_dir .. "/" .. dest_notebook
-  if not vim.uv.fs_stat(notebook_dir) then
-    return nil, "Notebook not found: " .. dest_notebook
-  end
-
-  local filename
-  if title and title ~= "" then
-    filename = os.date("%Y%m%d%H%M%S") .. ".md"
-  else
-    filename = vim.fn.fnamemodify(src_path, ":t")
-  end
-
-  local dst_path = notebook_dir .. "/" .. filename
-  -- 衝突回避
-  if vim.uv.fs_stat(dst_path) then
-    local stem, ext = filename:match("^(.+)(%.[^.]+)$")
-    if not stem then
-      stem, ext = filename, ""
-    end
-    local i = 1
-    while vim.uv.fs_stat(dst_path) do
-      filename = string.format("%s-%d%s", stem, i, ext)
-      dst_path = notebook_dir .. "/" .. filename
-      i = i + 1
-    end
-  end
-
-  -- title 指定時は H1 を差し替え
-  if title and title ~= "" then
-    local lines = {}
-    local f = io.open(src_path, "r")
-    if not f then
-      return nil, "Cannot read source"
-    end
-    for line in f:lines() do
-      table.insert(lines, line)
-    end
-    f:close()
-    if lines[1] and lines[1]:match("^#%s+") then
-      lines[1] = "# " .. title
-    else
-      table.insert(lines, 1, "# " .. title)
-    end
-    local out = io.open(dst_path, "w")
-    if not out then
-      return nil, "Cannot write destination"
-    end
-    out:write(table.concat(lines, "\n") .. "\n")
-    out:close()
-    vim.uv.fs_unlink(src_path)
-  else
-    if not vim.uv.fs_rename(src_path, dst_path) then
-      return nil, "Rename failed"
-    end
-  end
-
-  git_commit_async(notebook_dir, filename, "Adopt: " .. filename)
-  return dst_path
-end
-
 -- nb 配下のファイルをコミットし、リモートとも同期（pull --rebase + push）
 -- detach 付きで起動するため Vim 終了後も処理が継続する
 function M.commit_and_sync(filepath)
-  local nb_dir = M.get_nb_dir()
+  local nb_dir = M.dir()
   if not filepath:match("^" .. vim.pesc(nb_dir) .. "/") then
     return
   end
@@ -247,15 +168,6 @@ function M.run_cmd(args)
   return #output > 0 and output or nil
 end
 
--- nbノートのタイトルを取得する関数（bufferline用、H1 / frontmatter 両対応）
-function M.get_title(filepath)
-  local nb_dir = M.get_nb_dir()
-  if not filepath:match("^" .. vim.pesc(nb_dir)) then
-    return nil
-  end
-  return read_md_title(filepath)
-end
-
 -- ノートIDからファイルパスを取得
 function M.get_note_path(note_id)
   local escaped_id = vim.fn.shellescape(note_id)
@@ -272,11 +184,10 @@ function M.add_note(title, notebook)
   if not notebook then
     return nil
   end
-  local timestamp = os.date("%Y%m%d%H%M%S")
+  local timestamp = os.date(config.options.timestamp_format)
   local note_title = (title and title ~= "") and title or os.date("%Y-%m-%d %H:%M:%S")
   local filename = timestamp .. ".md"
-  local nb_dir = M.get_nb_dir()
-  local notebook_dir = nb_dir .. "/" .. notebook
+  local notebook_dir = M.dir() .. "/" .. notebook
   local path = notebook_dir .. "/" .. filename
 
   -- 同期: ファイル作成
@@ -291,11 +202,30 @@ function M.add_note(title, notebook)
   return path
 end
 
+-- 同名衝突時に -1, -2... を付与したファイル名を返す
+local function resolve_collision(notebook_dir, filename)
+  local dst_path = notebook_dir .. "/" .. filename
+  if not vim.uv.fs_stat(dst_path) then
+    return filename, dst_path
+  end
+  local stem, ext = filename:match("^(.+)(%.[^.]+)$")
+  if not stem then
+    stem, ext = filename, ""
+  end
+  local i = 1
+  while vim.uv.fs_stat(dst_path) do
+    filename = string.format("%s-%d%s", stem, i, ext)
+    dst_path = notebook_dir .. "/" .. filename
+    i = i + 1
+  end
+  return filename, dst_path
+end
+
 -- 画像（など）をnotebookにインポートする
 -- ファイルコピーは同期、git commit はバックグラウンド非同期
 -- 戻り値: (final_filename, err)
-function M.import_image(image_path, notebook, new_filename)
-  if not image_path or image_path == "" then
+function M.import_file(file_path, notebook, new_filename)
+  if not file_path or file_path == "" then
     return nil, "No path provided"
   end
   if not notebook then
@@ -303,7 +233,7 @@ function M.import_image(image_path, notebook, new_filename)
   end
 
   -- パスをクリーンアップ: 空白/改行/クォート除去、エスケープされたスペースを復元
-  local cleaned_path = image_path
+  local cleaned_path = file_path
     :gsub("^[%s\n]*['\"]?", "")
     :gsub("['\"]?[%s\n]*$", "")
     :gsub("/ ([^/])", " %1") -- Vim補完で「\ 」が「/ 」に変換される問題を修正
@@ -328,22 +258,9 @@ function M.import_image(image_path, notebook, new_filename)
     final_filename = vim.fn.fnamemodify(expanded_path, ":t")
   end
 
-  local notebook_dir = M.get_nb_dir() .. "/" .. notebook
-  local dst_path = notebook_dir .. "/" .. final_filename
-
-  -- 同名衝突時は -1, -2... を付与
-  if vim.uv.fs_stat(dst_path) then
-    local stem, ext = final_filename:match("^(.+)(%.[^.]+)$")
-    if not stem then
-      stem, ext = final_filename, ""
-    end
-    local i = 1
-    while vim.uv.fs_stat(dst_path) do
-      final_filename = string.format("%s-%d%s", stem, i, ext)
-      dst_path = notebook_dir .. "/" .. final_filename
-      i = i + 1
-    end
-  end
+  local notebook_dir = M.dir() .. "/" .. notebook
+  local dst_path
+  final_filename, dst_path = resolve_collision(notebook_dir, final_filename)
 
   local ok, err = vim.uv.fs_copyfile(expanded_path, dst_path)
   if not ok then
@@ -362,7 +279,7 @@ function M.delete_note(note_id)
   if not notebook or not filename then
     return false
   end
-  local notebook_dir = M.get_nb_dir() .. "/" .. notebook
+  local notebook_dir = M.dir() .. "/" .. notebook
   local path = notebook_dir .. "/" .. filename
 
   if not vim.uv.fs_unlink(path) then
@@ -380,7 +297,7 @@ function M.move_note(note_id, dest_notebook)
   if not src_notebook or not filename or not dest_notebook then
     return nil
   end
-  local nb_dir = M.get_nb_dir()
+  local nb_dir = M.dir()
   local src_dir = nb_dir .. "/" .. src_notebook
   local dst_dir = nb_dir .. "/" .. dest_notebook
 
@@ -394,11 +311,73 @@ function M.move_note(note_id, dest_notebook)
   return dest_notebook .. ":" .. filename
 end
 
+-- 任意のファイルを nb 配下の notebook へ移動
+-- title を渡すとファイル名は <timestamp>.md、H1 をその title に書き換える
+-- title が nil なら元ファイル名を維持
+-- 戻り値: 新パス、エラーメッセージ
+function M.adopt_file(src_path, dest_notebook, title)
+  if not src_path or src_path == "" then
+    return nil, "No source path"
+  end
+  if not dest_notebook or dest_notebook == "" then
+    return nil, "Notebook required"
+  end
+  if not vim.uv.fs_stat(src_path) then
+    return nil, "Source not found: " .. src_path
+  end
+
+  local notebook_dir = M.dir() .. "/" .. dest_notebook
+  if not vim.uv.fs_stat(notebook_dir) then
+    return nil, "Notebook not found: " .. dest_notebook
+  end
+
+  local filename
+  if title and title ~= "" then
+    filename = os.date(config.options.timestamp_format) .. ".md"
+  else
+    filename = vim.fn.fnamemodify(src_path, ":t")
+  end
+
+  local dst_path
+  filename, dst_path = resolve_collision(notebook_dir, filename)
+
+  -- title 指定時は H1 を差し替え
+  if title and title ~= "" then
+    local lines = {}
+    local f = io.open(src_path, "r")
+    if not f then
+      return nil, "Cannot read source"
+    end
+    for line in f:lines() do
+      table.insert(lines, line)
+    end
+    f:close()
+    if lines[1] and lines[1]:match("^#%s+") then
+      lines[1] = "# " .. title
+    else
+      table.insert(lines, 1, "# " .. title)
+    end
+    local out = io.open(dst_path, "w")
+    if not out then
+      return nil, "Cannot write destination"
+    end
+    out:write(table.concat(lines, "\n") .. "\n")
+    out:close()
+    vim.uv.fs_unlink(src_path)
+  else
+    if not vim.uv.fs_rename(src_path, dst_path) then
+      return nil, "Rename failed"
+    end
+  end
+
+  git_commit_async(notebook_dir, filename, "Adopt: " .. filename)
+  return dst_path
+end
+
 -- ノートブック一覧を取得
 function M.list_notebooks()
   -- nbディレクトリ内のサブディレクトリを直接読み取る（より確実）
-  local nb_dir = M.get_nb_dir()
-  local handle = vim.uv.fs_scandir(nb_dir)
+  local handle = vim.uv.fs_scandir(M.dir())
   if not handle then
     return nil
   end
@@ -440,7 +419,7 @@ local function walk_notebook(dir, notebook, folder_path, depth, items)
       elseif type == "file" then
         local title = name
         if name:match("%.md$") then
-          title = read_md_title(entry_path) or name
+          title = M.md_title(entry_path) or name
         end
         local fp = folder_path ~= "" and folder_path or nil
         local stat = vim.uv.fs_stat(entry_path)
@@ -465,7 +444,6 @@ end
 -- 全ノートブックのアイテムをファイルシステムから直接取得（高速）
 -- 結果は mtime 降順（最近編集したノートが上）
 function M.list_all_items()
-  local nb_dir = M.get_nb_dir()
   local notebooks = M.list_notebooks()
   if not notebooks then
     return nil
@@ -473,7 +451,7 @@ function M.list_all_items()
 
   local all_items = {}
   for _, notebook in ipairs(notebooks) do
-    walk_notebook(nb_dir .. "/" .. notebook, notebook, "", 0, all_items)
+    walk_notebook(M.dir() .. "/" .. notebook, notebook, "", 0, all_items)
   end
   table.sort(all_items, function(a, b)
     return a.mtime > b.mtime
