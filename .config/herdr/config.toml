@@ -1,6 +1,4 @@
-# Show first-run notification setup on startup.
-# Missing also shows onboarding; set false after you've chosen.
-onboarding = true
+onboarding = false
 
 [theme]
 # Built-in themes: catppuccin, terminal, tokyo-night, dracula, nord,
@@ -22,6 +20,8 @@ onboarding = true
 # red = "#ff6188"
 # green = "#a6e3a1"
 
+name = "terminal"
+auto_switch = false
 [terminal]
 # Executable used for new interactive panes.
 # Empty means $SHELL, then /bin/sh.

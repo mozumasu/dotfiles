@@ -134,6 +134,19 @@ let
           ];
         }
       ];
+      # herdr integration 用 (エージェントの状態を herdr に通知する)
+      SessionStart = [
+        {
+          matcher = "*";
+          hooks = [
+            {
+              type = "command";
+              command = "bash '/Users/ori.matsumoto/.config/claude/hooks/herdr-agent-state.sh' session";
+              timeout = 10;
+            }
+          ];
+        }
+      ];
       Stop = [
         {
           matcher = "";
