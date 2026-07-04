@@ -182,7 +182,7 @@ let
             }
             {
               type = "command";
-              command = ''terminal-notifier -title "Claude" -message "$(basename "$PWD")" & afplay /System/Library/Sounds/Glass.aiff'';
+              command = ''~/.config/claude/scripts/notify.sh "Claude"'';
             }
           ];
         }
@@ -193,7 +193,7 @@ let
           hooks = [
             {
               type = "command";
-              command = ''terminal-notifier -title "Claude Notification" -message "$(basename "$PWD")" & afplay /System/Library/Sounds/Glass.aiff'';
+              command = ''~/.config/claude/scripts/notify.sh "Claude Notification"'';
             }
           ];
         }
