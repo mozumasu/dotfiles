@@ -24,6 +24,9 @@ in
     "gomi".source = mkLink ".config/gomi";
     "mise".source = mkLink ".config/mise";
     "ccsession".source = mkLink ".config/ccsession";
+    # herdr は ~/.config/herdr/ にログ・ソケット等のランタイムファイルも
+    # 書き込むため、config.toml のみリンクする
+    "herdr/config.toml".source = mkLink ".config/herdr/config.toml";
     "raycast/scripts".source = mkLink ".config/raycast/scripts";
     # claude は claude-code.nix で個別管理
     # settings.json は書き込み可能コピー、それ以外はシンボリックリンク
