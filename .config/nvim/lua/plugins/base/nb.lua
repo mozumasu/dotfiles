@@ -8,7 +8,10 @@ local function strip_ansi(str)
 end
 
 return {
-  "folke/snacks.nvim",
+  dir = "~/src/github.com/mozumasu/nb.nvim",
+  name = "nb.nvim",
+  dependencies = { "folke/snacks.nvim" },
+  lazy = false, -- autosync の autocmd を起動時に登録する
   keys = {
     -- stylua: ignore start
     { "<leader>na", function() require("nb").add() end, desc = "nb add" },
@@ -23,23 +26,22 @@ return {
     { "<leader>nL", function() require("config.plans").open_latest() end, desc = "nb open latest plan" },
     -- stylua: ignore end
   },
-  init = function()
-    require("nb").setup({
-      dir = "~/src/github.com/mozumasu/nb",
-      -- WezTerm のスクロールバック (.wezesc) は ANSI を除去してプレビュー
-      preview = function(ctx)
-        if ctx.item.file:match("%.wezesc$") then
-          local lines = vim.fn.readfile(ctx.item.file)
-          for i, line in ipairs(lines) do
-            lines[i] = strip_ansi(line)
-          end
-          ctx.preview:set_lines(lines)
-          return
+  opts = {
+    dir = "~/src/github.com/mozumasu/nb",
+    -- WezTerm のスクロールバック (.wezesc) は ANSI を除去してプレビュー
+    preview = function(ctx)
+      if ctx.item.file:match("%.wezesc$") then
+        local lines = vim.fn.readfile(ctx.item.file)
+        for i, line in ipairs(lines) do
+          lines[i] = strip_ansi(line)
         end
-        return require("snacks").picker.preview.file(ctx)
-      end,
-    })
-
+        ctx.preview:set_lines(lines)
+        return
+      end
+      return require("snacks").picker.preview.file(ctx)
+    end,
+  },
+  init = function()
     vim.api.nvim_create_user_command("NbAdopt", function()
       require("nb").adopt_buffer()
     end, { desc = "Move current buffer into nb notebook" })
