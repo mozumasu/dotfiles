@@ -125,8 +125,8 @@ local keys = {
   -- Toggle nb workspace with CTRL+CMD+b
   { key = "a", mods = "CTRL|CMD", action = toggle_nb_workspace() },
   -- Skip scratch and nb workspace when switching workspaces
-  { key = "n", mods = "CTRL|CMD", action = switch_to_next_workspace_skip_scratch() },
-  { key = "p", mods = "CTRL|CMD", action = switch_to_prev_workspace_skip_scratch() },
+  -- { key = "n", mods = "CTRL|CMD", action = switch_to_next_workspace_skip_scratch() },
+  -- { key = "p", mods = "CTRL|CMD", action = switch_to_prev_workspace_skip_scratch() },
 
   {
     mods = "LEADER",
