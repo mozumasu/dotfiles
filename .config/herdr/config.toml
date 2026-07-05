@@ -104,6 +104,12 @@ toggle_sidebar = "prefix+b"
 # type = "pane"
 # command = "lazygit"
 
+# Copy the previous command line + output of the focused pane to the clipboard
+[[keys.command]]
+key = "prefix+y"
+type = "shell"
+command = "$HOME/dotfiles/.config/herdr/bin/herdr-copy-last-output"
+
 # Legacy indexed shortcut config is still parsed for compatibility.
 # Prefer switch_tab, switch_workspace, and focus_agent for new configs.
 # [keys.indexed]

@@ -1,0 +1,26 @@
+#!/usr/bin/env zsh
+# Copy the previous command line and its output from the focused herdr pane.
+# Splits scrollback on starship prompt lines: "❯" (U+276F) at column 0.
+# The starship header line is detected by the pill char "" (U+E0B6).
+
+pane="${HERDR_ACTIVE_PANE_ID:-$HERDR_PANE_ID}"
+if [[ -z "$pane" ]]; then
+  pane="$(herdr pane current 2>/dev/null | perl -ne 'print $1 if /"pane_id":"([^"]+)"/')"
+fi
+[[ -n "$pane" ]] || exit 1
+
+out="$(
+  herdr pane read "$pane" --source recent-unwrapped --lines 500 --format text |
+    perl -CSD -0777 -ne '
+      my @lines = split /\n/;
+      my @p = grep { $lines[$_] =~ /^\x{276F}(\s|$)/ } 0 .. $#lines;
+      exit 0 if @p < 2;
+      my @block = @lines[ $p[-2] .. $p[-1] - 1 ];
+      pop @block while @block && $block[-1] =~ /^\s*$|\x{E0B6}|\x{2500}{4,}/;
+      print join("\n", @block), "\n" if @block;
+    '
+)"
+
+[[ -n "$out" ]] || exit 1
+printf '%s\n' "$out" | pbcopy
+herdr notification show "herdr" --body "copied last command output" 2>/dev/null || true
