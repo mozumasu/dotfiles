@@ -203,6 +203,12 @@ local keys = {
   -- Claude Codeで改行できるようにする
   { key = "Enter", mods = "SHIFT", action = wezterm.action.SendString("\n") },
 
+  -- herdr の prefix (Ctrl+q)。macos_forward_to_ime_modifier_mask に CTRL が
+  -- 含まれるため通常は macSKK に転送され日本語モード中は消費されるが、
+  -- WezTerm のキー割り当ては IME 転送より先に判定されるためここで横取りし、
+  -- Ctrl+q のバイト (0x11) をペインへ直接送る
+  { key = "q", mods = "CTRL", action = act.SendString("\x11") },
+
   -- ScrollToPrompt
   { key = "[", mods = "ALT", action = act.ScrollToPrompt(-1) },
   { key = "]", mods = "ALT", action = act.ScrollToPrompt(1) },
