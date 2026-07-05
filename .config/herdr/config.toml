@@ -52,7 +52,7 @@ reload_config = "prefix+shift+r"
 open_notification_target = "prefix+o"
 workspace_picker = "prefix+w"
 # goto = "prefix+g"
-# new_workspace = "prefix+shift+n"
+new_workspace = "prefix+shift+n"
 # new_worktree = "prefix+shift+g"
 # open_worktree = ""    # optional, unset by default
 # remove_worktree = ""  # optional, unset by default; opens confirmation
@@ -81,10 +81,10 @@ close_tab = "prefix+shift+x"
 # cycle_pane_previous = "prefix+shift+tab"
 # last_pane = ""          # optional, unset by default; bind e.g. "prefix+tab" for global back-and-forth
 split_vertical = "prefix+v"
-split_horizontal = "prefix+d"
+split_horizontal = "prefix+-"
 close_pane = "prefix+x"
 zoom = "prefix+z"
-resize_mode = "prefix+c"
+resize_mode = "" # default prefix+r
 toggle_sidebar = "prefix+b"
 
 # Navigate-mode movement. These local shortcuts win while navigate mode is open.
