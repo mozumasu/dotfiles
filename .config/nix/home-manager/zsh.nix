@@ -200,7 +200,7 @@ in
         unset _brew_cache
 
         # Prioritize Japanese man pages
-        export MANPATH="/usr/local/share/man/ja_JP.UTF-8:$(manpath)"
+        export MANPATH="/usr/local/share/man/ja_JP.UTF-8:$(env -u MANPATH manpath)"
       '')
 
       # メイン部分
