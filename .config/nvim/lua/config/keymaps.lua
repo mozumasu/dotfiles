@@ -15,6 +15,8 @@ local util = require("lazyvim.util")
 -- emacs like keybind
 keymap("i", "<C-a>", "<Home>", opts)
 keymap("i", "<C-e>", "<End>", opts)
+keymap("i", "<C-b>", "<Left>", opts)
+keymap("i", "<C-f>", "<Right>", opts)
 
 -- Control + I と Tab をデフォルトの状態に戻す
 vim.api.nvim_set_keymap("n", "<C-i>", "<C-i>", { noremap = true })
