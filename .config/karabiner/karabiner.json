@@ -5,12 +5,15 @@
             "complex_modifications": {
                 "rules": [
                     {
-                        "description": "WezTerm + macSKK: Ctrl+j をかなキーに変換 (ひらがなモード切替)",
+                        "description": "WezTerm/Arc + macSKK: Ctrl+j をかなキーに変換 (ひらがなモード切替)",
                         "manipulators": [
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": ["^com\\.github\\.wez\\.wezterm$"],
+                                        "bundle_identifiers": [
+                                            "^com\\.github\\.wez\\.wezterm$",
+                                            "^company\\.thebrowser\\.Browser$"
+                                        ],
                                         "type": "frontmost_application_if"
                                     },
                                     {
