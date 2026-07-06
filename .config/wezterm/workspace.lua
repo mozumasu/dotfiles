@@ -128,6 +128,14 @@ local keys = {
   -- { key = "n", mods = "CTRL|CMD", action = switch_to_next_workspace_skip_scratch() },
   -- { key = "p", mods = "CTRL|CMD", action = switch_to_prev_workspace_skip_scratch() },
 
+  -- Forward cmd+ctrl+n/p to herdr as kitty CSI-u sequences (modifier 13 = ctrl+super+1).
+  -- The cmd modifier cannot cross the pty via legacy key encoding, and with
+  -- macos_forward_to_ime_modifier_mask = "SHIFT|CTRL" (macSKK) every CTRL chord is
+  -- routed to the IME, which silently consumes cmd-modified events before the
+  -- encoder. herdr always parses CSI-u regardless of the negotiated protocol.
+  { key = "n", mods = "CTRL|CMD", action = act.SendString("\27[110;13u") },
+  { key = "p", mods = "CTRL|CMD", action = act.SendString("\27[112;13u") },
+
   {
     mods = "LEADER",
     key = "w",
