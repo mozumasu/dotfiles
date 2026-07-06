@@ -463,7 +463,10 @@ __wezterm_osc7() {
 __wezterm_semantic_precmd_executing=""
 __wezterm_semantic_precmd() {
   local ret="$?"
-  if [[ "$__wezterm_semantic_precmd_executing" != "0" ]] ; then
+  # Wrap whenever PS1 lacks the markers: prompt frameworks like starship
+  # rebuild PS1 every precmd, which drops the markers even when no command
+  # ran in between (empty Enter, Ctrl-C).
+  if [[ "$PS1" != *$'\e]133;P'* ]] ; then
     __wezterm_save_ps1="$PS1"
     __wezterm_save_ps2="$PS2"
     # Markup the left and right prompts so that the terminal
