@@ -35,6 +35,37 @@
                         ]
                     },
                     {
+                        "description": "WezTerm + macSKK日本語モード: Ctrl+[ をescapeに変換 (変換キャンセル用)",
+                        "manipulators": [
+                            {
+                                "conditions": [
+                                    {
+                                        "bundle_identifiers": ["^com\\.github\\.wez\\.wezterm$"],
+                                        "type": "frontmost_application_if"
+                                    },
+                                    {
+                                        "input_sources": [
+                                            {
+                                                "input_source_id": "^net\\.mtgto\\.inputmethod\\.macSKK\\.(hiragana|katakana|hankaku|eisu)"
+                                            }
+                                        ],
+                                        "type": "input_source_if"
+                                    },
+                                    {
+                                        "keyboard_types": ["ansi", "iso"],
+                                        "type": "keyboard_type_if"
+                                    }
+                                ],
+                                "from": {
+                                    "key_code": "open_bracket",
+                                    "modifiers": { "mandatory": ["control"] }
+                                },
+                                "to": [{ "key_code": "escape" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "Change Alt+¥ to ¥",
                         "manipulators": [
                             {
@@ -232,6 +263,37 @@
         {
             "complex_modifications": {
                 "rules": [
+                    {
+                        "description": "WezTerm + macSKK日本語モード: Ctrl+[ をescapeに変換 (変換キャンセル用)",
+                        "manipulators": [
+                            {
+                                "conditions": [
+                                    {
+                                        "bundle_identifiers": ["^com\\.github\\.wez\\.wezterm$"],
+                                        "type": "frontmost_application_if"
+                                    },
+                                    {
+                                        "input_sources": [
+                                            {
+                                                "input_source_id": "^net\\.mtgto\\.inputmethod\\.macSKK\\.(hiragana|katakana|hankaku|eisu)"
+                                            }
+                                        ],
+                                        "type": "input_source_if"
+                                    },
+                                    {
+                                        "keyboard_types": ["jis"],
+                                        "type": "keyboard_type_if"
+                                    }
+                                ],
+                                "from": {
+                                    "key_code": "close_bracket",
+                                    "modifiers": { "mandatory": ["control"] }
+                                },
+                                "to": [{ "key_code": "escape" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
                     {
                         "description": "Change Alt+¥ to ¥",
                         "manipulators": [
