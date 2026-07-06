@@ -124,17 +124,8 @@ local keys = {
   { key = "s", mods = "CTRL|CMD", action = toggle_scratch_workspace() },
   -- Toggle nb workspace with CTRL+CMD+b
   { key = "a", mods = "CTRL|CMD", action = toggle_nb_workspace() },
-  -- Skip scratch and nb workspace when switching workspaces
-  -- { key = "n", mods = "CTRL|CMD", action = switch_to_next_workspace_skip_scratch() },
-  -- { key = "p", mods = "CTRL|CMD", action = switch_to_prev_workspace_skip_scratch() },
-
-  -- Forward cmd+ctrl+n/p to herdr as kitty CSI-u sequences (modifier 13 = ctrl+super+1).
-  -- The cmd modifier cannot cross the pty via legacy key encoding, and with
-  -- macos_forward_to_ime_modifier_mask = "SHIFT|CTRL" (macSKK) every CTRL chord is
-  -- routed to the IME, which silently consumes cmd-modified events before the
-  -- encoder. herdr always parses CSI-u regardless of the negotiated protocol.
-  { key = "n", mods = "CTRL|CMD", action = act.SendString("\27[110;13u") },
-  { key = "p", mods = "CTRL|CMD", action = act.SendString("\27[112;13u") },
+  -- cmd+ctrl+n/p は herdr のワークスペース切り替えに使うため WezTerm ではバインドしない
+  -- (kitty protocol 経由で herdr に届く)
 
   {
     mods = "LEADER",

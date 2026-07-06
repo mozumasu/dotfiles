@@ -7,18 +7,22 @@ local config = wezterm.config_builder()
 -- 設定ファイルの変更を自動で読み込む
 config.automatically_reload_config = true
 
--- macSKK向け: Control-jで改行されないようにする設定
--- https://github.com/mtgto/macSKK?tab=readme-ov-file#q-wezterm-%E3%81%A7-c-j-%E3%82%92%E6%8A%BC%E3%81%99%E3%81%A8%E6%94%B9%E8%A1%8C%E3%81%95%E3%82%8C%E3%81%A6%E3%81%97%E3%81%BE%E3%81%84%E3%81%BE%E3%81%99
+-- IME に転送するのは修飾なしと SHIFT 付きのみ (デフォルト)。CTRL を足すと
+-- cmd+ctrl+n のような組み合わせまで IME に消費される。macSKK の C-j
+-- (ひらがなモード切替) は Karabiner で かなキー に変換して届けている
 ---@diagnostic disable-next-line: assign-type-mismatch
-config.macos_forward_to_ime_modifier_mask = "SHIFT|CTRL"
+config.macos_forward_to_ime_modifier_mask = "SHIFT"
+
+-- 対応アプリ (herdr など) が要求したときに cmd 修飾キーを CSI-u で届ける
+config.enable_kitty_keyboard = true
 
 -- font
 config.font_size = 13.0
 config.font = wezterm.font("HackGen Console NF")
 
 -- 背景の透過度とぼかし
-config.window_background_opacity = 0.9  -- 非フォーカス時のデフォルト（blur見える）
-config.macos_window_background_blur = 8  -- opacityで視覚的に制御
+config.window_background_opacity = 0.9 -- 非フォーカス時のデフォルト（blur見える）
+config.macos_window_background_blur = 8 -- opacityで視覚的に制御
 
 -- ステータスバー更新間隔（デフォルト1000ms → 1500ms）
 config.status_update_interval = 1500
