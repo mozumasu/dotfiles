@@ -209,6 +209,23 @@ local keys = {
   -- Ctrl+q のバイト (0x11) をペインへ直接送る
   { key = "q", mods = "CTRL", action = act.SendString("\x11") },
 
+  -- kitty プロトコル下では ctrl+[ は esc と別キー扱いになるため esc に変換する。
+  -- herdr は素の 1b を esc の離しイベントが届くまで esc と確定しないので、
+  -- 曖昧さのない CSI 27u (kitty 形式の esc 押下) を送る。kitty を使わない
+  -- ペインには CSI 27u がゴミ文字になるため SendKey (レガシー 1b) に落とす
+  {
+    key = "[",
+    mods = "CTRL",
+    action = wezterm.action_callback(function(window, pane)
+      local proc = pane:get_foreground_process_name() or ""
+      if proc:match("herdr") then
+        window:perform_action(act.SendString("\x1b[27u"), pane)
+      else
+        window:perform_action(act.SendKey({ key = "Escape" }), pane)
+      end
+    end),
+  },
+
   -- ScrollToPrompt
   { key = "[", mods = "ALT", action = act.ScrollToPrompt(-1) },
   { key = "]", mods = "ALT", action = act.ScrollToPrompt(1) },
