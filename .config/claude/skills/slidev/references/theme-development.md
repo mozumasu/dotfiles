@@ -125,6 +125,6 @@ npm 公開は必須ではない。選択肢:
 
 ## 公開する場合
 
-- 命名規約 + keywords を満たして `npm publish` (ビルド不要)
+- 命名規約 + keywords を満たして `pnpm publish` (ビルド不要)
 - キーワード `slidev-theme` を付けて公開すればテーマギャラリー
   (<https://sli.dev/resources/theme-gallery>) から発見可能になる

@@ -15,11 +15,11 @@ Slidev は Markdown + Vue でスライドを書くプレゼンテーションツ
 ## 基本コマンド
 
 ```sh
-npm create slidev@latest        # 新規プロジェクト作成
-npx slidev slides.md            # 開発サーバー起動 (ライブプレビュー)
-npx slidev export slides.md     # PDF エクスポート (playwright-chromium が必要)
-npx slidev build slides.md      # SPA としてビルド
-npm init slidev-theme@latest    # テーマの雛形生成
+pnpm create slidev              # 新規プロジェクト作成
+pnpm slidev slides.md           # 開発サーバー起動 (ライブプレビュー)
+pnpm slidev export slides.md    # PDF エクスポート (playwright-chromium が必要)
+pnpm slidev build slides.md     # SPA としてビルド
+pnpm create slidev-theme        # テーマの雛形生成
 ```
 
 ## スライドの書き方
