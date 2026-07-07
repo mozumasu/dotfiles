@@ -241,6 +241,7 @@ let
       "example-skills@anthropic-agent-skills" = true;
       "pyright-lsp@claude-plugins-official" = true;
       "slack@claude-plugins-official" = true;
+      "frontend-design@claude-plugins-official" = true;
       "aws-core@agent-toolkit-for-aws" = true;
       "aws-data-analytics@agent-toolkit-for-aws" = true;
       "codex@openai-codex" = true;
