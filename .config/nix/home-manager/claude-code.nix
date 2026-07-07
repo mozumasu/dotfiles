@@ -74,7 +74,8 @@ let
         "Read(~/.gnupg/**)"
         "Read(./secrets/**)"
         "Read(**/credentials.json)"
-        "Read(**/*token*)"
+        "Read(**/.token*)"
+        "Read(**/*_token.json)"
         "Edit(.env)"
         "Edit(.env.*)"
         "Edit(~/.ssh/**)"
@@ -271,8 +272,6 @@ let
       builtins.readFile privateMarketplacesFile
     )).extraKnownMarketplaces;
     plansDirectory = "./plans";
-    maxTokens = 8192;
-    temperature = 0;
     language = "ja";
     effortLevel = "medium";
     skipAutoPermissionPrompt = true;

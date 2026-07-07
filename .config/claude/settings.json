@@ -55,7 +55,8 @@
       "Read(~/.gnupg/**)",
       "Read(./secrets/**)",
       "Read(**/credentials.json)",
-      "Read(**/*token*)",
+      "Read(**/.token*)",
+      "Read(**/*_token.json)",
       "Edit(.env)",
       "Edit(.env.*)",
       "Edit(~/.ssh/**)",
@@ -206,13 +207,5 @@
   },
   "effortLevel": "medium",
   "plansDirectory": "./plans",
-  "maxTokens": 8192,
-  "temperature": 0,
-  "preferences": {
-    "language": "ja",
-    "responses": {
-      "concise": false,
-      "includeExplanations": false
-    }
-  }
+  "language": "ja"
 }
