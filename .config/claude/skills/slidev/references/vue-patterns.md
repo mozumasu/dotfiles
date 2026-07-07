@@ -34,6 +34,50 @@ const isActive = useIsSlideActive()
 注意: `useSlideContext()` を使うとそのコンポーネントでは `$slidev` の自動注入が
 無効化されるため、戻り値から取得する。
 
+## global layers (global-bottom.vue / global-top.vue)
+
+全スライドの下 / 上に常時描画されるレイヤー。背景アニメーションやオーバーレイに使う。
+
+- **Slidev は global layers に props を渡さない**。`defineProps` を書いても常に undefined。
+  設定は `configs` (headmatter) や `$slidev.themeConfigs` から取る:
+
+```vue
+<script setup lang="ts">
+import { configs, useNav } from '@slidev/client'
+
+const { currentPage } = useNav() // URL 正規表現 + ポーリングでの自力追跡は不要
+const myConfig = configs.myAddonKey ?? {}
+</script>
+```
+
+- `window.__slidev__` は非公開の内部プロパティ。バージョンアップで壊れるので使わない
+- Vue の `onMounted` は戻り値をクリーンアップとして扱わない (React useEffect と違う)。
+  リスナー / タイマーの解除は必ず `onUnmounted` に書く
+
+## キーボードショートカット (setup/shortcuts.ts)
+
+テーマ / アドオンのキーバインドは生の keydown リスナーではなく
+`defineShortcutsSetup` で登録する (入力欄フォーカス中の抑制を Slidev 側が処理する)。
+global layer 側とは CustomEvent で連携するのが定石:
+
+```ts
+// setup/shortcuts.ts
+import { defineShortcutsSetup } from '@slidev/types'
+
+export default defineShortcutsSetup((nav, baseShortcuts) => [
+  ...baseShortcuts,
+  {
+    key: 'w',
+    fn: () => window.dispatchEvent(new CustomEvent('my-toggle')),
+    autoRepeat: false,
+  },
+])
+```
+
+```ts
+// global-bottom.vue 側: onMounted で addEventListener('my-toggle', ...)、onUnmounted で解除
+```
+
 ## レイアウトで frontmatter を受け取る
 
 スライドの frontmatter の値は props としてレイアウトに渡される。

@@ -76,3 +76,22 @@ layout: two-cols
 - 日本語スライドの文章は japanese-tech-writing スキルの規範に従う
 - フォント指定は headmatter の `fonts:` (デフォルトで Google Fonts から自動取得)。
   日本語なら `sans: Noto Sans JP` などを指定する
+
+## 落とし穴 (実案件で踏んだもの)
+
+- **markdown formatter が frontmatter を破壊する**: この環境の PostToolUse hook (`rumdl fmt`) は
+  スライド区切り `---` と frontmatter の間に空行を挿入し、frontmatter 内の裸 URL を
+  `<https://...>` に変換して壊す。Slidev 用 .md には最初のスライド本文冒頭に
+  `<!-- rumdl-disable -->` を入れ、編集後は `git diff` で `---` 直後の空行を確認する
+- **`seoMeta.ogImage: auto` は `slidev build` でも Playwright Chromium を要求する**
+  (ビルド後に OGP 画像をレンダリングするため)。CI では
+  `pnpm exec playwright install --with-deps chromium` が必要。
+  ローカルでは playwright-core のバージョン違いで headless shell の revision が
+  合わないことがある → `node node_modules/playwright-chromium/cli.js install chromium`
+  のようにデッキが依存するパッケージの CLI でインストールする
+- **public/ のアセットを fetch するコードは `import.meta.env.BASE_URL` を前置する**。
+  `/comments.json` のようなルート絶対パスは GitHub Pages の base path 配下で 404 になる。
+  相対パス `./foo.json` も現在スライドの URL 基準で解決され 2 枚目以降で壊れるので不可
+- **pnpm 10+ の build scripts 承認**: `esbuild` や `playwright-chromium` の postinstall が
+  ブロックされたら `pnpm-workspace.yaml` の `allowBuilds:` で許可する
+  (package.json の `pnpm.onlyBuiltDependencies` は pnpm 11 では読まれない)
