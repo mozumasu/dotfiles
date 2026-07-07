@@ -210,15 +210,16 @@ local keys = {
   { key = "q", mods = "CTRL", action = act.SendString("\x11") },
 
   -- kitty プロトコル下では ctrl+[ は esc と別キー扱いになるため esc に変換する。
-  -- herdr は素の 1b を esc の離しイベントが届くまで esc と確定しないので、
-  -- 曖昧さのない CSI 27u (kitty 形式の esc 押下) を送る。kitty を使わない
-  -- ペインには CSI 27u がゴミ文字になるため SendKey (レガシー 1b) に落とす
+  -- herdr は素の 1b を esc の離しイベントが届くまで esc と確定せず、
+  -- nvim (0.10+ は kitty プロトコルを有効化) は素の 1b をシーケンス開始
+  -- バイトと解釈するため、曖昧さのない CSI 27u (kitty 形式の esc 押下) を送る。
+  -- kitty を使わないペインには CSI 27u がゴミ文字になるため SendKey (レガシー 1b) に落とす
   {
     key = "[",
     mods = "CTRL",
     action = wezterm.action_callback(function(window, pane)
       local proc = pane:get_foreground_process_name() or ""
-      if proc:match("herdr") then
+      if proc:match("herdr") or proc:match("nvim") then
         window:perform_action(act.SendString("\x1b[27u"), pane)
       else
         window:perform_action(act.SendKey({ key = "Escape" }), pane)
