@@ -736,6 +736,17 @@ wezterm.on("augment-command-palette", function(window, pane)
       end),
     },
     {
+      brief = "AeroSpace: Reload config",
+      icon = "md_refresh",
+      action = wezterm.action_callback(function(window, pane)
+        wezterm.background_child_process({
+          os.getenv("SHELL") or "/bin/zsh",
+          "-lic",
+          "aerospace reload-config",
+        })
+      end),
+    },
+    {
       brief = "Weather: wttr.in",
       icon = "md_weather_cloudy",
       action = spawn_overlay_pane("curl wttr.in | less -R"),
