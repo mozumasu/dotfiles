@@ -509,6 +509,8 @@ local key_tables = {
     { key = "c", mods = "CTRL", action = act.Multiple({ "ScrollToBottom", { CopyMode = "Close" } }) },
     { key = "q", mods = "NONE", action = act.Multiple({ "ScrollToBottom", { CopyMode = "Close" } }) },
     { key = "Escape", mods = "NONE", action = act.Multiple({ "ScrollToBottom", { CopyMode = "Close" } }) },
+    -- key table はグローバルの C-[ → esc 変換より先に評価されるためここでも esc 相当を定義する
+    { key = "[", mods = "CTRL", action = act.Multiple({ "ScrollToBottom", { CopyMode = "Close" } }) },
 
     -- Vim風のキーバインド
     { key = "h", mods = "NONE", action = act.CopyMode("MoveLeft") },
@@ -581,6 +583,7 @@ local key_tables = {
 
   search_mode = {
     { key = "Escape", mods = "NONE", action = act.CopyMode("Close") },
+    { key = "[", mods = "CTRL", action = act.CopyMode("Close") },
     -- 検索結果にジャンプしたらコピーモードへ
     {
       key = "n",
@@ -634,6 +637,7 @@ local key_tables = {
 
     -- 自作モードから抜けるキーバインド設定
     { key = "Escape", action = "PopKeyTable" },
+    { key = "[", mods = "CTRL", action = "PopKeyTable" },
     { key = "q", action = "PopKeyTable" },
     { key = "c", mods = "CTRL", action = "PopKeyTable" },
   },
