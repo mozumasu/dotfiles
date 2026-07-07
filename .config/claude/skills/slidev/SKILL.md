@@ -59,7 +59,10 @@ layout: two-cols
 
 ## テーマ・アドオンを自作するとき
 
-詳細は @references/theme-development.md を参照。要点:
+詳細は @references/theme-development.md を参照。
+レイアウト・コンポーネントの Vue 実装 ($slidev コンテキスト、frontmatter の props 受け取り、
+組み込みコンポーネント、ダークモード、UnoCSS の注意点) は @references/vue-patterns.md を参照。
+要点:
 
 - 命名規約: `slidev-theme-*` / `slidev-addon-*`。keywords に `slidev-theme` (または `slidev-addon`) と `slidev` を入れる
 - テーマは見た目全般 (スタイル・デフォルト設定・レイアウト)、アドオンは独立機能 (コンポーネント等)。機能のテーマ同梱は公式非推奨
