@@ -127,44 +127,44 @@ local keys = {
   -- cmd+ctrl+n/p は herdr のワークスペース切り替えに使うため WezTerm ではバインドしない
   -- (kitty protocol 経由で herdr に届く)
 
-  {
-    mods = "LEADER",
-    key = "w",
-    action = wezterm.action_callback(function(win, pane)
-      -- 現在のPaneでworkspace_modeを有効化
-      win:perform_action(act.ActivateKeyTable({ name = "workspace_mode", one_shot = false }), pane)
-      -- workspace のリストを作成 (scratch と nb を除外)
-      local workspaces = {}
-      local index = 1
-      for _, name in ipairs(wezterm.mux.get_workspace_names()) do
-        if name ~= "scratch" and name ~= "nb" then
-          table.insert(workspaces, {
-            id = name,
-            label = string.format("%d. %s", index, name),
-          })
-          index = index + 1
-        end
-      end
-      local current = wezterm.mux.get_active_workspace()
-      -- 選択メニューを起動
-      win:perform_action(
-        act.InputSelector({
-          action = wezterm.action_callback(function(_, _, id, label)
-            if not id and not label then
-              wezterm.log_info("Workspace selection canceled") -- 入力が空ならキャンセル
-            else
-              win:perform_action(act.SwitchToWorkspace({ name = id }), pane) -- workspace を移動
-            end
-          end),
-          title = "Select workspace",
-          choices = workspaces,
-          fuzzy = true,
-          -- fuzzy_description = string.format("Select workspace: %s -> ", current), -- requires nightly build
-        }),
-        pane
-      )
-    end),
-  },
+  -- {
+  --   mods = "LEADER",
+  --   key = "w",
+  --   action = wezterm.action_callback(function(win, pane)
+  --     -- 現在のPaneでworkspace_modeを有効化
+  --     win:perform_action(act.ActivateKeyTable({ name = "workspace_mode", one_shot = false }), pane)
+  --     -- workspace のリストを作成 (scratch と nb を除外)
+  --     local workspaces = {}
+  --     local index = 1
+  --     for _, name in ipairs(wezterm.mux.get_workspace_names()) do
+  --       if name ~= "scratch" and name ~= "nb" then
+  --         table.insert(workspaces, {
+  --           id = name,
+  --           label = string.format("%d. %s", index, name),
+  --         })
+  --         index = index + 1
+  --       end
+  --     end
+  --     local current = wezterm.mux.get_active_workspace()
+  --     -- 選択メニューを起動
+  --     win:perform_action(
+  --       act.InputSelector({
+  --         action = wezterm.action_callback(function(_, _, id, label)
+  --           if not id and not label then
+  --             wezterm.log_info("Workspace selection canceled") -- 入力が空ならキャンセル
+  --           else
+  --             win:perform_action(act.SwitchToWorkspace({ name = id }), pane) -- workspace を移動
+  --           end
+  --         end),
+  --         title = "Select workspace",
+  --         choices = workspaces,
+  --         fuzzy = true,
+  --         -- fuzzy_description = string.format("Select workspace: %s -> ", current), -- requires nightly build
+  --       }),
+  --       pane
+  --     )
+  --   end),
+  -- },
 }
 
 local key_tables = {
