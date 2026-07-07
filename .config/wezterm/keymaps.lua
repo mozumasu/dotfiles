@@ -624,16 +624,6 @@ wezterm.on("augment-command-palette", function(window, pane)
       action = spawn_overlay_pane("ghost"),
     },
     {
-      brief = "Launch: Lazygit",
-      icon = "md_git",
-      action = spawn_overlay_pane("lazygit"),
-    },
-    {
-      brief = "Launch: Neovim",
-      icon = "md_vim",
-      action = spawn_overlay_pane("nvim"),
-    },
-    {
       brief = "Launch: Yazi",
       icon = "md_folder",
       action = spawn_overlay_pane("yazi"),

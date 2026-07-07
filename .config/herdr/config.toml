@@ -102,6 +102,10 @@ key = "prefix+shift+l"
 type = "pane"
 command = "lazygit"
 
+[[keys.command]]
+key = "prefix+shift+n"
+type = "pane"
+command = "nvim"
 
 # [worktrees]
 # directory = "~/.herdr/worktrees"
