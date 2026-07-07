@@ -741,6 +741,32 @@ wezterm.on("augment-command-palette", function(window, pane)
       end),
     },
     {
+      brief = "Herdr: New workspace",
+      icon = "md_plus_box",
+      action = wezterm.action_callback(function(window, pane)
+        window:perform_action(
+          act.PromptInputLine({
+            description = "(herdr) New workspace name (empty for generated name):",
+            action = wezterm.action_callback(function(_, _, line)
+              if line == nil then
+                return
+              end
+              local cmd = "herdr workspace create --focus"
+              if line ~= "" then
+                cmd = cmd .. " --label '" .. line:gsub("'", [['\'']]) .. "'"
+              end
+              wezterm.background_child_process({
+                os.getenv("SHELL") or "/bin/zsh",
+                "-lic",
+                cmd,
+              })
+            end),
+          }),
+          pane
+        )
+      end),
+    },
+    {
       brief = "AeroSpace: Reload config",
       icon = "md_refresh",
       action = wezterm.action_callback(function(window, pane)
