@@ -16,7 +16,7 @@ let
       # sops の claude-otel-env シークレットから activation 時にマージされる
     };
     includeCoAuthoredBy = true;
-    model = "claude-fable-5[1m]";
+    model = "sonnet";
     tui = "fullscreen";
     permissions = {
       allow = [
@@ -154,45 +154,7 @@ let
           hooks = [
             {
               type = "command";
-              command = ''cols=$(jq -r --arg pane "$WEZTERM_PANE" 'first(.[] | select(.pane_id==($pane|tonumber)) | .size.cols) // empty' <<<"$(wezterm cli list --format=json 2>/dev/null)"); [ -n "$cols" ] || cols=$COLUMNS; [ -n "$cols" ] || cols=$(tput cols 2>/dev/null || echo 80); cols=$((cols - 10)); line=$(printf '─%.0s' $(seq 1 $cols)); echo "{\"systemMessage\": \"$line\"}"'';
-            }
-            {
-              type = "command";
               command = "~/.config/claude/hooks/check-settings-drift.sh";
-            }
-            {
-              type = "agent";
-              prompt = ''
-                ~/.config/claude/settings.json が Nix 管理の状態から変更されていないか確認し、差分があれば適切なソースファイルに反映する。
-
-                permission は Stop hook 用に Bash(diff:*) / Bash(jq:*) / Read / Edit が許可済み。
-                permission_mode を理由に作業を諦めず、まず diff を実行して差分有無を判定すること。
-
-                ## ステップ 0: 差分判定（必ず最初に実行）
-
-                次のコマンドを 1 回だけ実行する:
-
-                ```bash
-                diff <(jq -S . ~/.config/claude/settings.json) <(jq -S . ~/.config/claude/.settings.json.nix-managed)
-                ```
-
-                - **exit code 0（差分なし）**: 「差分なし」と 1 行だけ報告して**即終了**。
-                  これ以降のステップは一切実行しない。ファイル読み込みも編集もしない。
-                - **exit code 1（差分あり）**: ステップ 1 以降に進む。
-                - **exit code 2 以上（コマンドエラー）**: 「drift 判定に失敗: <エラー内容>」と報告して即終了。
-
-                ## ステップ 1 以降（差分があったときだけ実行）
-
-                1. ~/.config/claude/.private-marketplaces.json を読み、extraKnownMarketplaces のキー一覧からプライベートマーケットプレイス名を取得する
-                2. 以下の振り分けルールに従って ~/dotfiles/.config/nix/home-manager/claude-code.nix の publicSettings を編集する:
-                   - プラグイン名の @ 以降がプライベートマーケットプレイス名と一致する enabledPlugins → sops-nix (user-secrets.yaml の claude-private-marketplaces)
-                   - extraKnownMarketplaces のキーがプライベートマーケットプレイス名と一致 → 同上
-                   - 上記以外の enabledPlugins、extraKnownMarketplaces → claude-code.nix の publicSettings
-                   - hooks、permissions、model 等その他の設定変更 → claude-code.nix の publicSettings
-                   - 一時的な変更（temperature、maxTokens の微調整など）→ 無視
-                3. darwin-rebuild switch の実行はユーザーに任せること（自動実行しない）
-                4. 変更後はユーザーに何を変更したかと darwin-rebuild switch の実行が必要であることを報告する
-              '';
             }
             {
               type = "command";
