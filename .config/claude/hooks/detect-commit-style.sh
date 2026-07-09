@@ -31,14 +31,23 @@ fi
 # 3. 言語を git log の subject と body で別々に推定
 SUBJECTS=$(git log --format=%s -10 2>/dev/null || echo "")
 
-# subject: 過半数が日本語かどうかで判定
+# プロジェクト側で明示的に指定されていれば git log 推定より優先する
+# .claude/settings.json の env セクションで以下を指定できる:
+#   {"env": {"CLAUDE_COMMIT_LANG": "ja", "CLAUDE_COMMIT_STYLE": "gitmoji"}}
+# Claude Code 標準の env 機構で hook プロセスに継承される。
+OVERRIDE_LANG="${CLAUDE_COMMIT_LANG:-}"
+OVERRIDE_STYLE="${CLAUDE_COMMIT_STYLE:-}"
+
+# subject: 日本語文字を含む subject の割合で判定（30% 以上で日本語傾向あり）
+# 閾値を低めに取ることで、英単語が多く混ざる技術系日本語コミットや、
+# hook が English と判定 → AI が英語コミット → さらに英語比率が上がるループを防ぐ
 JA_SUBJECT_RATIO=$(printf '%s\n' "$SUBJECTS" | perl -CSD -ne '
   $total++ if /\S/;
   $ja++ if /\p{Hiragana}|\p{Katakana}|\p{Han}/;
   END { printf "%.0f", ($total ? $ja / $total * 100 : 0) }
 ')
 HAS_JA_SUBJECT=false
-[ "$JA_SUBJECT_RATIO" -gt 50 ] && HAS_JA_SUBJECT=true
+[ "$JA_SUBJECT_RATIO" -ge 30 ] && HAS_JA_SUBJECT=true
 
 # body: NUL 区切りで commit ごとに分割し、非空 body のうち過半数が日本語を含めば日本語と判定
 # （単発の日本語混入で fully-English のリポジトリが誤判定されないようにする）
@@ -55,12 +64,21 @@ HAS_JA_BODY=$(git log -z --format=%b -10 2>/dev/null | perl -CSD -0 -ne '
 ')
 [ -z "$HAS_JA_BODY" ] && HAS_JA_BODY=false
 
-if ! $HAS_JA_SUBJECT && $HAS_JA_BODY; then
+if [ "$OVERRIDE_LANG" = "ja" ]; then
+  LANG_LABEL="Japanese (project override)"
+elif [ "$OVERRIDE_LANG" = "en" ]; then
+  LANG_LABEL="English (project override)"
+elif ! $HAS_JA_SUBJECT && $HAS_JA_BODY; then
   LANG_LABEL="English subject, Japanese body"
 elif $HAS_JA_SUBJECT; then
   LANG_LABEL="Japanese"
 else
   LANG_LABEL="English"
+fi
+
+# style も .claude/commit-style.json で上書き可能
+if [ "$OVERRIDE_STYLE" = "gitmoji" ] || [ "$OVERRIDE_STYLE" = "conventional" ]; then
+  STYLE="$OVERRIDE_STYLE"
 fi
 
 # 4. scope 使用率を推定（`fix(ui):` のようなパターン）
