@@ -80,9 +80,72 @@ layout: two-cols
 ## 落とし穴 (実案件で踏んだもの)
 
 - **markdown formatter が frontmatter を破壊する**: この環境の PostToolUse hook (`rumdl fmt`) は
-  スライド区切り `---` と frontmatter の間に空行を挿入し、frontmatter 内の裸 URL を
-  `<https://...>` に変換して壊す。Slidev 用 .md には最初のスライド本文冒頭に
-  `<!-- rumdl-disable -->` を入れ、編集後は `git diff` で `---` 直後の空行を確認する
+  スライド区切り `---` と frontmatter の間に空行を挿入し、`layout: xxx` を `## layout: xxx` に
+  誤変換する。**ファイル先頭に `<!-- rumdl-disable -->` を置いてはいけない** — Slidev の
+  headmatter パーサは 1 行目が `---` でないと反応せず、`addons:` `theme:` が全て無視される。
+  代わりに**プロジェクトルートに `.rumdl.toml` を置いて Slidev の md を除外**する:
+
+  ```toml
+  [global]
+  exclude = [
+    "packages/*/example.md",
+    "packages/*/slides.md",
+  ]
+  ```
+
+- **`title:` はレイアウトの props に届かない (Slidev 予約フィールド)**: `title:` はページ
+  タイトルとして Slidev が消費するため、`defineProps<{ title?: string }>` で受けても常に
+  undefined になる。フォールバック属性としては `frontmatter="[object Object]"` の形で
+  DOM に落ちる。**`frontmatter` オブジェクト経由で受ける**のが正解:
+
+  ```vue
+  const props = defineProps<{ frontmatter?: { title?: string } }>()
+  const displayTitle = computed(() => props.frontmatter?.title)
+  ```
+
+  他の予約フィールド (`layout`, `class`, `transition`, `hideInToc` 等) も同様。
+
+- **headmatter と最初のスライド frontmatter を別ブロックにすると空スライドが混入する**:
+
+  ```md
+  ---
+  theme: ./
+  ---
+
+  ---
+  layout: cover
+  ---
+
+  # 表紙
+  ```
+
+  この構造だと Slidev は「空の 1 枚目 + cover の 2 枚目」と解釈する。**headmatter と最初の
+  スライドの frontmatter は同じブロックにマージする**:
+
+  ```md
+  ---
+  theme: ./
+  layout: cover
+  ---
+
+  # 表紙
+  ```
+
+- **`**bold**` は Vue コンポーネント内のインラインスロットでは markdown 解釈されない**:
+  `<FindyKeyValue label="..."> **太字** </FindyKeyValue>` は literal `**太字**` として
+  表示される。**HTML の `<strong>` を直接書く**か、スロット内容の前後に空行を入れて
+  ブロックとして評価させる。
+
+- **local path 指定の addon は pnpm workspace で components/ を自動走査しないことがある**:
+  `addons: ['../slidev-addon-foo']` が動かない場合、テーマ側 package.json に
+  `"slidev-addon-foo": "workspace:*"` を dep 追加し、headmatter でも
+  `addons: [slidev-addon-foo]` と**パッケージ名で参照**する。pnpm install 後に
+  Slidev CLI を再起動しないと反映されない (HMR 対象外)。
+
+- **rumdl 除外を作った後は `.rumdl.toml` の場所に注意**: hook は編集対象ファイルから見て
+  カレントディレクトリ順に config を探す。モノレポ root に置けば全パッケージに効くが、
+  グローバル `~/dotfiles/.rumdl.toml` は上書きされない (上書きされてほしいなら
+  プロジェクト側で `[global] exclude = []` を明示的に空にする)。
 - **`seoMeta.ogImage: auto` は `slidev build` でも Playwright Chromium を要求する**
   (ビルド後に OGP 画像をレンダリングするため)。CI では
   `pnpm exec playwright install --with-deps chromium` が必要。
