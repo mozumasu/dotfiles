@@ -158,3 +158,19 @@ layout: two-cols
 - **pnpm 10+ の build scripts 承認**: `esbuild` や `playwright-chromium` の postinstall が
   ブロックされたら `pnpm-workspace.yaml` の `allowBuilds:` で許可する
   (package.json の `pnpm.onlyBuiltDependencies` は pnpm 11 では読まれない)
+- **コードフェンスの `[タイトル]` と `{行ハイライト}` は順序を間違えると無視される**:
+  正しくは `` lang [title] {range} ``。`` lang {range} [title] `` のように逆にすると
+  `@slidev/cli` の `RE_BLOCK_INFO` 正規表現がタイトルをキャプチャせず、ファイル名タブが
+  描画されない (行ハイライトだけは効くので気付きにくい)。
+
+  ```md
+  ```ts [app.ts] {2,3}
+  const hello = 'world'
+  ```
+  ```
+
+- **headmatter に `comark: true` を追加しても `::code-group` がテキストのまま出ることがある**:
+  `comark` は markdown-it 拡張の初期化に関わる設定のため、Vite の HMR では反映されない。
+  **dev サーバーを再起動する**まで `::code-group` ブロックがタブ UI にならず、
+  生のコロン区切りテキストとして表示され続ける (中の code fence 自体は正常に動くので
+  一見動いているように見えて紛らわしい)。
