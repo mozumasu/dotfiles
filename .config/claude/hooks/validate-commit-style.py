@@ -88,7 +88,7 @@ def detect_style() -> dict | None:
     if "English subject, Japanese body" in ctx:
         lang_subject = "english"
         lang_body = "japanese"
-    elif "(Japanese)" in ctx:
+    elif "Japanese" in ctx:
         lang_subject = "japanese"
         lang_body = "japanese"
     else:  # "(English)" — fully English repo
