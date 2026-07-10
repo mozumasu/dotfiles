@@ -279,7 +279,7 @@
                         "product_id": 24926,
                         "vendor_id": 7504
                     },
-                    "ignore": false
+                    "ignore": true
                 }
             ],
             "name": "Mac Built-in (US)",
@@ -540,7 +540,7 @@
                         "product_id": 24926,
                         "vendor_id": 7504
                     },
-                    "ignore": false
+                    "ignore": true
                 }
             ],
             "name": "External Keyboard (JIS)",
