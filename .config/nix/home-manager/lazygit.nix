@@ -41,7 +41,7 @@
           description = "Open repository in browser (gh browse)";
           context = "files";
           command = "gh browse";
-          output = "terminal";
+          output = "none";
         }
         {
           key = "<c-g>";
