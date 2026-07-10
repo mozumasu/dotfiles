@@ -16,8 +16,9 @@
   targets.genericLinux.enable = true;
 
   home.packages = with pkgs; [
-    # エディタ
+    # エディタ/エージェント
     neovim
+    herdr
 
     # シェルツール
     bat
