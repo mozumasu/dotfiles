@@ -5,12 +5,14 @@
       customCommands = [
         {
           command = "czg";
+          description = "Commit with czg";
           context = "files";
           key = "c";
           output = "terminal";
         }
         {
           command = "czg ai";
+          description = "Commit with czg (AI)";
           context = "files";
           key = "C";
           output = "terminal";
@@ -41,10 +43,11 @@
           description = "Open repository in browser (gh browse)";
           context = "files";
           command = "gh browse";
-          output = "none";
+          output = "log";
         }
         {
           key = "<c-g>";
+          description = "Generate commit message with Claude (haiku) and commit";
           context = "files";
           output = "terminal";
           loadingText = "Generating commit message with AI...";
