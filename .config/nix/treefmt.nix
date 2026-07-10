@@ -26,6 +26,12 @@ in
     yamlfmt.enable = true;
   };
 
+  # sops 暗号化ファイルは整形すると MAC が壊れて復号できなくなる
+  settings.global.excludes = [
+    ".config/nix/secrets/**"
+    "secrets/**"
+  ];
+
   settings.formatter = {
     # dotfiles 全体を対象にする
     nixfmt.includes = [
