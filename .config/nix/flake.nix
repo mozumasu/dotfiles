@@ -1,5 +1,5 @@
 {
-  description = "Darwin configuration";
+  description = "Darwin & WSL configuration";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
@@ -62,6 +62,14 @@
     }:
     let
       system = "aarch64-darwin";
+
+      # WSL (robusta) 用。localOverlay は system が darwin 固定の
+      # パッケージ (gws, version-lsp 等) を含むため適用しない
+      linuxSystem = "x86_64-linux";
+      pkgsLinux = import nixpkgs {
+        system = linuxSystem;
+        config.allowUnfree = true;
+      };
 
       # Custom overlay for local packages
       localOverlay = final: prev: {
@@ -202,30 +210,47 @@
           ;
       };
 
-      apps.${system} = {
-        # nix run .#switch
-        switch = mkApp "darwin-switch" ''
-          sudo darwin-rebuild switch --flake "${flakeDir}#geisha"
-        '';
+      apps = {
+        ${system} = {
+          # nix run .#switch
+          switch = mkApp "darwin-switch" ''
+            sudo darwin-rebuild switch --flake "${flakeDir}#geisha"
+          '';
 
-        # nix run .#build
-        build = mkApp "darwin-build" ''
-          darwin-rebuild build --flake "${flakeDir}#geisha"
-        '';
+          # nix run .#build
+          build = mkApp "darwin-build" ''
+            darwin-rebuild build --flake "${flakeDir}#geisha"
+          '';
 
-        # nix run .#check
-        check = mkApp "darwin-check" ''
-          darwin-rebuild check --flake "${flakeDir}#geisha"
-        '';
+          # nix run .#check
+          check = mkApp "darwin-check" ''
+            darwin-rebuild check --flake "${flakeDir}#geisha"
+          '';
 
-        # nix run .#update
-        update = mkApp "darwin-update" ''
-          echo "Updating flake..."
-          nix flake update --flake "${flakeDir}"
-          echo "Rebuilding nix-darwin (includes home-manager)..."
-          sudo darwin-rebuild switch --flake "${flakeDir}#geisha"
-          echo "Update complete!"
-        '';
+          # nix run .#update
+          update = mkApp "darwin-update" ''
+            echo "Updating flake..."
+            nix flake update --flake "${flakeDir}"
+            echo "Rebuilding nix-darwin (includes home-manager)..."
+            sudo darwin-rebuild switch --flake "${flakeDir}#geisha"
+            echo "Update complete!"
+          '';
+        };
+
+        # robusta (WSL) 上での `nix run .#switch`
+        ${linuxSystem} = {
+          switch = {
+            type = "app";
+            program = "${
+              pkgsLinux.writeShellApplication {
+                name = "hm-switch";
+                text = ''
+                  nix run nixpkgs#home-manager -- switch --flake "${flakeDir}#robusta"
+                '';
+              }
+            }/bin/hm-switch";
+          };
+        };
       };
 
       darwinConfigurations = {
@@ -242,6 +267,15 @@
         mocha = darwin.lib.darwinSystem {
           inherit system;
           modules = [ ./hosts/mocha ] ++ commonModules;
+        };
+      };
+
+      # WSL (Ubuntu) 上で standalone home-manager として使う:
+      #   home-manager switch --flake ~/dotfiles/.config/nix#robusta
+      homeConfigurations = {
+        robusta = home-manager.lib.homeManagerConfiguration {
+          pkgs = pkgsLinux;
+          modules = [ ./hosts/robusta/home.nix ];
         };
       };
     };

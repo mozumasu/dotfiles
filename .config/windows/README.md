@@ -2,6 +2,26 @@
 
 WSL の Nix/Home Manager では管理できない Windows 本体の設定。
 適用は手動で 1 回だけ行う (レジストリは Home Manager の rollback では戻らないため、自動適用はしない方針)。
+WSL 側のユーザー環境は `home-manager switch --flake ~/dotfiles/.config/nix#robusta` で管理する。
+
+## WezTerm (nightly 必須)
+
+安定版 (20240203) には CorvusSKK 使用中にクラッシュするバグがある
+([wezterm#7157](https://github.com/wezterm/wezterm/issues/7157))。
+修正 ([PR #7529](https://github.com/wezterm/wezterm/pull/7529), 2026-06 マージ) は nightly にしか入っていないため、Windows では nightly を使う。
+
+- [GitHub の nightly タグ](https://github.com/wezterm/wezterm/releases/tag/nightly) から `WezTerm-*-setup.exe` をダウンロードして実行
+- または scoop: `scoop bucket add versions && scoop install wezterm-nightly`
+
+winget の安定版 (`winget install wez.wezterm`) は上記バグを踏むので使わない。
+
+## CorvusSKK (SKK 日本語入力)
+
+```powershell
+winget install nathancorvussolis.corvusskk
+```
+
+WSL2 で辞書サーバー (crvskkserv) に localhost で届かせたい場合はミラーモードにする。
 
 ## マウス加速カーブ (roBa トラックボール対策)
 
