@@ -15,9 +15,6 @@
       # Container runtime
       "docker"
       "colima"
-
-      # Dev tools
-      "herdr"
     ];
 
     # Common casks for all hosts (work-essential apps)

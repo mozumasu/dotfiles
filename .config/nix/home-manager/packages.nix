@@ -30,6 +30,7 @@
     neovim
     starship
     tmux
+    herdr
 
     # 開発ツール
     lua # wezterm の preview スクリプト等で使用
