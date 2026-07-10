@@ -37,6 +37,13 @@
           output = "popup";
         }
         {
+          key = "O";
+          description = "Open repository in browser (gh browse)";
+          context = "files";
+          command = "gh browse";
+          output = "terminal";
+        }
+        {
           key = "<c-g>";
           context = "files";
           output = "terminal";
