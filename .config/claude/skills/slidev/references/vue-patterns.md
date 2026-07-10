@@ -105,6 +105,16 @@ const props = defineProps({
 - ユーザー側は `layout: image-right` + `image: /foo.png` と書くだけで props に届く
 - props で受けない値は `$frontmatter` からも参照できる
 - ルート要素には `slidev-layout` クラスを付ける慣例 (テーマ基本スタイルが当たる)
+- **`title:` など Slidev 予約フィールドは props に届かない**: `title` はページタイトルとして
+  Slidev が消費するため `defineProps<{ title?: string }>` で受けても常に undefined になる
+  (DOM には `frontmatter="[object Object]"` の形で落ちる)。`frontmatter` オブジェクト経由で受ける:
+
+  ```vue
+  const props = defineProps<{ frontmatter?: { title?: string } }>()
+  const displayTitle = computed(() => props.frontmatter?.title)
+  ```
+
+  他の予約フィールド (`layout`, `class`, `transition`, `hideInToc` 等) も同様。
 
 ## コンポーネントの提供
 

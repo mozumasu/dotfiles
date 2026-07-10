@@ -190,6 +190,12 @@ my-slidev/
 テーマからアドオンに依存する場合は dependencies に `workspace:*` で参照する
 (公開後は npm 解決される)。
 
+- **local path 指定の addon は pnpm workspace で components/ を自動走査しないことがある**:
+  `addons: ['../slidev-addon-yyy']` が動かない場合、テーマ側 package.json に
+  `"slidev-addon-yyy": "workspace:*"` を dep 追加し、headmatter でも
+  `addons: [slidev-addon-yyy]` と**パッケージ名で参照**する。pnpm install 後に
+  Slidev CLI を再起動しないと反映されない (HMR 対象外)。
+
 ## 非公開 (private) での利用
 
 npm 公開は必須ではない。選択肢:

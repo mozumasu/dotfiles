@@ -59,9 +59,12 @@ layout: two-cols
 
 ## テーマ・アドオンを自作するとき
 
-詳細は @references/theme-development.md を参照。
+詳細は [references/theme-development.md](references/theme-development.md) を参照。
 レイアウト・コンポーネントの Vue 実装 ($slidev コンテキスト、frontmatter の props 受け取り、
-組み込みコンポーネント、ダークモード、UnoCSS の注意点) は @references/vue-patterns.md を参照。
+組み込みコンポーネント、ダークモード、UnoCSS の注意点) は
+[references/vue-patterns.md](references/vue-patterns.md) を参照。
+テーマ開発固有の落とし穴 (予約 frontmatter フィールド、workspace addon の解決) も
+各リファレンス内の該当セクションに記載している。
 要点:
 
 - 命名規約: `slidev-theme-*` / `slidev-addon-*`。keywords に `slidev-theme` (または `slidev-addon`) と `slidev` を入れる
@@ -93,18 +96,6 @@ layout: two-cols
   ]
   ```
 
-- **`title:` はレイアウトの props に届かない (Slidev 予約フィールド)**: `title:` はページ
-  タイトルとして Slidev が消費するため、`defineProps<{ title?: string }>` で受けても常に
-  undefined になる。フォールバック属性としては `frontmatter="[object Object]"` の形で
-  DOM に落ちる。**`frontmatter` オブジェクト経由で受ける**のが正解:
-
-  ```vue
-  const props = defineProps<{ frontmatter?: { title?: string } }>()
-  const displayTitle = computed(() => props.frontmatter?.title)
-  ```
-
-  他の予約フィールド (`layout`, `class`, `transition`, `hideInToc` 等) も同様。
-
 - **headmatter と最初のスライド frontmatter を別ブロックにすると空スライドが混入する**:
 
   ```md
@@ -135,12 +126,6 @@ layout: two-cols
   `<FindyKeyValue label="..."> **太字** </FindyKeyValue>` は literal `**太字**` として
   表示される。**HTML の `<strong>` を直接書く**か、スロット内容の前後に空行を入れて
   ブロックとして評価させる。
-
-- **local path 指定の addon は pnpm workspace で components/ を自動走査しないことがある**:
-  `addons: ['../slidev-addon-foo']` が動かない場合、テーマ側 package.json に
-  `"slidev-addon-foo": "workspace:*"` を dep 追加し、headmatter でも
-  `addons: [slidev-addon-foo]` と**パッケージ名で参照**する。pnpm install 後に
-  Slidev CLI を再起動しないと反映されない (HMR 対象外)。
 
 - **rumdl 除外を作った後は `.rumdl.toml` の場所に注意**: hook は編集対象ファイルから見て
   カレントディレクトリ順に config を探す。モノレポ root に置けば全パッケージに効くが、
