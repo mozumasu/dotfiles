@@ -1,6 +1,9 @@
 ---
 name: git-commit
-description: Stage meaningful diffs and create commits with WHY-focused messages. Use when agent needs to commit code changes.
+description: >
+  Stage meaningful diffs and create commits with WHY-focused messages.
+  「コミットして」「変更をコミットして」「commit these changes」などのリクエスト、
+  またはエージェントが作業成果をコミットする必要があるときに使用する。
 ---
 
 ## DISCIPLINE
