@@ -33,7 +33,7 @@ open_notification_target = "prefix+o"
 # workspace
 workspace_picker = "prefix+w"
 goto = "prefix+g"
-new_workspace = "" # default prefix+shift+n
+new_workspace = "prefix+shift+n" # default prefix+shift+n
 rename_workspace = "prefix+shift+w"
 close_workspace = "prefix+shift+d"
 previous_workspace = "prefix+p"
@@ -103,7 +103,7 @@ type = "pane"
 command = "lazygit"
 
 [[keys.command]]
-key = "prefix+shift+n"
+key = "prefix+shift+v"
 type = "pane"
 command = "nvim"
 
