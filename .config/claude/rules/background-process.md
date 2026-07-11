@@ -3,6 +3,8 @@
 - **MUST**: バックグラウンドでプロセスを実行するときは Bash ツールの
   `run_in_background` ではなく [ghost](https://github.com/skanehira/ghost) を使う。
 - **MUST**: 起動前に `ghost list` で同じコマンドが実行中でないか確認し、多重起動しない。
+- **MUST**: シェル演算子でのバックグラウンド化 (`cmd &` / `nohup` / `setsid` / `disown`) も使わない
+  (PreToolUse hook が deny する)。
 
 ## 使い分け
 

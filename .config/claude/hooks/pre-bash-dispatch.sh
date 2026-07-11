@@ -65,6 +65,11 @@ if echo "$COMMAND" | grep -qE '(^|[;&|] *)(terraform|terragrunt)\b'; then
   run_check python3 ~/.config/claude/hooks/terraform-hook.py
 fi
 
+# & / nohup / setsid / disown を含むコマンドのみバックグラウンド化チェックを実行
+if echo "$COMMAND" | grep -qE '&|(^|[;|(] *)(nohup|setsid|disown)\b'; then
+  run_check ~/.config/claude/hooks/prevent-shell-background.sh
+fi
+
 # 集約された hint をまとめて 1 件の hookSpecificOutput として出力
 if [ "${#HINTS[@]}" -gt 0 ]; then
   joined=$(printf '%s\n\n' "${HINTS[@]}")
