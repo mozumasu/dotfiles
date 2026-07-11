@@ -136,6 +136,20 @@ def find_compose_file(project_root: str) -> Optional[str]:
     return None
 
 
+def is_docker_daemon_running() -> bool:
+    """docker デーモンに到達できるかを確認する"""
+    try:
+        result = subprocess.run(
+            ["docker", "info", "--format", "{{.ServerVersion}}"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        return result.returncode == 0
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return False
+
+
 def find_terraform_service(compose_file: str) -> str:
     """compose ファイルから terraform/terragrunt サービス名を取得"""
     try:
@@ -184,6 +198,9 @@ def route_to_docker(part: str, tokens: list[str]) -> None:
     compose_file = find_compose_file(project_root)
     if compose_file is None:
         return  # compose ファイルなし → ローカル実行
+
+    if not is_docker_daemon_running():
+        return  # docker デーモン停止中 → ローカル実行
 
     service = find_terraform_service(compose_file)
     container_base = get_container_base(compose_file, project_root, service)
