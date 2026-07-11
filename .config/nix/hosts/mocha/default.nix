@@ -18,6 +18,10 @@
   networking.hostName = config.hostSpec.hostName;
   system.primaryUser = config.hostSpec.username;
 
+  # fish (PATH 等の環境変数セットアップと /etc/shells への登録込み)
+  programs.fish.enable = true;
+  environment.shells = [ pkgs.fish ];
+
   # User configuration
   users.users.${config.hostSpec.username} = {
     name = config.hostSpec.username;
