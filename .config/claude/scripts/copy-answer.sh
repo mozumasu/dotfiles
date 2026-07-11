@@ -4,30 +4,63 @@
 # save-answer.sh のクリップボード版。本文はモデルに再生成させないので
 # ハルシネーション（内容の改変）は発生しない。
 #
-# Usage: copy-answer.sh [-c <count>] [-t]
+# Usage: copy-answer.sh [count] [-c <count> | -n <nth>] [-t] [-b] [-o <path>]
+#   count       -c の省略形。裸の数値 1 つを直近件数として扱う (例: copy-answer.sh 10)
 #   -c <count>  直近いくつの回答をコピーするか (default: 1)
 #               2 以上なら時系列順（古い→新しい）で "---" 区切り。
+#   -n <nth>    N 番目前の回答を 1 件だけコピー (1 = 最新)。-c と排他。
+#               範囲外（回答数より大きい N）はエラー。
 #   -t          先頭にタイトル行（`# <title> - <日時>`）を付ける
+#   -b          コードブロック（``` フェンス内）のみ抽出する
+#   -o <path>   クリップボードの代わりにファイルへ書き出す
 set -euo pipefail
 
 COUNT=1
+NTH=0
 WITH_TITLE=0
-while getopts ":c:t" opt; do
+CODE_ONLY=0
+OUT_FILE=""
+COUNT_SET=0
+
+# 裸の数値 1 つを先頭で受け付ける (-c の省略形)
+if [ "$#" -gt 0 ]; then
+  case "$1" in
+    *[!0-9]*|'') ;;
+    *) COUNT="$1"; COUNT_SET=1; shift ;;
+  esac
+fi
+
+while getopts ":c:n:o:tb" opt; do
   case "$opt" in
-    c) COUNT="$OPTARG" ;;
+    c) [ "$COUNT_SET" -eq 0 ] || { echo "copy-answer: 件数が重複指定されています" >&2; exit 1; }
+       COUNT="$OPTARG"; COUNT_SET=1 ;;
+    n) NTH="$OPTARG" ;;
+    o) OUT_FILE="$OPTARG" ;;
     t) WITH_TITLE=1 ;;
+    b) CODE_ONLY=1 ;;
     :) echo "copy-answer: オプション -$OPTARG には引数が必要です" >&2; exit 1 ;;
     \?) echo "copy-answer: 不明なオプション -$OPTARG" >&2; exit 1 ;;
   esac
 done
 
+shift $((OPTIND - 1))
+[ "$#" -eq 0 ] || { echo "copy-answer: 不明な引数です: $*" >&2; exit 1; }
+
 case "$COUNT" in
   ''|*[!0-9]*) echo "copy-answer: -c には正の整数を指定してください: $COUNT" >&2; exit 1 ;;
 esac
 [ "$COUNT" -ge 1 ] || { echo "copy-answer: -c には 1 以上を指定してください: $COUNT" >&2; exit 1; }
+case "$NTH" in
+  *[!0-9]*) echo "copy-answer: -n には正の整数を指定してください: $NTH" >&2; exit 1 ;;
+esac
+if [ "$NTH" -gt 0 ] && [ "$COUNT_SET" -eq 1 ]; then
+  echo "copy-answer: -n と -c は同時に指定できません" >&2; exit 1
+fi
 
 command -v jq >/dev/null || { echo "copy-answer: jq が見つかりません" >&2; exit 1; }
-command -v pbcopy >/dev/null || { echo "copy-answer: pbcopy が見つかりません（macOS 専用）" >&2; exit 1; }
+if [ -z "$OUT_FILE" ]; then
+  command -v pbcopy >/dev/null || { echo "copy-answer: pbcopy が見つかりません（macOS 専用）" >&2; exit 1; }
+fi
 
 CFG="${CLAUDE_CONFIG_DIR:-$HOME/.config/claude}"
 encoded="$(printf '%s' "$PWD" | perl -pe 's![/.]!-!g')"
@@ -48,7 +81,7 @@ fi
 [ "${#files[@]}" -gt 0 ] || {
   echo "copy-answer: 現在セッションのトランスクリプトが見つかりません" >&2; exit 1; }
 
-data="$(jq -rs --argjson n "$COUNT" '
+data="$(jq -rs --argjson n "$COUNT" --argjson nth "$NTH" '
   [ .[] | select(.type=="assistant"
         and (.message.content | type == "array")
         and (any(.message.content[]; .type == "text")))
@@ -57,20 +90,47 @@ data="$(jq -rs --argjson n "$COUNT" '
   | map(select(.text | test("is currently unavailable\\. Learn more:") | not))
   | map(select((.text | gsub("\\s"; "") | length) > 0))
   | sort_by(.ts)
-  | (if length > $n then .[length - $n:] else . end) as $sel
-  | { nsaved: ($sel | length),
+  | length as $total
+  | (if $nth > 0 then
+       (if $nth > $total then [] else [.[$total - $nth]] end)
+     elif length > $n then .[length - $n:]
+     else . end) as $sel
+  | { total:  $total,
+      nsaved: ($sel | length),
       body:   ($sel | map(.text) | join("\n\n---\n\n")),
       latest: ($sel | if length == 0 then "" else .[-1].text end) }
   | @json
 ' "${files[@]}")"
 
+total="$(printf '%s' "$data" | jq -r '.total')"
 nsaved="$(printf '%s' "$data" | jq -r '.nsaved')"
 body="$(printf '%s' "$data" | jq -r '.body')"
 latest="$(printf '%s' "$data" | jq -r '.latest')"
 
+if [ "$NTH" -gt 0 ] && [ "$NTH" -gt "$total" ]; then
+  echo "copy-answer: -n $NTH は範囲外です（このセッションの回答は ${total} 件）" >&2
+  exit 1
+fi
+
 if [ -z "${body//[$'\n\t ']/}" ]; then
   echo "copy-answer: 直前の回答を抽出できませんでした（コピーを中止しました）" >&2
   exit 1
+fi
+
+if [ "$CODE_ONLY" -eq 1 ]; then
+  body="$(printf '%s\n' "$body" | perl -ne '
+    if (/^\s*(`{3,}|~{3,})/) {
+      if ($in) { $in = 0; push @blocks, $buf; $buf = "" }
+      else { $in = 1 }
+      next;
+    }
+    $buf .= $_ if $in;
+    END { print join("\n", @blocks) }
+  ')"
+  if [ -z "${body//[$'\n\t ']/}" ]; then
+    echo "copy-answer: 対象の回答にコードブロックが見つかりませんでした" >&2
+    exit 1
+  fi
 fi
 
 if [ "$WITH_TITLE" -eq 1 ]; then
@@ -85,6 +145,11 @@ else
   out="$body"
 fi
 
-printf '%s' "$out" | pbcopy
 bytes="$(printf '%s' "$out" | wc -c | tr -d ' ')"
-echo "クリップボードにコピーしました: ${nsaved}件 / ${bytes} bytes"
+if [ -n "$OUT_FILE" ]; then
+  printf '%s' "$out" > "$OUT_FILE"
+  echo "ファイルに書き出しました: ${OUT_FILE} / ${nsaved}件 / ${bytes} bytes"
+else
+  printf '%s' "$out" | pbcopy
+  echo "クリップボードにコピーしました: ${nsaved}件 / ${bytes} bytes"
+fi
