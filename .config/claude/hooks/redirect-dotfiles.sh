@@ -33,6 +33,15 @@ if [[ "$EXPANDED" == "$HOME/.claude/"* ]] || [[ "$EXPANDED" == "$HOME/.config/cl
     RELATIVE="${EXPANDED#$HOME/.config/claude/}"
   fi
 
+  # dotfiles にシンボリックリンクされる項目 (claude-code.nix の activation リスト) と
+  # Nix 生成の settings.json だけが誘導対象。projects/ (memory) や .claude.json 等の
+  # ランタイム領域は Claude Code 本体が直接書くため許可する
+  TOP="${RELATIVE%%/*}"
+  case "$TOP" in
+    CLAUDE.md|rules|hooks|scripts|skills|plugins|commands|agents|keybindings.json|settings.json) ;;
+    *) exit 0 ;;
+  esac
+
   # settings.json は Nix 管理なので claude-code.nix に誘導
   if [[ "$RELATIVE" == "settings.json" ]]; then
     cat <<EOF
