@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # copy-answer.sh — 直前の AI 回答をセッションのトランスクリプト(JSONL)から
 # 機械抽出してクリップボードにコピーする。
-# save-answer.sh のクリップボード版。本文はモデルに再生成させないので
+# 本文はモデルに再生成させないので
 # ハルシネーション（内容の改変）は発生しない。
 #
 # Usage: copy-answer.sh [nth] [-c <count> | -n <nth>] [-t] [-b] [-o <path>] [-nb <notebook>]
