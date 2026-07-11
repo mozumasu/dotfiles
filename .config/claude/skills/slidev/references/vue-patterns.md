@@ -81,23 +81,30 @@ export default defineShortcutsSetup((nav, baseShortcuts) => [
 ## レイアウトで frontmatter を受け取る
 
 スライドの frontmatter の値は props としてレイアウトに渡される。
-公式レイアウトも `defineProps` で受けている:
+Slidev 52.x は Vue 3.5+ を同梱するため、type-based 宣言 + Reactive Props Destructure で書く
+(vue-conventions スキル準拠)。`background:` は `@slidev/client/layoutHelper.ts` の
+`handleBackground` で style に変換するのが公式レイアウトと同じやり方
+(import は `.ts` 拡張子付きが公式テーマの形):
 
 ```vue
 <!-- layouts/image-right.vue 相当 -->
 <script setup lang="ts">
+import { handleBackground } from '@slidev/client/layoutHelper.ts'
 import { computed } from 'vue'
 
-const props = defineProps({
-  image: { type: String },
-  backgroundSize: { type: String, default: 'cover' },
-})
+const { background, image, backgroundSize = 'cover' } = defineProps<{
+  background?: string
+  image?: string
+  backgroundSize?: string
+}>()
+
+const style = computed(() => handleBackground(background))
 </script>
 
 <template>
-  <div class="grid grid-cols-2 w-full h-full">
+  <div class="grid grid-cols-2 w-full h-full" :style="style">
     <div class="slidev-layout default"><slot /></div>
-    <div class="w-full h-full" :style="{ backgroundImage: `url(${props.image})` }" />
+    <div class="w-full h-full" :style="{ backgroundImage: `url(${image})`, backgroundSize }" />
   </div>
 </template>
 ```
@@ -110,8 +117,8 @@ const props = defineProps({
   (DOM には `frontmatter="[object Object]"` の形で落ちる)。`frontmatter` オブジェクト経由で受ける:
 
   ```vue
-  const props = defineProps<{ frontmatter?: { title?: string } }>()
-  const displayTitle = computed(() => props.frontmatter?.title)
+  const { frontmatter } = defineProps<{ frontmatter?: { title?: string } }>()
+  const displayTitle = computed(() => frontmatter?.title)
   ```
 
   他の予約フィールド (`layout`, `class`, `transition`, `hideInToc` 等) も同様。
@@ -120,6 +127,10 @@ const props = defineProps({
 
 `components/*.{vue,ts,tsx,md}` に置くと import 不要でスライドから `<MyComponent />` と
 使える (unplugin-vue-components)。テーマ・アドオンも同じ規約で提供する。
+
+- **属性で渡した文字列内の `\n` はエスケープ解釈されず、リテラルの「バックスラッシュ + n」で届く**
+  (`<FindySwatch usage="用途A\n用途B" />` など)。コンポーネント側で改行として扱うなら
+  `str.split(/\\n|\n/)` のように両方を受けて行配列にし、`v-for` で描画する (`v-html` は使わない)。
 
 ## テーマ開発で再利用しやすい組み込みコンポーネント
 
