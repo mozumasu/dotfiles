@@ -95,5 +95,6 @@
     "docker-desktop"
     "jordanbaird-ice"
     "kaku"
+    "multipass"
   ];
 }
