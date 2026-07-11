@@ -34,6 +34,8 @@ let
         "mcp__terraform-mcp-server"
       ];
       deny = [
+        # バックグラウンド実行は ghost を使う (rules/background-process.md)
+        "Bash(run_in_background:true)"
         "Bash(git push:*)"
         "Bash(rm -rf:*)"
         "Bash(sudo:*)"
