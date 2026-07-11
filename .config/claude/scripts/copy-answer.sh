@@ -4,7 +4,7 @@
 # save-answer.sh のクリップボード版。本文はモデルに再生成させないので
 # ハルシネーション（内容の改変）は発生しない。
 #
-# Usage: copy-answer.sh [nth] [-c <count> | -n <nth>] [-t] [-b] [-o <path>]
+# Usage: copy-answer.sh [nth] [-c <count> | -n <nth>] [-t] [-b] [-o <path>] [-nb <notebook>]
 #   nth         -n の省略形。ビルトイン /copy N と同じく N 番目前の回答を
 #               1 件コピーする (例: copy-answer.sh 2)
 #   -c <count>  直近いくつの回答をコピーするか (default: 1)
@@ -16,6 +16,8 @@
 #   -l          コードブロックの一覧を表示するだけ（コピーしない）
 #   -B <k>      k 番目のコードブロックのみコピーする (1 始まり)
 #   -o <path>   クリップボードの代わりにファイルへ書き出す
+#   -nb <notebook>  クリップボードの代わりに nb のノートとして保存する（--nb も可）。
+#               タイトル自動生成 + `#answer-log` タグ付き。-o / -l と排他
 set -euo pipefail
 
 COUNT=1
@@ -24,6 +26,19 @@ WITH_TITLE=0
 CODE_ONLY=0
 OUT_FILE=""
 COUNT_SET=0
+NB_NOTEBOOK=""
+
+# -nb/--nb は getopts (1 文字オプションのみ) で扱えないため先に取り出す
+args=()
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -nb|--nb)
+      [ "$#" -ge 2 ] || { echo "copy-answer: -nb には notebook 名が必要です" >&2; exit 1; }
+      NB_NOTEBOOK="$2"; shift 2 ;;
+    *) args+=("$1"); shift ;;
+  esac
+done
+set -- ${args[@]+"${args[@]}"}
 
 # 裸の数値 1 つを先頭で受け付ける (-n の省略形。ビルトイン /copy N と同じ挙動)
 NTH_SET=0
@@ -77,9 +92,15 @@ fi
 if [ "$NTH" -gt 0 ] && [ "$COUNT_SET" -eq 1 ]; then
   echo "copy-answer: -n と -c は同時に指定できません" >&2; exit 1
 fi
+if [ -n "$NB_NOTEBOOK" ]; then
+  [ -z "$OUT_FILE" ] || { echo "copy-answer: -nb と -o は同時に指定できません" >&2; exit 1; }
+  [ "$LIST_BLOCKS" -eq 0 ] || { echo "copy-answer: -nb と -l は同時に指定できません" >&2; exit 1; }
+fi
 
 command -v jq >/dev/null || { echo "copy-answer: jq が見つかりません" >&2; exit 1; }
-if [ -z "$OUT_FILE" ]; then
+if [ -n "$NB_NOTEBOOK" ]; then
+  command -v nb >/dev/null || { echo "copy-answer: nb が見つかりません" >&2; exit 1; }
+elif [ -z "$OUT_FILE" ]; then
   command -v pbcopy >/dev/null || { echo "copy-answer: pbcopy が見つかりません（macOS 専用）" >&2; exit 1; }
 fi
 
@@ -188,12 +209,27 @@ if [ "$CODE_ONLY" -eq 1 ]; then
   fi
 fi
 
-if [ "$WITH_TITLE" -eq 1 ]; then
+gen_title() {
   TITLE="$(printf '%s\n' "$latest" | grep -m1 -E '^#{1,4} ' \
             | perl -pe 's/^#{1,4}\s*//; s/\s+$//' || true)"
   [ -n "$TITLE" ] || \
     TITLE="$(printf '%s\n' "$latest" | grep -m1 -E '\S' | cut -c1-50)"
-  [ "$nsaved" -gt 1 ] && TITLE="${TITLE}（直近${nsaved}件）"
+  if [ "$nsaved" -gt 1 ]; then TITLE="${TITLE}（直近${nsaved}件）"; fi
+  printf '%s' "$TITLE"
+}
+
+if [ -n "$NB_NOTEBOOK" ]; then
+  TITLE="$(gen_title)"
+  ts="$(date +%Y%m%d%H%M%S)"
+  disp="$(date '+%Y-%m-%d %H:%M:%S')"
+  note="$(printf '# %s - %s\n\n`#answer-log`\n\n%s\n' "$TITLE" "$disp" "$body")"
+  nb "${NB_NOTEBOOK}:add" --filename "${ts}.md" --content "$note" >/dev/null
+  echo "nb に保存しました: ${NB_NOTEBOOK}:${ts}.md 「${TITLE}」（${nsaved}件）"
+  exit 0
+fi
+
+if [ "$WITH_TITLE" -eq 1 ]; then
+  TITLE="$(gen_title)"
   disp="$(date '+%Y-%m-%d %H:%M:%S')"
   out="$(printf '# %s - %s\n\n%s\n' "$TITLE" "$disp" "$body")"
 else
