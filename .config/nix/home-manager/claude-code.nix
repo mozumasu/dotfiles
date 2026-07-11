@@ -118,16 +118,7 @@ let
           hooks = [
             {
               type = "command";
-              command = "~/.config/claude/hooks/prevent-deprecated-tf-providers.sh";
-            }
-          ];
-        }
-        {
-          matcher = "Write|Edit|MultiEdit";
-          hooks = [
-            {
-              type = "command";
-              command = "~/.config/claude/hooks/redirect-dotfiles.sh";
+              command = "~/.config/claude/hooks/pre-write-dispatch.sh";
             }
           ];
         }
