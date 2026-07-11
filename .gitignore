@@ -93,6 +93,13 @@ zenn-cli.json
 .config/claude/telemetry/
 .config/claude/backups/
 .config/claude/sessions/
+# settings.json は claude-code.nix の publicSettings から生成される (dotfiles 直下には置かない)
+.config/claude/settings.json
+.config/claude/policy-limits.json
+.config/claude/session-env/
+.config/claude/usage-data/
+.config/claude/.rumdl_cache/
+.config/claude/*.backup/
 plans/
 .config/karabiner/scripts/*.log
 .config/karabiner/scripts/.last_process_time
