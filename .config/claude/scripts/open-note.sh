@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # open-note.sh — 保存済みの nb ノートを新しい WezTerm タブで開く（保存はしない）。
-# save-answer / save-session の保存と「新タブで開く」を分離して使うためのコマンド。
+# save-answer の保存と「新タブで開く」を分離して使うためのコマンド。
 #
 # Usage: open-note.sh [-n <notebook>] [<target>]
 #   -n <notebook>  対象 notebook (default: log)

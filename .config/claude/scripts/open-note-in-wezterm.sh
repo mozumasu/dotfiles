@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # open-note-in-wezterm.sh — 指定ファイルを新しい WezTerm タブで開く。
-# save-answer.sh / save-session.sh の -o/--open から呼ばれる共有ヘルパー。
+# save-answer.sh の -o/--open から呼ばれる共有ヘルパー。
 #
 # Usage: open-note-in-wezterm.sh <file>
 #
