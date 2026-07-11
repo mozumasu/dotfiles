@@ -13,6 +13,8 @@
 #               範囲外（回答数より大きい N）はエラー。
 #   -t          先頭にタイトル行（`# <title> - <日時>`）を付ける
 #   -b          コードブロック（``` フェンス内）のみ抽出する
+#   -l          コードブロックの一覧を表示するだけ（コピーしない）
+#   -B <k>      k 番目のコードブロックのみコピーする (1 始まり)
 #   -o <path>   クリップボードの代わりにファイルへ書き出す
 set -euo pipefail
 
@@ -32,7 +34,9 @@ if [ "$#" -gt 0 ]; then
   esac
 fi
 
-while getopts ":c:n:o:tb" opt; do
+LIST_BLOCKS=0
+BLOCK_N=0
+while getopts ":c:n:o:B:tbl" opt; do
   case "$opt" in
     c) [ "$COUNT_SET" -eq 0 ] || { echo "copy-answer: 件数が重複指定されています" >&2; exit 1; }
        COUNT="$OPTARG"; COUNT_SET=1 ;;
@@ -41,6 +45,8 @@ while getopts ":c:n:o:tb" opt; do
     o) OUT_FILE="$OPTARG" ;;
     t) WITH_TITLE=1 ;;
     b) CODE_ONLY=1 ;;
+    l) LIST_BLOCKS=1 ;;
+    B) BLOCK_N="$OPTARG" ;;
     :) echo "copy-answer: オプション -$OPTARG には引数が必要です" >&2; exit 1 ;;
     \?) echo "copy-answer: 不明なオプション -$OPTARG" >&2; exit 1 ;;
   esac
@@ -58,6 +64,15 @@ case "$NTH" in
 esac
 if [ "$NTH_SET" -eq 1 ] && [ "$NTH" -lt 1 ]; then
   echo "copy-answer: N には 1 以上を指定してください: $NTH" >&2; exit 1
+fi
+case "$BLOCK_N" in
+  *[!0-9]*) echo "copy-answer: -B には正の整数を指定してください: $BLOCK_N" >&2; exit 1 ;;
+esac
+if [ "$BLOCK_N" -gt 0 ] && [ "$CODE_ONLY" -eq 1 ]; then
+  echo "copy-answer: -B と -b は同時に指定できません" >&2; exit 1
+fi
+if [ "$LIST_BLOCKS" -eq 1 ] && { [ "$BLOCK_N" -gt 0 ] || [ "$CODE_ONLY" -eq 1 ]; }; then
+  echo "copy-answer: -l は -B / -b と同時に指定できません" >&2; exit 1
 fi
 if [ "$NTH" -gt 0 ] && [ "$COUNT_SET" -eq 1 ]; then
   echo "copy-answer: -n と -c は同時に指定できません" >&2; exit 1
@@ -121,6 +136,40 @@ fi
 if [ -z "${body//[$'\n\t ']/}" ]; then
   echo "copy-answer: 直前の回答を抽出できませんでした（コピーを中止しました）" >&2
   exit 1
+fi
+
+if [ "$LIST_BLOCKS" -eq 1 ]; then
+  list="$(printf '%s\n' "$body" | perl -CSD -Mutf8 -ne '
+    if (/^\s*(?:`{3,}|~{3,})\s*(\S*)/) {
+      if ($in) { $in = 0;
+        printf "%d) [%s] %d行: %s\n", $i, ($lang eq "" ? "text" : $lang), $cnt, $first;
+      } else { $in = 1; $i++; $lang = $1; $cnt = 0; $first = "" }
+      next;
+    }
+    if ($in) { $cnt++;
+      if ($first eq "") { ($first = $_) =~ s/\s+$//; $first = substr($first, 0, 60) }
+    }
+  ')"
+  if [ -z "$list" ]; then
+    echo "copy-answer: 対象の回答にコードブロックが見つかりませんでした" >&2
+    exit 1
+  fi
+  printf '%s\n' "$list"
+  exit 0
+fi
+
+if [ "$BLOCK_N" -gt 0 ]; then
+  body="$(printf '%s\n' "$body" | K="$BLOCK_N" perl -ne '
+    if (/^\s*(?:`{3,}|~{3,})/) {
+      if ($in) { $in = 0 } else { $in = 1; $i++ }
+      next;
+    }
+    print if $in && $i == $ENV{K};
+  ')"
+  if [ -z "${body//[$'\n\t ']/}" ]; then
+    echo "copy-answer: -B $BLOCK_N は範囲外です（コードブロック数を -l で確認できます）" >&2
+    exit 1
+  fi
 fi
 
 if [ "$CODE_ONLY" -eq 1 ]; then
