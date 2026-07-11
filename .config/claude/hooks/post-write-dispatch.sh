@@ -20,10 +20,10 @@ case "$FILE_PATH" in
     command -v rumdl >/dev/null 2>&1 && rumdl fmt "$FILE_PATH"
     ;;
   *.nix)
-    echo "$INPUT" | ~/.config/claude/scripts/format-nix.sh
+    echo "$INPUT" | ~/.config/claude/hooks/format-nix.sh
     ;;
   *.tf|*.tfvars|*.tfvars.json)
-    echo "$INPUT" | python3 ~/.config/claude/scripts/terraform-post-hook.py
+    echo "$INPUT" | python3 ~/.config/claude/hooks/terraform-post-hook.py
     ;;
 esac
 

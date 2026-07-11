@@ -62,7 +62,7 @@ fi
 # terraform / terragrunt コマンドのみ apply チェックと Docker ルーティングを実行
 # コマンドとしての terraform にのみマッチ（ファイルパス中の terraform.tf 等は除外）
 if echo "$COMMAND" | grep -qE '(^|[;&|] *)(terraform|terragrunt)\b'; then
-  run_check python3 ~/.config/claude/scripts/terraform-hook.py
+  run_check python3 ~/.config/claude/hooks/terraform-hook.py
 fi
 
 # 集約された hint をまとめて 1 件の hookSpecificOutput として出力
