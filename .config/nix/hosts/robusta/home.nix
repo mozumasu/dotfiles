@@ -18,7 +18,7 @@
   home.packages = with pkgs; [
     # エディタ/エージェント
     neovim
-    herdr
+    # herdr # あとから導入する
 
     # シェルツール
     bat
