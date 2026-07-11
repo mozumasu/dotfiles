@@ -4,8 +4,9 @@
 # save-answer.sh のクリップボード版。本文はモデルに再生成させないので
 # ハルシネーション（内容の改変）は発生しない。
 #
-# Usage: copy-answer.sh [count] [-c <count> | -n <nth>] [-t] [-b] [-o <path>]
-#   count       -c の省略形。裸の数値 1 つを直近件数として扱う (例: copy-answer.sh 10)
+# Usage: copy-answer.sh [nth] [-c <count> | -n <nth>] [-t] [-b] [-o <path>]
+#   nth         -n の省略形。ビルトイン /copy N と同じく N 番目前の回答を
+#               1 件コピーする (例: copy-answer.sh 2)
 #   -c <count>  直近いくつの回答をコピーするか (default: 1)
 #               2 以上なら時系列順（古い→新しい）で "---" 区切り。
 #   -n <nth>    N 番目前の回答を 1 件だけコピー (1 = 最新)。-c と排他。
@@ -22,11 +23,12 @@ CODE_ONLY=0
 OUT_FILE=""
 COUNT_SET=0
 
-# 裸の数値 1 つを先頭で受け付ける (-c の省略形)
+# 裸の数値 1 つを先頭で受け付ける (-n の省略形。ビルトイン /copy N と同じ挙動)
+NTH_SET=0
 if [ "$#" -gt 0 ]; then
   case "$1" in
     *[!0-9]*|'') ;;
-    *) COUNT="$1"; COUNT_SET=1; shift ;;
+    *) NTH="$1"; NTH_SET=1; shift ;;
   esac
 fi
 
@@ -34,7 +36,8 @@ while getopts ":c:n:o:tb" opt; do
   case "$opt" in
     c) [ "$COUNT_SET" -eq 0 ] || { echo "copy-answer: 件数が重複指定されています" >&2; exit 1; }
        COUNT="$OPTARG"; COUNT_SET=1 ;;
-    n) NTH="$OPTARG" ;;
+    n) [ "$NTH_SET" -eq 0 ] || { echo "copy-answer: N が重複指定されています" >&2; exit 1; }
+       NTH="$OPTARG"; NTH_SET=1 ;;
     o) OUT_FILE="$OPTARG" ;;
     t) WITH_TITLE=1 ;;
     b) CODE_ONLY=1 ;;
@@ -53,6 +56,9 @@ esac
 case "$NTH" in
   *[!0-9]*) echo "copy-answer: -n には正の整数を指定してください: $NTH" >&2; exit 1 ;;
 esac
+if [ "$NTH_SET" -eq 1 ] && [ "$NTH" -lt 1 ]; then
+  echo "copy-answer: N には 1 以上を指定してください: $NTH" >&2; exit 1
+fi
 if [ "$NTH" -gt 0 ] && [ "$COUNT_SET" -eq 1 ]; then
   echo "copy-answer: -n と -c は同時に指定できません" >&2; exit 1
 fi
