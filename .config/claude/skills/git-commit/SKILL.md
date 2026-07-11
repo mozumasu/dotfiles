@@ -7,7 +7,7 @@ description: Stage meaningful diffs and create commits with WHY-focused messages
 
 - pre-commit設定時は検査が通る状態でコミット (バイパス禁止)
 - 意味のある最小単位でコミット
-    - `git status --short --untracked-files` で確認し **`--untracked-files=no` を使わない**
+  - `git status --short --untracked-files` で確認し **`--untracked-files=no` を使わない**
 - メッセージが複数の意味を示す時は分割
 - レビュー対応を「レビュー修正」等で1コミットに纏めない。各修正を個別の意味単位でコミットする
 - コミットメッセージのprefixはcommitlint.config.cjsファイルが存在するプロジェクトではこのルールに従うこと
@@ -16,3 +16,9 @@ description: Stage meaningful diffs and create commits with WHY-focused messages
   2. すべてのコンパイラ/リンタ警告が解決されていること
   3. 変更内容が論理的に一貫した作業単位であること
   4. コミットメッセージに、構造的変更か動作的変更のいずれが含まれているかを明確に記載すること
+
+## MESSAGE
+
+- コードは HOW、テストは WHAT、コミットログは **WHY** を語る
+- 本文には diff の言い換えではなく「なぜ必要だったか」「なぜこの方法を選んだか」を書く
+- 1つのファイルに複数の論理変更がある場合は `git add -p` で部分ステージする
