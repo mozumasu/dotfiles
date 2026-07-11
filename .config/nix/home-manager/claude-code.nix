@@ -16,7 +16,7 @@ let
       # sops の claude-otel-env シークレットから activation 時にマージされる
     };
     includeCoAuthoredBy = true;
-    model = "sonnet";
+    model = "claude-fable-5[1m]";
     tui = "fullscreen";
     permissions = {
       allow = [
@@ -30,13 +30,8 @@ let
         "Bash(diff:*)"
         "Bash(jq:*)"
         "mcp__context7"
-        "mcp__chrome-devtools"
-        "mcp__serena"
-        "mcp__gemini-cli"
-        "mcp__aws-cdk-mcp-server"
-        "mcp__aws-documentation-mcp-server"
-        "mcp__playwright"
-        "mcp__mcp-google-sheets"
+        "mcp__findy-ai-plus"
+        "mcp__terraform-mcp-server"
       ];
       deny = [
         "Bash(git push:*)"
