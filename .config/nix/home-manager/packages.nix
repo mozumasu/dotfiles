@@ -44,6 +44,7 @@
     playwright-cli
     go # for gopls etc.
     rustup # for building sniprun.nvim, etc.
+    portless # dev サーバーのポート自動割り当て
 
     # ビルドツール
     cmake

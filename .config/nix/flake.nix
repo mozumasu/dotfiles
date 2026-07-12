@@ -79,6 +79,7 @@
         czg = final.callPackage ./packages/czg.nix { };
         gogcli = final.callPackage ./packages/gogcli.nix { };
         ccplan = final.callPackage ./packages/ccplan.nix { };
+        portless = final.callPackage ./packages/portless.nix { };
         gcx = final.callPackage ./packages/gcx.nix { };
         pup = final.callPackage ./packages/pup.nix { };
         shishoctl = final.callPackage ./packages/shishoctl.nix { };
