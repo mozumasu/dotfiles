@@ -26,6 +26,7 @@
       ignoreAllDups = true;
       ignoreSpace = true;
       share = true;
+      saveNoDups = true;
       expireDuplicatesFirst = true;
     };
 

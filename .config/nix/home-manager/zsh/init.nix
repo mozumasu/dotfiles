@@ -117,16 +117,11 @@
       # Options
       # ----------------------------------------------------
       setopt correct
-      setopt EXTENDED_HISTORY
+      # history: extended/share/ignore_dups 系は programs.zsh.history で設定済み
       setopt hist_verify
-      setopt hist_ignore_dups
-      setopt hist_ignore_all_dups
-      setopt hist_ignore_space
       setopt hist_no_store
       setopt hist_reduce_blanks
-      setopt hist_save_no_dups
       setopt hist_expand
-      setopt inc_append_history
       setopt auto_cd
       setopt auto_pushd
       setopt pushd_ignore_dups
