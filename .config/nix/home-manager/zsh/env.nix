@@ -42,7 +42,6 @@
 
     # Go
     export GOPATH="$XDG_DATA_HOME/go"
-    export GO111MODULE="on"
     export PATH=$XDG_DATA_HOME/go/bin:$PATH
 
     # Rust
