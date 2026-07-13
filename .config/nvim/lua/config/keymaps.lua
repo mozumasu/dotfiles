@@ -46,7 +46,7 @@ keymap("n", "<C-w><down>", "<C-w>-")
 
 -- Diagnostics
 keymap("n", "<C-j>", function()
-  vim.diagnostic.goto_next()
+  vim.diagnostic.jump({ count = 1 })
 end, opts)
 
 -- lazydocker
