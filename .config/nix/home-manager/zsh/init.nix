@@ -87,19 +87,6 @@
       fi
 
       # ----------------------------------------------------
-      # ntn (Notion CLI) completions
-      # ----------------------------------------------------
-      if type ntn &>/dev/null; then
-        _ntn_cache="''${XDG_CACHE_HOME:-$HOME/.cache}/ntn.zsh"
-        if [[ ! -r "$_ntn_cache" || "$(command -v ntn)" -nt "$_ntn_cache" ]]; then
-          ntn completions zsh > "$_ntn_cache"
-          zcompile "$_ntn_cache"
-        fi
-        source "$_ntn_cache"
-        unset _ntn_cache
-      fi
-
-      # ----------------------------------------------------
       # Alias (additional)
       # ----------------------------------------------------
       # ls with eza
@@ -170,6 +157,20 @@
         unset _comp_dump _comp_zwc
       }
       zsh-defer _deferred_compinit
+
+      # ----------------------------------------------------
+      # ntn (Notion CLI) completions
+      # ----------------------------------------------------
+      # compdef を使うため compinit の後に遅延実行する (zsh-defer は FIFO)
+      if type ntn &>/dev/null; then
+        _ntn_cache="''${XDG_CACHE_HOME:-$HOME/.cache}/ntn.zsh"
+        if [[ ! -r "$_ntn_cache" || "$(command -v ntn)" -nt "$_ntn_cache" ]]; then
+          ntn completions zsh > "$_ntn_cache"
+          zcompile "$_ntn_cache"
+        fi
+        zsh-defer source "$_ntn_cache"
+        unset _ntn_cache
+      fi
 
       # ----------------------------------------------------
       # zsh local settings

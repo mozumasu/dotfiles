@@ -12,6 +12,10 @@
   programs.zsh = {
     enable = true;
 
+    # compinit は initContent 側で zsh-defer により遅延実行するため、
+    # home-manager が生成する同期 compinit を無効化する
+    enableCompletion = false;
+
     # ZDOTDIR の設定 (.config/zsh を使用)
     # 相対パスは非推奨のため、ホームディレクトリからの相対パスとして指定
     dotDir = "${config.xdg.configHome}/zsh";
