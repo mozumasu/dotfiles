@@ -199,33 +199,19 @@ vim.keymap.set("n", "<leader>S", function()
   end
 end, { desc = "Stash buffer to codex_stash.txt and clear" })
 
--- zz -> z -> z cycle: center -> top -> bottom -> center ...
+-- zz repeat cycle: center -> top -> bottom -> center ...
 -- ref: https://zenn.dev/vim_jp/articles/67ec77641af3f2
 local zz_state = { pos = 0, last_time = 0 }
+local zz_cmds = { "zz", "zt", "zb" }
 
 keymap("n", "zz", function()
-  zz_state.pos = 1
-  zz_state.last_time = vim.uv.now()
-  vim.cmd("normal! zz")
-end, { desc = "Scroll center (then z to cycle)" })
-
-keymap("n", "z", function()
   local now = vim.uv.now()
-  -- 1秒以内かつzzの後なら次の位置へ
-  if zz_state.pos > 0 and (now - zz_state.last_time) < 1000 then
-    zz_state.last_time = now
+  -- 1秒以内の連打なら次の位置へ、それ以外は中央から開始
+  if (now - zz_state.last_time) < 1000 then
     zz_state.pos = (zz_state.pos % 3) + 1
-    if zz_state.pos == 1 then
-      vim.cmd("normal! zz")
-    elseif zz_state.pos == 2 then
-      vim.cmd("normal! zt")
-    else
-      vim.cmd("normal! zb")
-    end
   else
-    -- 通常のz（次のキーを待つ）
-    zz_state.pos = 0
-    local char = vim.fn.getcharstr()
-    vim.cmd("normal! z" .. char)
+    zz_state.pos = 1
   end
-end, { desc = "Cycle scroll after zz / normal z commands" })
+  zz_state.last_time = now
+  vim.cmd("normal! " .. zz_cmds[zz_state.pos])
+end, { desc = "Scroll center (repeat zz to cycle top/bottom)" })
