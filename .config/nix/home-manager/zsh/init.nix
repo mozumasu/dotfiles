@@ -178,12 +178,12 @@
       # ----------------------------------------------------
       # wezterm
       # ----------------------------------------------------
-      zsh-defer -a source "$HOME/.config/zsh/rc/pluginconfig/wezterm.zsh"
+      zsh-defer -a source "$ZRCDIR/pluginconfig/wezterm.zsh"
 
       # ----------------------------------------------------
       # zeno.zsh
       # ----------------------------------------------------
-      source "$HOME/.config/zsh/rc/pluginconfig/zeno.zsh"
+      source "$ZRCDIR/pluginconfig/zeno.zsh"
 
       # ----------------------------------------------------
       # fzf
@@ -191,7 +191,7 @@
       if [[ ! "$PATH" == */opt/homebrew/opt/fzf/bin* ]]; then
         PATH="''${PATH:+''${PATH}:}/opt/homebrew/opt/fzf/bin"
       fi
-      zsh-defer source "$HOME/dotfiles/.config/zsh/rc/pluginconfig/fzf.key-bindings.zsh"
+      zsh-defer source "$ZRCDIR/pluginconfig/fzf.key-bindings.zsh"
 
       # ----------------------------------------------------
       # starship
