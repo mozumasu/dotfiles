@@ -270,12 +270,6 @@ return {
               actions.select_entry,
               { desc = "Open the diff for the selected entry" },
             },
-            -- {
-            --   "n",
-            --   "l",
-            --   actions.select_entry,
-            --   { desc = "Open the diff for the selected entry" },
-            -- },
             -- staging
             {
               "n",
@@ -332,32 +326,18 @@ return {
               actions.goto_file_edit,
               { desc = "Open the file in the previous tabpage" },
             },
-            -- { "n", "<C-w><C-f>", actions.goto_file_split, { desc = "Open the file in a new split" } },
-            -- {
-            --   "n",
-            --   "<C-w>gf",
-            --   actions.goto_file_tab,
-            --   { desc = "Open the file in a new tabpage" },
-            -- },
             {
               "n",
               "i",
               actions.listing_style,
               { desc = "Toggle between 'list' and 'tree' views" },
             },
-            -- {
-            --   "n",
-            --   "f",
-            --   actions.toggle_flatten_dirs,
-            --   { desc = "Flatten empty subdirectories in tree listing style" },
-            -- },
             {
               "n",
               "R",
               actions.refresh_files,
               { desc = "Update stats and entries in the file list" },
             },
-            -- { "n", "<leader>e", actions.focus_files, { desc = "Bring focus to the file panel" } },
             { "n", "<leader>e", actions.toggle_files, { desc = "Toggle the file panel" } },
             -- layout
             { "n", "g<C-x>", actions.cycle_layout, { desc = "Cycle available layouts" } },
