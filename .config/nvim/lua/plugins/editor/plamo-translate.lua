@@ -13,6 +13,7 @@ return {
     "PlamoTranslateCommentsToggle",
   },
   keys = {
+    { "<leader>t", "", desc = "+translate", mode = { "n", "v" } },
     -- Normal mode: interactive window
     { "<leader>tt", "<cmd>PlamoTranslate<cr>", mode = "n", desc = "Translate text (interactive)" },
     -- Visual mode: translate selection (:'<,'> preserves selection)

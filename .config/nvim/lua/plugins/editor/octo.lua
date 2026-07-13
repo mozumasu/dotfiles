@@ -6,6 +6,15 @@ return {
       "<cmd>OctoSearchProject<CR>",
       desc = "Search Project Issues (with completion)",
     },
+    -- LazyVim octo extra のデフォルトキーマップを無効化
+    { "<leader>gS", false },
+    { "<leader>a", false },
+    { "<leader>c", false },
+    { "<leader>l", false },
+    { "<leader>ie", false },
+    { "<leader>r", false },
+    { "<leader>p", false },
+    { "<leader>v", false },
   },
   config = function(_, opts)
     -- octo://バッファはGitHub APIが実態のため、スワップファイル不要
