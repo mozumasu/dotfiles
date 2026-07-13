@@ -20,7 +20,7 @@ export ZENO_ENABLE_SOCK=1
 export ZENO_GIT_CAT="bat --color=always"
 
 # default: tree
-export ZENO_GIT_TREE="exa --tree"
+export ZENO_GIT_TREE="eza --tree"
 
 if [[ -n $ZENO_LOADED ]]; then
   bindkey ' '  zeno-auto-snippet
