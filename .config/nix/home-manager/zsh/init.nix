@@ -56,6 +56,9 @@
       # ----------------------------------------------------
       # sheldon
       # ----------------------------------------------------
+      # zeno のロード時 deno cache を止める (zeno を読み込む sheldon より前で設定が必要)
+      export ZENO_DISABLE_EXECUTE_CACHE_COMMAND=1
+
       cache_dir=''${XDG_CACHE_HOME:-$HOME/.cache}
       sheldon_cache="$cache_dir/sheldon.zsh"
       sheldon_toml="$HOME/.config/sheldon/plugins.toml"
