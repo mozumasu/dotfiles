@@ -165,7 +165,7 @@ keymap("n", "<leader>gR", function()
   if github_repogitory_name:match(".+/[^/]+") then
     vim.system({ "open", "https://github.com/" .. github_repogitory_name }) -- for macOS（os.executeのブロッキング回避）
   else
-    vim.cmd("normal!, gF!")
+    vim.cmd("normal! gF!")
   end
 end, { desc = "GitHub repogitory" })
 
