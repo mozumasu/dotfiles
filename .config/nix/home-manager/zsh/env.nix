@@ -21,7 +21,6 @@
 
     # path
     export PATH=''${HOME}/.local/bin:$PATH
-    export PATH="/usr/local/sbin:$PATH"
 
     # lang
     export LANGUAGE="en_US.UTF-8"
@@ -49,18 +48,6 @@
     # Rust
     export PATH=$HOME/.cargo/bin:$PATH
 
-    # Python
-    export PATH=$PATH:$HOME/.rye/shims
-    export PATH=$PATH:$HOME/Library/Python/2.7/bin
-
-    # Java
-    export JAVA_HOME=/opt/homebrew/Cellar/openjdk@11/11.0.26/libexec/openjdk.jdk/Contents/Home
-    export PATH=$JAVA_HOME/bin:$PATH
-    export CPPFLAGS="-I/opt/homebrew/opt/openjdk@11/include"
-
-    # TiDB
-    export PATH=$HOME/.tiup/bin:$PATH
-
     # pnpm
     export PNPM_HOME="$HOME/.local/share/pnpm"
     case ":$PATH:" in
@@ -70,9 +57,6 @@
 
     # Homemade command
     export PATH=$XDG_CONFIG_HOME/local/bin:$PATH
-
-    # mysql
-    export PATH="/opt/homebrew/opt/mysql@8.0/bin:$PATH"
 
     # mise shims (for subprocesses like nvim)
     export PATH="$HOME/.local/share/mise/shims:$PATH"
