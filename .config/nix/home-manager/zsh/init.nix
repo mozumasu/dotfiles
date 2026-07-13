@@ -29,15 +29,17 @@
       # homebrew (cached)
       # ----------------------------------------------------
       _brew_cache="''${XDG_CACHE_HOME:-$HOME/.cache}/zsh/brew-shellenv.zsh"
-      if [[ ! -f "$_brew_cache" ]]; then
+      # 日本語 man 設定を含まない旧形式キャッシュは作り直す
+      if [[ ! -f "$_brew_cache" || "$(<$_brew_cache)" != *ja_JP.UTF-8* ]]; then
         mkdir -p "''${_brew_cache:h}"
         /opt/homebrew/bin/brew shellenv > "$_brew_cache"
+        builtin source "$_brew_cache"
+        # Prioritize Japanese man pages
+        # manpath は brew の PATH を反映した状態で計算する必要がある
+        print -r -- "export MANPATH=\"/usr/local/share/man/ja_JP.UTF-8:$(env -u MANPATH manpath)\"" >> "$_brew_cache"
       fi
       source "$_brew_cache"
       unset _brew_cache
-
-      # Prioritize Japanese man pages
-      export MANPATH="/usr/local/share/man/ja_JP.UTF-8:$(env -u MANPATH manpath)"
     '')
 
     # メイン部分
