@@ -12,7 +12,7 @@
     ./gh.nix
     ./lazygit.nix
     ./packages.nix
-    ./zsh.nix
+    ./zsh
     ./sops.nix
   ];
 
