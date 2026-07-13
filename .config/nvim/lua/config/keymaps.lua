@@ -51,7 +51,7 @@ end, opts)
 
 -- lazydocker
 if vim.fn.executable("lazydocker") == 1 then
-  vim.keymap.set("n", "<leader>d", function()
+  vim.keymap.set("n", "<leader>dd", function()
     util.terminal("lazydocker", { esc_esc = false, ctrl_hjkl = false, border = "rounded" })
   end, { desc = "LazyDocker" })
 end
