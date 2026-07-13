@@ -10,7 +10,6 @@ bindkey -r "^X^F"
 
 # fzf
 zle -N fzf-history-widget
-# bindkey '^R' fzf-history-widget  # Disabled: Using zeno-smart-history-selection instead
 
 # ghq
 zle -N ghq-fzf
@@ -42,8 +41,6 @@ bindkey "^[." insert-last-word
 autoload edit-command-line
 zle -N edit-command-line
 bindkey "^[e" edit-command-line
-
-# bindkey '^U' push-line
 
 # redo
 bindkey '^X^R' redo
