@@ -389,7 +389,7 @@ return {
             local byte_start = vim.fn.byteidx(clean_line, hl.col_start)
             local byte_end = vim.fn.byteidx(clean_line, hl.col_end)
             if byte_start >= 0 and byte_end >= 0 then
-              vim.api.nvim_buf_add_highlight(bufnr, ns, hl_group, lnum - 1, byte_start, byte_end)
+              vim.hl.range(bufnr, ns, hl_group, { lnum - 1, byte_start }, { lnum - 1, byte_end })
             end
           end
         end
@@ -476,7 +476,7 @@ return {
         -- filetypeが設定されるのを待つ（man関数の -c 'set ft=man' を考慮）
         vim.defer_fn(function()
           -- man ページの場合はスキップ（col -bx で処理済みのため）
-          local ft = vim.api.nvim_buf_get_option(bufnr, "filetype")
+          local ft = vim.bo[bufnr].filetype
           if ft == "man" then
             return
           end
