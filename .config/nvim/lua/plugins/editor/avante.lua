@@ -28,6 +28,9 @@ return {
         -- ft には octo を入れない: FileType=octo 遅延ロードが octo の非同期バッファ
         -- 生成中に発火し race (Invalid buffer id) を誘発するため。
         file_types = { "markdown", "Avante", "octo" },
+        -- ファイル先頭以外の frontmatter (Slidev 等) は setext_heading に
+        -- 誤解釈されるため、setext 見出しは装飾しない
+        heading = { setext = false },
       },
       ft = { "markdown", "Avante" },
     },
