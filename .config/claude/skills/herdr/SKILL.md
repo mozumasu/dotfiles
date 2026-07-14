@@ -79,6 +79,8 @@ An agent runs inside a pane. Use the pane ID as the control target for agents, s
 
 Use workspace and tab commands for organization. Use worktree commands only when you intentionally want Herdr to create, open, or remove a Git checkout.
 
+**Exception (parallel-work rule, MUST)**: when delegating a task that will EDIT files in a repository — implementing an issue, fixing code, writing slides — create a dedicated worktree with `herdr worktree create --branch NAME --base REF` even if the user did not mention worktrees. Letting a delegated agent switch branches inside the main checkout breaks the user's running dev servers and mixes uncommitted changes. Read-only delegation (research, review, log watching) stays in the current checkout.
+
 Pane records expose `agent`, `agent_status`, and native session metadata when available. Agent status is `idle`, `working`, `blocked`, `done`, or `unknown`.
 
 `idle` and `done` are the same underlying semantic state with different attention state:
@@ -92,7 +94,7 @@ Focusing a pane, switching to its tab, or regaining outer terminal focus marks t
 
 ## Start agents interactively
 
-Default to a sibling pane in the current tab and current working directory. Do not create a workspace, tab, worktree, or different cwd unless the user explicitly requests that topology or location.
+Default to a sibling pane in the current tab and current working directory. Do not create a workspace, tab, or different cwd unless the user explicitly requests that topology or location — EXCEPT for worktrees: an editing task MUST get its own worktree (see the parallel-work exception above) even without an explicit request.
 
 Honor a direction requested by the user. Otherwise inspect the caller pane's current rectangle:
 
