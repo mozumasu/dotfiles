@@ -3,7 +3,6 @@ let
   # 管理したい gh extension の一覧 (owner/repo 形式)
   extensions = [
     "github/gh-stack"
-    "drogers0/gh-image"
   ];
 in
 {
