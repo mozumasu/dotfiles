@@ -18,8 +18,9 @@ Session.vim
 
 # raycast
 .config/raycast/extensions/*
-# claude-notify-ctl.sh が生成するスタブ (タイトルが実行時状態を持つ)
+# claude-*-ctl.sh が生成するスタブ (タイトルが実行時状態を持つ)
 .config/raycast/scripts/claude-notify.sh
+.config/raycast/scripts/claude-git-push.sh
 
 # dpl
 .config/dpl/

@@ -36,7 +36,8 @@ let
       deny = [
         # バックグラウンド実行は ghost を使う (rules/background-process.md)
         "Bash(run_in_background:true)"
-        "Bash(git push:*)"
+        # git push は prevent-git-push.py hook が制御する
+        # (claude-git-push-ctl.sh のトグルで許可できる)
         "Bash(rm -rf:*)"
         "Bash(sudo:*)"
         "Bash(curl:*)"

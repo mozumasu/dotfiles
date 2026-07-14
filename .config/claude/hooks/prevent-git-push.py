@@ -3,11 +3,17 @@
 git push を確実にブロックする PreToolUse hook。
 オプションの順番に関わらず、トークン単位で解析する。
 クォート内のコンテンツを保護し、ヒアドキュメントの誤検知を防ぐ。
+~/.local/state/claude-git-push/allowed が存在する間は許可する
+(claude-git-push-ctl.sh がトグルで作成/削除する)。
 """
+import os
 import sys
 import json
 import re
 import shlex
+
+if os.path.exists(os.path.expanduser("~/.local/state/claude-git-push/allowed")):
+    sys.exit(0)
 
 data = json.load(sys.stdin)
 cmd = data.get("tool_input", {}).get("command", "")
@@ -78,7 +84,7 @@ for part in split_commands(cmd):
             "hookSpecificOutput": {
                 "hookEventName": "PreToolUse",
                 "permissionDecision": "deny",
-                "permissionDecisionReason": "git pushは自動実行できません。手動でpushしてください。",
+                "permissionDecisionReason": "git pushは自動実行できません。手動でpushするか、Raycastの「Claude Git Push」でトグルを ON にしてください。",
             }
         }))
         sys.exit(0)
