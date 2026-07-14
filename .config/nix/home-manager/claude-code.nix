@@ -38,6 +38,8 @@ let
         "Bash(run_in_background:true)"
         # git push は prevent-git-push.py hook が制御する
         # (claude-git-push-ctl.sh のトグルで許可できる)
+        # ブラウザ操作は Playwright MCP / arc-browser スキルを使う
+        "mcp__claude-in-chrome"
         "Bash(rm -rf:*)"
         "Bash(sudo:*)"
         "Bash(curl:*)"
