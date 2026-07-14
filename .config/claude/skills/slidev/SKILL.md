@@ -53,8 +53,13 @@ layout: two-cols
 - `theme:` は 1 つだけ。`seriph` のような短縮名は `@slidev/theme-seriph` (公式) や
   `slidev-theme-seriph` (コミュニティ) に自動解決される。スコープ付きは完全名が必要
 - `addons:` は配列で複数指定可
-- **ローカルパスも指定できる**: `theme: ./theme` `addons: [../slidev-addon-foo]`。
-  npm 公開不要で private リポジトリ運用が可能
+- **ローカルパスも指定できる**が、解決基準が theme と addon で異なる:
+  - `theme:` は **entry ファイル基準** (`theme: ./` はデッキと同じディレクトリ)
+  - `addons:` は **deck ディレクトリの 1 つ上基準** (`@slidev/cli` の `createResolver` が
+    `resolve(dirname(importer), name)` で importer にディレクトリを渡すため)。
+    addon パッケージ自身の example.md で `./` と書くと親ディレクトリの package.json を
+    探しに行き ENOENT で起動失敗する。正しくは `./slidev-addon-foo` (親から見たパス)
+  - npm 公開不要で private リポジトリ運用が可能
 - 未インストールのテーマは起動時に自動インストールを提案してくれる
 
 ## テーマ・アドオンを自作するとき
@@ -79,9 +84,29 @@ layout: two-cols
 - 日本語スライドの文章は japanese-tech-writing スキルの規範に従う
 - フォント指定は headmatter の `fonts:` (デフォルトで Google Fonts から自動取得)。
   日本語なら `sans: Noto Sans JP` などを指定する
+- **スタイリングの置き場所は次の優先順位で決める** (デッキの md に CSS を溜めない):
+  1. テーマ/アドオンの既存コンポーネント・レイアウト prop で表現できないか探す
+  2. 本当にそのスライド限りの微調整だけ、スライド内 `<style>` を使う
+  3. 同じ見た目を 2 箇所目に書きそうになったら、コピペせずテーマ/アドオン側に
+     コンポーネントや prop として移管する (テーマリポジトリに issue / PR を出す)。
+     デッキ側は移管後にそれを使う形へ書き換える
 
 ## 落とし穴 (実案件で踏んだもの)
 
+- **スライド内 `<style>` は Vue scoped としてコンパイルされ、レイアウト内部の要素に
+  届かない**: `.two-cols-body` のようなレイアウトコンポーネント内部のクラスは、
+  スライドの `<style>` からセレクタの specificity をいくら上げても当たらない
+  (スライドのコンテンツはレイアウトの子スロットであり、scoped の data 属性が付かないため)。
+  `:global()` でページ限定にして書く:
+
+  ```css
+  :global(.slidev-page-7 .two-cols-body) {
+    align-items: center;
+  }
+  ```
+
+  ただし同じ調整を複数スライドでコピペし始めたら、テーマ側に prop を生やす
+  (例: two-cols の `valign`) のが正しい置き場所。
 - **markdown formatter が frontmatter を破壊する**: この環境の PostToolUse hook (`rumdl fmt`) は
   スライド区切り `---` と frontmatter の間に空行を挿入し、`layout: xxx` を `## layout: xxx` に
   誤変換する。**ファイル先頭に `<!-- rumdl-disable -->` を置いてはいけない** — Slidev の
