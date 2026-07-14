@@ -123,7 +123,7 @@
         overlays = [
           localOverlay
           kanata-darwin-nix.overlays.default
-          llm-agents.overlays.default
+          llm-agents.overlays.shared-nixpkgs
         ];
         config.allowUnfree = true;
       };
@@ -156,7 +156,7 @@
           nixpkgs.overlays = [
             localOverlay
             kanata-darwin-nix.overlays.default
-            llm-agents.overlays.default
+            llm-agents.overlays.shared-nixpkgs
           ];
           nixpkgs.config.allowUnfree = true;
         }
