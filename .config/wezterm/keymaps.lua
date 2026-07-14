@@ -159,8 +159,8 @@ local keys = {
   { key = "r", mods = "SUPER", action = act.ReloadConfiguration },
   -- { key = "L", mods = "CTRL", action = act.ShowDebugOverlay },
 
-  -- コマンドパレット
-  { key = "P", mods = "CTRL", action = act.ActivateCommandPalette },
+  -- コマンドパレット (Control Shift p)
+  { key = "UpArrow", mods = "SHIFT", action = act.ActivateCommandPalette },
   -- 文字選択パレット
   {
     key = "U",
