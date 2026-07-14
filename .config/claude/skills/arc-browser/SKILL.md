@@ -174,6 +174,38 @@ async (page) => {
 
 ## 既知の落とし穴
 
+- **`initializeServer: Timeout 30000ms exceeded` (ws connected まで進むのに
+  タイムアウト)**: Arc がスリープさせたタブが `Runtime.evaluate` に無応答になり、
+  Playwright の `connectOverCDP` 初期化全体をブロックするのが典型原因
+  (HTTP の `/json/list` や生 CDP の attach は正常に通るので紛らわしい)。
+  **claude-in-chrome にフォールバックせず**、以下で復旧する (Arc 再起動は不要):
+  1. 各 page target に `Runtime.evaluate` (`1+1`, timeout 2.5s) を送り、
+     無応答タブを特定する:
+
+     ```sh
+     node -e '
+     (async () => {
+       const list = await fetch("http://localhost:9222/json/list").then(r => r.json());
+       for (const t of list.filter(t => t.type === "page")) {
+         const ws = new WebSocket(t.webSocketDebuggerUrl);
+         const ok = await new Promise((res) => {
+           const timer = setTimeout(() => { ws.close(); res(false); }, 2500);
+           ws.onopen = () => ws.send(JSON.stringify({ id: 1, method: "Runtime.evaluate", params: { expression: "1+1" } }));
+           ws.onmessage = (e) => { if (JSON.parse(e.data).id === 1) { clearTimeout(timer); ws.close(); res(true); } };
+           ws.onerror = () => { clearTimeout(timer); res(false); };
+         });
+         console.log(ok ? "OK  " : "HANG", t.title.slice(0, 50), t.id);
+       }
+     })();'
+     ```
+
+  2. HANG のタブを `POST http://localhost:9222/json/activate/<id>` で
+     アクティブ化するとフリーズが解除される (ユーザーの前面タブが一瞬
+     切り替わるが実害なし)
+  3. Playwright ツールを再実行 (MCP サーバーは呼び出しごとに再接続する)
+
+  それでも直らない場合のみ、Arc の完全終了 →
+  `! open -a "Arc" --args --remote-debugging-port=9222` での再起動を案内する
 - **タブが閉じられる/CDP接続が切れる**: `Target page, context or browser has
   been closed` エラーが出たら、`browser_navigate` を再度叩くと再接続される
   ことが多い。`browser_tabs (list)` がタイムアウトする場合も同様
