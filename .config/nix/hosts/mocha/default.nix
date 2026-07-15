@@ -53,6 +53,7 @@
   # mocha-specific brews
   homebrew.brews = [
     "agent-browser"
+    "rjyo/moshi/moshi-hook"
     "timac/vpnstatus/vpnutil"
   ];
 
@@ -83,6 +84,7 @@
   # mocha-specific taps
   homebrew.taps = [
     "manaflow-ai/cmux"
+    "rjyo/moshi"
     "timac/vpnstatus"
     "tw93/tap"
   ];
