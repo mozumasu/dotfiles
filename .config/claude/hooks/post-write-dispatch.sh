@@ -17,7 +17,17 @@ case "$FILE_PATH" in
     fi
     ;;
   *.md)
-    command -v rumdl >/dev/null 2>&1 && rumdl fmt "$FILE_PATH"
+    # rumdl は「ファイル側の最近傍 .rumdl.toml を読み、exclude はプロセス cwd 基準で照合する」。
+    # セッション cwd のままだと別リポジトリのファイルで exclude が効かないため、
+    # ファイルの属するリポジトリのルートへ cd してから実行する
+    if command -v rumdl >/dev/null 2>&1; then
+      REPO_ROOT=$(git -C "$(dirname "$FILE_PATH")" rev-parse --show-toplevel 2>/dev/null)
+      if [ -n "$REPO_ROOT" ]; then
+        (cd "$REPO_ROOT" && rumdl fmt "$FILE_PATH")
+      else
+        rumdl fmt "$FILE_PATH"
+      fi
+    fi
     ;;
   *.nix)
     echo "$INPUT" | ~/.config/claude/hooks/format-nix.sh
