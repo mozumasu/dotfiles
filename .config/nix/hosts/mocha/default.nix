@@ -18,6 +18,8 @@
   networking.hostName = config.hostSpec.hostName;
   system.primaryUser = config.hostSpec.username;
 
+  services.tailscale.enable = true;
+
   # fish (PATH 等の環境変数セットアップと /etc/shells への登録込み)
   programs.fish.enable = true;
   environment.shells = [ pkgs.fish ];
@@ -39,6 +41,7 @@
     glab
     google-cloud-sdk
     gws
+    mosh
     nyancat
     nushell
     open-policy-agent
