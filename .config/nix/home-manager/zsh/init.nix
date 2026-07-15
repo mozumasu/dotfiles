@@ -143,18 +143,16 @@
       function _deferred_compinit() {
         autoload -Uz compinit
         _comp_dump="''${ZDOTDIR:-$HOME}/.zcompdump"
-        _comp_zwc="$_comp_dump.zwc"
-        # .zcompdump.zwc が最新なら source、なければ compinit して zcompile
-        if [[ -r "$_comp_zwc" && "$_comp_zwc" -nt "$_comp_dump" ]]; then
-          source "$_comp_dump"
-        elif [[ -r "$_comp_dump" ]]; then
-          source "$_comp_dump"
-          zcompile "$_comp_dump"
+        # dump を source するだけでは compdef と complete-word 等の
+        # 中核ウィジェットが定義されないため、必ず compinit を通す。
+        # -C は compaudit と dump 再生成をスキップするので十分速い。
+        if [[ -r "$_comp_dump" ]]; then
+          compinit -C -d "$_comp_dump"
         else
           compinit -d "$_comp_dump"
           zcompile "$_comp_dump"
         fi
-        unset _comp_dump _comp_zwc
+        unset _comp_dump
       }
       zsh-defer _deferred_compinit
 
