@@ -32,6 +32,22 @@ let
         "mcp__context7"
         "mcp__findy-ai-plus"
         "mcp__terraform-mcp-server"
+        # 読み取り専用コマンド
+        "mcp__plugin_playwright_playwright__browser_take_screenshot"
+        "mcp__plugin_playwright_playwright__browser_wait_for"
+        "Bash(ghost log *)"
+        "Bash(ghost list *)"
+        "Bash(portless list *)"
+        "Bash(gh run watch *)"
+        "Bash(log show *)"
+        "Bash(herdr pane read *)"
+        "Bash(herdr pane get *)"
+        "Bash(herdr wait *)"
+        "Bash(herdr worktree list *)"
+        "Bash(nix eval *)"
+        "Bash(pnpm lint *)"
+        "Bash(pnpm typecheck *)"
+        "Bash(plutil -p *)"
       ];
       deny = [
         # バックグラウンド実行は ghost を使う (rules/background-process.md)
