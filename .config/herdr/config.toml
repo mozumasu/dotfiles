@@ -3,14 +3,12 @@ onboarding = false
 [theme]
 name = "solarized"
 auto_switch = false
-# dark_name = "catppuccin"
-# light_name = "catppuccin-latte"
 
 [theme.custom]
 panel_bg = "reset"
 # accent = "#f5c2e7"
-# red = "#ff6188"
-# green = "#a6e3a1"
+red = "#ff6188"
+green = "#a6e3a1"
 
 [terminal]
 default_shell = "" # Empty means $SHELL, then /bin/sh.
@@ -38,18 +36,19 @@ rename_workspace = "prefix+shift+w"
 close_workspace = "prefix+shift+d"
 previous_workspace = "prefix+p"
 next_workspace = "prefix+n"
+switch_workspace = ""   # optional indexed binding, e.g. "prefix+shift+1..9"
 
 # worktree
-# new_worktree = "prefix+shift+g"
-# open_worktree = ""    # optional, unset by default
-# remove_worktree = ""  # optional, unset by default; opens confirmation
+new_worktree = "prefix+shift+g"
+open_worktree = ""    # optional, unset by default
+remove_worktree = ""  # optional, unset by default; opens confirmation
 
 # agent
 previous_agent = "cmd+ctrl+p"     # optional, unset by default
 next_agent = "cmd+ctrl+n"         # optional, unset by default
-# focus_agent = ""        # optional indexed binding, e.g. "prefix+alt+1..9"
+focus_agent = ""        # optional indexed binding, e.g. "prefix+alt+1..9"
 
-# remote_image_paste = "ctrl+v" # only active in herdr --remote; empty disables raw-key image paste
+remote_image_paste = "ctrl+v" # only active in herdr --remote; empty disables raw-key image paste
 
 # tab
 new_tab = "cmd+t"
@@ -57,12 +56,11 @@ rename_tab = "prefix+shift+t"
 previous_tab = "ctrl+shift+tab"
 next_tab = "ctrl+tab"
 switch_tab = "cmd+1..9"
-
-# switch_workspace = ""   # optional indexed binding, e.g. "prefix+shift+1..9"
 close_tab = "prefix+shift+x"
 
+
 # Pane
-# rename_pane = "prefix+shift+p"
+rename_pane = "prefix+shift+p"
 edit_scrollback = "prefix+e"
 focus_pane_left = "shift+backspace"
 focus_pane_down = "ctrl+shift+j"
@@ -86,10 +84,6 @@ navigate_pane_left = "h"
 navigate_pane_down = "j"
 navigate_pane_up = "k"
 navigate_pane_right = "l"
-
-# Custom commands use the same binding syntax.
-# type = "shell" runs detached in the background.
-# type = "pane" opens a temporary pane and closes it when the command exits.
 
 # Copy the previous command line + output of the focused pane to the clipboard
 [[keys.command]]
@@ -115,54 +109,21 @@ command = "nvim"
 sidebar_width = 26
 sidebar_min_width = 18
 sidebar_max_width = 36
-
-# mobile_width_threshold = 64
-
-# Capture mouse input for Herdr's mouse UI.
-# Set false to let the terminal handle normal clicks, such as Cmd-clicking URLs.
-# Pane apps like lazygit and btop can still receive mouse when they request it.
-mouse_capture = true
-
-# Optional modifier that forwards right-click hold/drag gestures to pane apps instead of opening Herdr's pane menu.
-# Empty/off disables this. Shift is intentionally unsupported because terminals commonly reserve Shift+mouse.
-# right_click_passthrough_modifier = ""
-
+mobile_width_threshold = 64
+mouse_capture = false
+right_click_passthrough_modifier = ""
 redraw_on_focus_gained = true
-
-# Pane scrollback lines to scroll per mouse wheel notch.
 mouse_scroll_lines = 3
-
-# Ask for confirmation before closing a workspace
 confirm_close = true
-
-# Ask for a tab name before creating a new tab.
-# Set false to create tabs immediately with generated names.
 prompt_new_tab_name = true
-
-# Draw borders around split panes.
 pane_borders = true
-
-# Keep split panes visually separated instead of sharing divider borders.
 pane_gaps = false
-
-# Show detected/reported agent labels in split pane borders when no manual pane name is set.
 show_agent_labels_on_pane_borders = true
-
-# Agent panel ordering: "spaces" (grouped by space) or "priority" (attention queue).
-# "workspaces" is accepted as an alias for "spaces".
 agent_panel_sort = "spaces"
-
-# Accent color for highlights, borders, and navigation UI.
-# Accepts: hex (#89b4fa), named colors (cyan, blue, magenta), or rgb(r,g,b)
 accent = "cyan"
 
-# Background notification popup delivery
 [ui.toast]
-# off = disable pop-up notifications
-# herdr = show in-app toasts
-# terminal = ask the outer terminal to show a desktop notification
-# system = ask the OS notification service directly
-# delay_seconds = 1
+delay_seconds = 1
 delivery = "herdr"
 
 [ui.toast.herdr]
@@ -172,30 +133,16 @@ position = "bottom-right"
 enabled = true
 position = "bottom-center"
 
-# Play sounds when agents change state in background workspaces
 [ui.sound]
 enabled = true
-# Optional custom mp3 sound files. Relative paths are resolved from this config file's directory.
-# path = "sounds/notification.mp3"   # one mp3 file for all sound notifications
-# done_path = "sounds/done.mp3"      # overrides only finished notifications
-# request_path = "sounds/request.mp3" # overrides only needs-attention notifications
 
-# Per-agent overrides: default | on | off
-# By default, droid is muted.
-# [ui.sound.agents]
-# droid = "off"
+[ui.sound.agents]
+droid = "off" # By default, droid is muted.
 
 [session]
 resume_agents_on_restore = true
 
 [remote]
-# Whether herdr manages the ssh config used for the `herdr --remote` bridge.
-# When true (default), herdr runs the bridge ssh through a generated config that
-# includes your ~/.ssh/config first and adds ServerAliveInterval/
-# ServerAliveCountMax as a fallback (so any keepalive you set yourself still
-# wins) to survive idle network/NAT timeouts. Set false to run plain ssh against
-# your ssh config unchanged — this does not force keepalive off, it only stops
-# herdr from adding its own.
 manage_ssh_config = true
 
 [experimental]
@@ -203,20 +150,9 @@ allow_nested = false
 kitty_graphics = true
 pane_history = true
 switch_ascii_input_source_in_prefix = true # default false
-# Expose the focused pane's cursor to the outer terminal so macOS input
-# methods keep tracking the candidate window when TUIs paint their own
-# cursor (Claude Code, pi, codex). Trade-off: extra cursor visible for
-# apps that hide it without painting a replacement (vim normal mode, etc.).
 reveal_hidden_cursor_for_cjk_ime = false
-# Optional allow-list: only reveal for focused panes whose detected agent
-# matches one of these names. Empty means apply to any focused pane.
-# If the list contains no valid names, the reveal does not apply.
-# Accepted: pi, claude, codex, gemini, cursor, devin, cline, opencode,
-# copilot, kimi, kiro, droid, amp, grok, hermes, kilo, qodercli, qoder.
 cjk_ime_agents = []
-# Cursor shape rendered when reveal_hidden_cursor_for_cjk_ime is true.
-# Values: block, steady_block (default), underline, steady_underline, bar, steady_bar.
-cjk_ime_cursor_shape = "steady_block"
+cjk_ime_cursor_shape = "steady_block" # Values: block, steady_block (default), underline, steady_underline, bar, steady_bar.
 
 [advanced]
 scrollback_limit_bytes = 10000000
