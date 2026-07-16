@@ -204,6 +204,7 @@ local key_tables = {
     --   action = wezterm.action_callback(kill_workspace()),
     -- },
     { key = "Escape", action = "PopKeyTable" },
+    { key = "[", mods = "CTRL", action = "PopKeyTable" },
   },
 }
 
