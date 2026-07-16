@@ -33,9 +33,9 @@ let
         "mcp__context7"
         "mcp__findy-ai-plus"
         "mcp__terraform-mcp-server"
+        # ブラウザ操作は Playwright MCP に寄せている (claude-in-chrome は deny)
+        "mcp__plugin_playwright_playwright"
         # 読み取り専用コマンド
-        "mcp__plugin_playwright_playwright__browser_take_screenshot"
-        "mcp__plugin_playwright_playwright__browser_wait_for"
         "Bash(ghost log *)"
         "Bash(ghost list *)"
         "Bash(portless list *)"
