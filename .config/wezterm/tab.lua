@@ -1,4 +1,5 @@
 local wezterm = require("wezterm")
+local act = wezterm.action
 local palette = require("colors")
 local module = {}
 
@@ -24,7 +25,7 @@ local ICONS = {
 local ICON_COLORS = {
   docker = "#4169e1",
   neovim = "#57A143",
-  nb = "#9370DB",
+  nb = palette.nb,
   ssh = palette.ssh,
   claude = "#D97757",
 }
@@ -33,7 +34,7 @@ local ICON_COLORS = {
 local TAB_COLORS = {
   foreground_inactive = "#a0a9cb",
   background_inactive = "none",
-  foreground_active = "#313244",
+  foreground_active = palette.accent_fg,
   background_active = palette.accent,
   background_ssh_active = palette.ssh,
   foreground_ssh_active = "#ffffff",
@@ -145,6 +146,32 @@ local function has_zoomed_pane(panes)
     end
   end
   return false
+end
+
+-- タブ名を対話的に変更する action（空入力でカスタムタイトルをリセット）
+function module.rename_prompt_action()
+  return wezterm.action_callback(function(window, pane)
+    local tab_id = pane:tab():tab_id()
+    local current = module.custom_title[tab_id] or ""
+    window:perform_action(
+      act.PromptInputLine({
+        description = "(wezterm) Rename tab (empty to reset):",
+        initial_value = current,
+        action = wezterm.action_callback(function(_, inner_pane, line)
+          if line == nil then
+            return
+          end
+          local t = inner_pane:tab()
+          if line == "" then
+            module.custom_title[t:tab_id()] = nil
+          else
+            module.custom_title[t:tab_id()] = line
+          end
+        end),
+      }),
+      pane
+    )
+  end)
 end
 
 -- =============================================================================

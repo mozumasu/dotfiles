@@ -1,116 +1,17 @@
 local wezterm = require("wezterm")
 local act = wezterm.action
+local overlay = require("keymaps.overlay")
+local resize = require("keymaps.pane_resize")
 
 local module = {}
 
--- オーバーレイペインでコマンドを実行するヘルパー関数（autoload関数用: -lic で .zshrc を読み込む）
-local function spawn_overlay_pane_interactive(command)
-  return wezterm.action_callback(function(window, pane)
-    local new_pane = pane:split({
-      direction = "Bottom",
-      size = 1.0,
-      args = { os.getenv("SHELL"), "-lic", command },
-    })
-    window:perform_action(act.TogglePaneZoomState, new_pane)
+-- set_right_status に一時通知を表示し、3秒後に消す
+local function flash_status(window, message)
+  window:set_right_status(message)
+  wezterm.time.call_after(3, function()
+    window:set_right_status("")
   end)
 end
-
--- オーバーレイペインでコマンドを実行するヘルパー関数
-local function spawn_overlay_pane(command)
-  return wezterm.action_callback(function(window, pane)
-    local new_pane = pane:split({
-      direction = "Bottom",
-      size = 1.0,
-      args = { os.getenv("SHELL"), "-lc", command },
-    })
-    window:perform_action(act.TogglePaneZoomState, new_pane)
-  end)
-end
-
--- ペインの高さを指定したパーセンテージに設定する内部処理
-local function apply_pane_height_percent(window, pane, percent)
-  local tab = pane:tab()
-  local tab_size = tab:get_size()
-  local pane_dims = pane:get_dimensions()
-  local pane_id = pane:pane_id()
-
-  -- ペインの位置を取得（topが0なら上のペイン）
-  local is_top_pane = false
-  for _, info in ipairs(tab:panes_with_info()) do
-    if info.pane:pane_id() == pane_id then
-      is_top_pane = (info.top == 0)
-      break
-    end
-  end
-
-  local target_rows = math.floor(tab_size.rows * percent)
-  local current_rows = pane_dims.viewport_rows
-  local diff = current_rows - target_rows
-
-  if is_top_pane then
-    -- 上ペイン: 縮小はUp、拡大はDown
-    if diff > 0 then
-      window:perform_action(act.AdjustPaneSize({ "Up", diff }), pane)
-    elseif diff < 0 then
-      window:perform_action(act.AdjustPaneSize({ "Down", -diff }), pane)
-    end
-  else
-    -- 下ペイン: 縮小はDown、拡大はUp
-    if diff > 0 then
-      window:perform_action(act.AdjustPaneSize({ "Down", diff }), pane)
-    elseif diff < 0 then
-      window:perform_action(act.AdjustPaneSize({ "Up", -diff }), pane)
-    end
-  end
-end
-
-local function set_pane_height_percent(percent)
-  return wezterm.action_callback(function(window, pane)
-    apply_pane_height_percent(window, pane, percent)
-  end)
-end
-
--- ペインの幅を指定したパーセンテージに設定するヘルパー関数
-local function set_pane_width_percent(percent)
-  return wezterm.action_callback(function(window, pane)
-    local tab = pane:tab()
-    local tab_size = tab:get_size()
-    local pane_dims = pane:get_dimensions()
-    local pane_id = pane:pane_id()
-
-    -- ペインの位置を取得（leftが0なら左のペイン）
-    local is_left_pane = false
-    for _, info in ipairs(tab:panes_with_info()) do
-      if info.pane:pane_id() == pane_id then
-        is_left_pane = (info.left == 0)
-        break
-      end
-    end
-
-    local target_cols = math.floor(tab_size.cols * percent)
-    local current_cols = pane_dims.cols
-    local diff = current_cols - target_cols
-
-    if is_left_pane then
-      -- 左ペイン: 縮小はLeft、拡大はRight
-      if diff > 0 then
-        window:perform_action(act.AdjustPaneSize({ "Left", diff }), pane)
-      elseif diff < 0 then
-        window:perform_action(act.AdjustPaneSize({ "Right", -diff }), pane)
-      end
-    else
-      -- 右ペイン: 縮小はRight、拡大はLeft
-      if diff > 0 then
-        window:perform_action(act.AdjustPaneSize({ "Right", diff }), pane)
-      elseif diff < 0 then
-        window:perform_action(act.AdjustPaneSize({ "Left", -diff }), pane)
-      end
-    end
-  end)
-end
-
--- ペインの最小化前の高さを記憶するテーブル (pane_id -> percent)
-local pane_height_store = {}
 
 -- Ctrl+; は端末エンコーディングに存在せず TUI アプリに届かないため、
 -- shell/nvim/herdr のキーバインドと競合しない
@@ -119,23 +20,12 @@ local leader = { key = ";", mods = "CTRL", timeout_milliseconds = 2000 }
 local keys = {
   -- AltキーをMetaキーとして扱いつつ、バックスラッシュ機能（Alt+¥）は維持する
   { key = "¥", mods = "ALT", action = wezterm.action.SendString("\\") },
-  -- 終了
-  -- { key = "q", mods = "SUPER", action = act.QuitApplication },
   -- ウィンドウ操作
   { key = "Enter", mods = "ALT", action = act.ToggleFullScreen },
   { key = "n", mods = "SUPER", action = act.SpawnWindow },
   -- タブ操作
   { key = "n", mods = "LEADER", action = act.ActivateTabRelative(1) },
   { key = "p", mods = "LEADER", action = act.ActivateTabRelative(-1) },
-  -- { key = "1", mods = "SUPER", action = act.ActivateTab(0) },
-  -- { key = "2", mods = "SUPER", action = act.ActivateTab(1) },
-  -- { key = "3", mods = "SUPER", action = act.ActivateTab(2) },
-  -- { key = "4", mods = "SUPER", action = act.ActivateTab(3) },
-  -- { key = "5", mods = "SUPER", action = act.ActivateTab(4) },
-  -- { key = "6", mods = "SUPER", action = act.ActivateTab(5) },
-  -- { key = "7", mods = "SUPER", action = act.ActivateTab(6) },
-  -- { key = "8", mods = "SUPER", action = act.ActivateTab(7) },
-  -- { key = "9", mods = "SUPER", action = act.ActivateTab(-1) },
   { key = "t", mods = "LEADER", action = act.SpawnTab("CurrentPaneDomain") },
   { key = "w", mods = "LEADER", action = act.CloseCurrentTab({ confirm = true }) },
   -- Pane操作
@@ -157,7 +47,6 @@ local keys = {
   { key = "l", mods = "SUPER", action = act.ShowDebugOverlay },
   { key = "R", mods = "CTRL", action = act.ReloadConfiguration },
   { key = "r", mods = "SUPER", action = act.ReloadConfiguration },
-  -- { key = "L", mods = "CTRL", action = act.ShowDebugOverlay },
 
   -- コマンドパレット (Control Shift p)
   { key = "UpArrow", mods = "SHIFT", action = act.ActivateCommandPalette },
@@ -187,7 +76,6 @@ local keys = {
   -- { key = "H", mods = "CTRL", action = act.HideApplication },
 
   -- control + space がMaccOSのIME切り替えに使われるので、別のキーに割り当て
-  -- { key = "phys:Space", mods = "SHIFT|CTRL", action = act.QuickSelect },
   { key = " ", mods = "SUPER", action = act.QuickSelect },
 
   -- スクロール
@@ -235,83 +123,16 @@ local keys = {
   { key = "]", mods = "ALT", action = act.ScrollToPrompt(1) },
 
   -- Tab rename (tmux: prefix + ,)
-  {
-    key = ",",
-    mods = "LEADER",
-    action = wezterm.action_callback(function(window, pane)
-      local tab = pane:tab()
-      local tab_id = tab:tab_id()
-      local tab_module = require("tab")
-      local current = tab_module.custom_title[tab_id] or ""
-      window:perform_action(
-        act.PromptInputLine({
-          description = "(wezterm) Rename tab (empty to reset):",
-          initial_value = current,
-          action = wezterm.action_callback(function(_, inner_pane, line)
-            if line == nil then
-              return
-            end
-            local t = inner_pane:tab()
-            if line == "" then
-              tab_module.custom_title[t:tab_id()] = nil
-            else
-              tab_module.custom_title[t:tab_id()] = line
-            end
-          end),
-        }),
-        pane
-      )
-    end),
-  },
+  { key = ",", mods = "LEADER", action = require("tab").rename_prompt_action() },
 
   -- Pane
   { key = ":", mods = "CTRL", action = act.PaneSelect },
   { key = "r", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) }, -- Control+; → r 横分割
   { key = "d", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) }, -- Control+; → d 縦分割
   { key = "x", mods = "LEADER", action = act({ CloseCurrentPane = { confirm = true } }) }, -- Control+; → x ペインを閉じる
-  -- Ctrl+Shift+C: 現在のペインを最大化（他ペインを1行に最小化）
-  -- { key = "C", mods = "CTRL|SHIFT", action = set_pane_height_percent(0) },
 
   -- Ctrl+Shift+C: すでに1行に最小化されていれば元の高さ（or 50%）に復元、そうでなければ1行に最小化してラベルを注入
-  {
-    key = "c",
-    mods = "CTRL|SHIFT",
-    action = wezterm.action_callback(function(window, pane)
-      local pane_dims = pane:get_dimensions()
-      local pane_id = pane:pane_id()
-
-      -- すでに1行に最小化されている場合は元の高さ（記憶がなければ50%）に復元
-      if pane_dims.viewport_rows <= 1 then
-        local restore_percent = pane_height_store[pane_id] or 0.5
-        pane_height_store[pane_id] = nil
-        apply_pane_height_percent(window, pane, restore_percent)
-        return
-      end
-
-      -- 最小化前に現在の高さ比率を保存
-      local tab = pane:tab()
-      local tab_size = tab:get_size()
-      pane_height_store[pane_id] = pane_dims.viewport_rows / tab_size.rows
-
-      local title = pane:get_title()
-      local cwd_uri = pane:get_current_working_dir()
-      local cwd = cwd_uri and cwd_uri.file_path:match("([^/]+)/?$") or ""
-      -- titleがcwdと同じ場合はプロセス名にフォールバック
-      local name
-      if title ~= "" and title ~= cwd then
-        name = title
-      else
-        local process = pane:get_foreground_process_name()
-        name = process and process:match("([^/]+)$") or "?"
-      end
-      local label = cwd ~= "" and (name .. " (" .. cwd .. ")") or name
-      apply_pane_height_percent(window, pane, 0) -- 現在のペインを1行に最小化
-      -- リサイズ完了後にラベルを注入
-      wezterm.time.call_after(0.05, function()
-        pane:inject_output("\r\x1b[2K\x1b[33m◀ " .. label .. " ▶\x1b[0m")
-      end)
-    end),
-  },
+  { key = "c", mods = "CTRL|SHIFT", action = resize.toggle_pane_minimize() },
 
   -- AWS ARN を Quick Select してブラウザで開く
   {
@@ -368,10 +189,7 @@ local keys = {
         wezterm.time.call_after(0.3, function()
           -- :wq で保存・終了
           window:perform_action(wezterm.action.SendString(":wq\n"), pane)
-          window:set_right_status("📦 Stashed!")
-          wezterm.time.call_after(3, function()
-            window:set_right_status("")
-          end)
+          flash_status(window, "📦 Stashed!")
         end)
       end)
     end),
@@ -385,28 +203,19 @@ local keys = {
       local stash_file = os.getenv("HOME") .. "/.local/share/codex_stash.txt"
       local f = io.open(stash_file, "r")
       if not f then
-        window:set_right_status("⚠ Stash empty")
-        wezterm.time.call_after(3, function()
-          window:set_right_status("")
-        end)
+        flash_status(window, "⚠ Stash empty")
         return
       end
       local content = f:read("*a")
       f:close()
       if content == "" then
-        window:set_right_status("⚠ Stash empty")
-        wezterm.time.call_after(3, function()
-          window:set_right_status("")
-        end)
+        flash_status(window, "⚠ Stash empty")
         return
       end
       -- 末尾の改行を除去
       content = content:gsub("\n$", "")
       window:perform_action(wezterm.action.SendString(content), pane)
-      window:set_right_status("📋 Popped!")
-      wezterm.time.call_after(3, function()
-        window:set_right_status("")
-      end)
+      flash_status(window, "📋 Popped!")
     end),
   },
   -- 直前のコマンドと出力をコピー
@@ -439,12 +248,7 @@ local keys = {
         pane
       )
 
-      -- ステータスバーに一時的なステータスを表示
-      window:set_right_status("📋 Copied!")
-      -- 3秒後にクリア
-      wezterm.time.call_after(3, function()
-        window:set_right_status("")
-      end)
+      flash_status(window, "📋 Copied!")
     end),
   },
   -- バッファの内容をNeovimで表示（色付き）
@@ -470,295 +274,21 @@ local keys = {
   },
 }
 
-local key_tables = {
-  copy_mode = {
-    -- モードの終了
-    { key = "c", mods = "CTRL", action = act.Multiple({ "ScrollToBottom", { CopyMode = "Close" } }) },
-    { key = "q", mods = "NONE", action = act.Multiple({ "ScrollToBottom", { CopyMode = "Close" } }) },
-    { key = "Escape", mods = "NONE", action = act.Multiple({ "ScrollToBottom", { CopyMode = "Close" } }) },
-    -- key table はグローバルの C-[ → esc 変換より先に評価されるためここでも esc 相当を定義する
-    { key = "[", mods = "CTRL", action = act.Multiple({ "ScrollToBottom", { CopyMode = "Close" } }) },
-
-    -- Vim風のキーバインド
-    { key = "h", mods = "NONE", action = act.CopyMode("MoveLeft") },
-    { key = "j", mods = "NONE", action = act.CopyMode("MoveDown") },
-    { key = "k", mods = "NONE", action = act.CopyMode("MoveUp") },
-    { key = "l", mods = "NONE", action = act.CopyMode("MoveRight") },
-    { key = "0", mods = "NONE", action = act.CopyMode("MoveToStartOfLine") },
-    { key = "^", mods = "NONE", action = act.CopyMode("MoveToStartOfLineContent") },
-    { key = "$", mods = "NONE", action = act.CopyMode("MoveToEndOfLineContent") },
-    { key = ",", mods = "NONE", action = act.CopyMode("JumpReverse") },
-    { key = ";", mods = "NONE", action = act.CopyMode("JumpAgain") },
-    { key = "g", mods = "NONE", action = act.CopyMode("MoveToScrollbackTop") },
-    { key = "G", mods = "NONE", action = act.CopyMode("MoveToScrollbackBottom") },
-    { key = "w", mods = "NONE", action = act.CopyMode("MoveForwardWord") },
-    { key = "e", mods = "NONE", action = act.CopyMode("MoveForwardWordEnd") },
-    { key = "b", mods = "NONE", action = act.CopyMode("MoveBackwardWord") },
-    { key = "t", mods = "NONE", action = act.CopyMode({ JumpForward = { prev_char = true } }) },
-    { key = "f", mods = "NONE", action = act.CopyMode({ JumpForward = { prev_char = false } }) },
-    { key = "T", mods = "NONE", action = act.CopyMode({ JumpBackward = { prev_char = true } }) },
-    { key = "F", mods = "NONE", action = act.CopyMode({ JumpBackward = { prev_char = false } }) },
-    { key = "H", mods = "NONE", action = act.CopyMode("MoveToViewportTop") },
-    { key = "L", mods = "NONE", action = act.CopyMode("MoveToViewportBottom") },
-    { key = "O", mods = "NONE", action = act.CopyMode("MoveToSelectionOtherEndHoriz") },
-    { key = "M", mods = "NONE", action = act.CopyMode("MoveToViewportMiddle") },
-    { key = "o", mods = "NONE", action = act.CopyMode("MoveToSelectionOtherEnd") },
-    { key = "m", mods = "ALT", action = act.CopyMode("MoveToStartOfLineContent") },
-    { key = "b", mods = "CTRL", action = act.CopyMode("PageUp") },
-    { key = "f", mods = "CTRL", action = act.CopyMode("PageDown") },
-    { key = "u", mods = "CTRL", action = act.CopyMode({ MoveByPage = -0.5 }) },
-    { key = "d", mods = "CTRL", action = act.CopyMode({ MoveByPage = 0.5 }) },
-    { key = "v", mods = "NONE", action = act.CopyMode({ SetSelectionMode = "Cell" }) },
-    { key = "v", mods = "CTRL", action = act.CopyMode({ SetSelectionMode = "Block" }) },
-    { key = "V", mods = "NONE", action = act.CopyMode({ SetSelectionMode = "Line" }) },
-    {
-      key = "y",
-      mods = "NONE",
-      action = act.Multiple({
-        { CopyTo = "ClipboardAndPrimarySelection" },
-        -- { Multiple = { "ScrollToBottom", { CopyMode = "Close" } } }, 連続でコピーしたいこともあるのでコメントアウト
-      }),
-    },
-
-    { key = "p", mods = "ALT|CTRL", action = act.CopyMode("PageUp") },
-    { key = "n", mods = "ALT|CTRL", action = act.CopyMode("PageDown") },
-
-    -- 検索結果へジャンプ
-    { key = "n", mods = "CTRL", action = act.CopyMode("NextMatch") },
-    { key = "p", mods = "CTRL", action = act.CopyMode("PriorMatch") },
-    -- 検索モードへ
-    { key = "/", mods = "NONE", action = act.Search("CurrentSelectionOrEmptyString") },
-    -- ScrollToPrompt
-    { key = "[", mods = "ALT", action = act.ScrollToPrompt(-1) },
-    { key = "]", mods = "ALT", action = act.ScrollToPrompt(1) },
-    -- コマンドの入力領域（Inputゾーン）単位でカーソル移動
-    { key = "]", mods = "NONE", action = act.CopyMode({ MoveForwardZoneOfType = "Input" }) }, -- Input, Output, Promptから選択可能
-    { key = "[", mods = "NONE", action = act.CopyMode({ MoveBackwardZoneOfType = "Input" }) }, -- Input, Output, Promptから選択可能
-    -- セマンティックゾーン選択モード開始（現在位置のゾーン全体を選択）
-    { key = "z", mods = "NONE", action = act.CopyMode({ SetSelectionMode = "SemanticZone" }) },
-    -- CopyMode中のペーストはモードを終了してからペースト
-    {
-      key = "v",
-      mods = "SUPER",
-      action = act.Multiple({
-        "ScrollToBottom",
-        { CopyMode = "Close" },
-        act.PasteFrom("Clipboard"),
-      }),
-    },
-  },
-
-  search_mode = {
-    { key = "Escape", mods = "NONE", action = act.CopyMode("Close") },
-    { key = "[", mods = "CTRL", action = act.CopyMode("Close") },
-    -- 検索結果にジャンプしたらコピーモードへ
-    {
-      key = "n",
-      mods = "CTRL",
-      action = act.Multiple({
-        act.CopyMode("NextMatch"),
-        act.ActivateCopyMode,
-      }),
-    },
-    {
-      key = "p",
-      mods = "CTRL",
-      action = act.Multiple({
-        act.CopyMode("PriorMatch"),
-        act.ActivateCopyMode,
-      }),
-    },
-    { key = "r", mods = "CTRL", action = act.CopyMode("CycleMatchType") },
-    { key = "u", mods = "CTRL", action = act.CopyMode("ClearPattern") },
-    -- 検索パターンを維持したままコピーモードへ
-    { key = "X", mods = "CTRL", action = act.ActivateCopyMode },
-  },
-  setting_mode = {
-    -- Paneサイズの調整
-    { key = "h", action = act.AdjustPaneSize({ "Left", 1 }) },
-    { key = "l", action = act.AdjustPaneSize({ "Right", 1 }) },
-    { key = "k", action = act.AdjustPaneSize({ "Up", 1 }) },
-    { key = "j", action = act.AdjustPaneSize({ "Down", 1 }) },
-
-    -- ペインの高さをパーセンテージで設定 (1=10%, 2=20%, ..., 9=90%)
-    { key = "1", action = set_pane_height_percent(0.1) },
-    { key = "2", action = set_pane_height_percent(0.2) },
-    { key = "3", action = set_pane_height_percent(0.3) },
-    { key = "4", action = set_pane_height_percent(0.4) },
-    { key = "5", action = set_pane_height_percent(0.5) },
-    { key = "6", action = set_pane_height_percent(0.6) },
-    { key = "7", action = set_pane_height_percent(0.7) },
-    { key = "8", action = set_pane_height_percent(0.8) },
-    { key = "9", action = set_pane_height_percent(0.9) },
-
-    -- ペインの幅をパーセンテージで設定
-    { key = "1", mods = "CTRL", action = set_pane_width_percent(0.1) },
-    { key = "2", mods = "CTRL", action = set_pane_width_percent(0.2) },
-    { key = "3", mods = "CTRL", action = set_pane_width_percent(0.3) },
-    { key = "4", mods = "CTRL", action = set_pane_width_percent(0.4) },
-    { key = "5", mods = "CTRL", action = set_pane_width_percent(0.5) },
-    { key = "6", mods = "CTRL", action = set_pane_width_percent(0.6) },
-    { key = "7", mods = "CTRL", action = set_pane_width_percent(0.7) },
-    { key = "8", mods = "CTRL", action = set_pane_width_percent(0.8) },
-    { key = "9", mods = "CTRL", action = set_pane_width_percent(0.9) },
-
-    -- 自作モードから抜けるキーバインド設定
-    { key = "Escape", action = "PopKeyTable" },
-    { key = "[", mods = "CTRL", action = "PopKeyTable" },
-    { key = "q", action = "PopKeyTable" },
-    { key = "c", mods = "CTRL", action = "PopKeyTable" },
-  },
-}
-
--- augment-command-palette イベントでコマンドパレットにカスタムアクションを追加
-wezterm.on("augment-command-palette", function(window, pane)
-  local karabiner = require("modules.karabiner_profile")
-  local caffeinate = require("modules.caffeinate")
-
-  local commands = {
-    {
-      brief = "Launch: zsh",
-      icon = "md_terminal",
-      action = spawn_overlay_pane("zsh"),
-    },
-    {
-      brief = "Launch: Ghost",
-      icon = "md_ghost",
-      action = spawn_overlay_pane("ghost"),
-    },
-    {
-      brief = "Launch: Yazi",
-      icon = "md_folder",
-      action = spawn_overlay_pane("yazi"),
-    },
-    {
-      brief = "Launch: Claude Code",
-      icon = "md_robot",
-      action = spawn_overlay_pane("claude"),
-    },
-    {
-      brief = "GitHub: Browse (gh browse)",
-      icon = "md_github",
-      action = spawn_overlay_pane("gh browse"),
-    },
-    {
-      brief = "Edit: ~/.aws/config",
-      icon = "md_aws",
-      action = spawn_overlay_pane("nvim ~/.aws/config"),
-    },
-    {
-      brief = "Edit: ~/.ssh/conf.d/hosts/",
-      icon = "md_server",
-      action = spawn_overlay_pane("nvim ~/.ssh/conf.d/hosts/"),
-    },
-    {
-      brief = "Edit: ~/.config/gcloud/configurations/",
-      icon = "md_cloud",
-      action = spawn_overlay_pane("nvim ~/.config/gcloud/configurations/"),
-    },
-    {
-      brief = "VPN: Connect (vpnc)",
-      icon = "md_vpn",
-      action = spawn_overlay_pane_interactive("vpn-connect-with-fzf"),
-    },
-    {
-      brief = "Layout: vde-layout demo (current tab)",
-      icon = "md_view_column",
-      action = wezterm.action_callback(function(window, pane)
-        local pane_id = pane:pane_id()
-        wezterm.background_child_process({
-          os.getenv("SHELL") or "/bin/zsh",
-          "-lic",
-          string.format("WEZTERM_PANE=%d vde-layout demo --current-window", pane_id),
-        })
-      end),
-    },
-    {
-      brief = "Layout: vde-layout demo (new tab)",
-      icon = "md_view_column",
-      action = wezterm.action_callback(function(window, pane)
-        local cwd = pane:get_current_working_dir()
-        local cwd_path = cwd and cwd.file_path or os.getenv("HOME")
-        wezterm.background_child_process({
-          os.getenv("SHELL") or "/bin/zsh",
-          "-lic",
-          string.format("cd %q && vde-layout demo --new-window", cwd_path),
-        })
-      end),
-    },
-    {
-      brief = "Herdr: Reload config",
-      icon = "md_refresh",
-      action = wezterm.action_callback(function(window, pane)
-        wezterm.background_child_process({
-          os.getenv("SHELL") or "/bin/zsh",
-          "-lic",
-          "herdr server reload-config",
-        })
-      end),
-    },
-    {
-      brief = "Herdr: New workspace",
-      icon = "md_plus_box",
-      action = wezterm.action_callback(function(window, pane)
-        window:perform_action(
-          act.PromptInputLine({
-            description = "(herdr) New workspace name (empty for generated name):",
-            action = wezterm.action_callback(function(_, _, line)
-              if line == nil then
-                return
-              end
-              local cmd = "herdr workspace create --focus"
-              if line ~= "" then
-                cmd = cmd .. " --label '" .. line:gsub("'", [['\'']]) .. "'"
-              end
-              wezterm.background_child_process({
-                os.getenv("SHELL") or "/bin/zsh",
-                "-lic",
-                cmd,
-              })
-            end),
-          }),
-          pane
-        )
-      end),
-    },
-    {
-      brief = "AeroSpace: Reload config",
-      icon = "md_refresh",
-      action = wezterm.action_callback(function(window, pane)
-        wezterm.background_child_process({
-          os.getenv("SHELL") or "/bin/zsh",
-          "-lic",
-          "aerospace reload-config",
-        })
-      end),
-    },
-    {
-      brief = "Weather: wttr.in",
-      icon = "md_weather_cloudy",
-      action = spawn_overlay_pane("curl wttr.in | less -R"),
-    },
-  }
-
-  -- Karabinerプロファイルエントリを追加
-  for _, cmd in ipairs(karabiner.get_commands()) do
-    table.insert(commands, cmd)
-  end
-
-  -- Caffeinateエントリを追加
-  for _, cmd in ipairs(caffeinate.get_commands()) do
-    table.insert(commands, cmd)
-  end
-
-  return commands
-end)
-
 function module.apply_to_config(config)
   config.disable_default_key_bindings = true
-  config.keys = keys
-  config.key_tables = key_tables
   config.leader = leader
+
+  config.keys = config.keys or {}
+  for _, key in ipairs(keys) do
+    table.insert(config.keys, key)
+  end
+
+  config.key_tables = config.key_tables or {}
+  for name, table_def in pairs(require("keymaps.key_tables")) do
+    config.key_tables[name] = table_def
+  end
+
+  require("keymaps.command_palette").setup()
 end
 
 return module
