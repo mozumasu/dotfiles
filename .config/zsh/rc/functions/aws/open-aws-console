@@ -1,0 +1,118 @@
+#!/usr/bin/env zsh
+
+# 指定プロファイル (省略時: $AWS_PROFILE、未設定なら fzf で選択) のマネジメントコンソールをブラウザで開く。
+#
+# federation エンドポイントは AssumeRole 由来の一時クレデンシャルのみ受け付けるため、
+# クレデンシャル種別で経路を分ける:
+# - AssumeRole / SSO 由来: そのまま federation でサインイン URL を発行
+# - IAM ユーザー: プロファイルの console_role_arn (~/.aws/config) のロールを assume してから federation。
+#   未設定ならアカウント専用サインイン URL を開くフォールバック (ブラウザに既存セッションがあればそのまま入れる)
+
+local profile=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -p|--profile)
+      if [ -z "${2:-}" ]; then
+        echo "usage: open-aws-console [--profile <PROFILE> | <PROFILE>]"
+        return 1
+      fi
+      profile="$2"; shift 2 ;;
+    *)
+      profile="$1"; shift ;;
+  esac
+done
+profile="${profile:-$AWS_PROFILE}"
+if [ -z "$profile" ]; then
+  profile=$(aws configure list-profiles |
+    grep -v "default" |
+    sort |
+    fzf --prompt "Open console for PROFILE > " \
+        --height 50% --layout=reverse --border --preview-window 'right:50%' \
+        --preview "grep {} -A5 ~/.aws/config")
+  [ -z "$profile" ] && return 1
+fi
+
+local region
+region=$(aws configure get region --profile "$profile" 2>/dev/null)
+region="${region:-${AWS_REGION:-ap-northeast-1}}"
+
+local identity arn account
+if ! identity=$(aws sts get-caller-identity --profile "$profile" --output text --query '[Arn,Account]' 2>&1); then
+  echo "❌ クレデンシャルを取得できませんでした:"
+  echo "$identity"
+  echo "aws login --profile $profile (または aws sso login) を実行してから再試行してください"
+  return 1
+fi
+arn="${identity%%$'\t'*}"
+account="${identity##*$'\t'}"
+
+local creds
+if [[ "$arn" == *":user/"* ]]; then
+  local console_role_arn
+  console_role_arn=$(aws configure get console_role_arn --profile "$profile" 2>/dev/null)
+  if [ -z "$console_role_arn" ]; then
+    # assume するロールが未設定なら、既存ブラウザセッション頼みのサインイン URL を開く
+    open "https://${account}.signin.aws.amazon.com/console?region=${region}"
+    echo "🌐 Opened sign-in URL for account ${account} ('$profile')"
+    echo "   毎回サインインを求められる場合は、assume 可能なロールを設定すると自動サインインできます:"
+    echo "   aws configure set console_role_arn arn:aws:iam::${account}:role/<ROLE_NAME> --profile $profile"
+    return 0
+  fi
+  if ! creds=$(aws sts assume-role --profile "$profile" \
+      --role-arn "$console_role_arn" \
+      --role-session-name "open-aws-console" \
+      --query Credentials --output json 2>&1); then
+    echo "❌ console_role_arn の assume に失敗しました:"
+    echo "$creds"
+    return 1
+  fi
+else
+  if ! creds=$(aws configure export-credentials --profile "$profile" 2>&1); then
+    echo "❌ クレデンシャルを取得できませんでした:"
+    echo "$creds"
+    return 1
+  fi
+fi
+
+local url
+url=$(python3 - "$creds" "$region" <<'PYEOF'
+import json, sys, urllib.parse, urllib.request
+
+creds = json.loads(sys.argv[1])
+region = sys.argv[2]
+
+if not creds.get("SessionToken"):
+    print("長期 IAM クレデンシャルではコンソール URL を発行できません (一時クレデンシャルが必要)", file=sys.stderr)
+    sys.exit(1)
+
+session = json.dumps({
+    "sessionId": creds["AccessKeyId"],
+    "sessionKey": creds["SecretAccessKey"],
+    "sessionToken": creds["SessionToken"],
+})
+try:
+    res = urllib.request.urlopen(
+        "https://signin.aws.amazon.com/federation?"
+        + urllib.parse.urlencode({"Action": "getSigninToken", "Session": session}),
+        timeout=15,
+    )
+except urllib.error.HTTPError as e:
+    print(f"federation エンドポイントが {e.code} を返しました: {e.read()[:200]}", file=sys.stderr)
+    sys.exit(1)
+
+token = json.loads(res.read())["SigninToken"]
+dest = f"https://{region}.console.aws.amazon.com/console/home?region={region}"
+print(
+    "https://signin.aws.amazon.com/federation?"
+    + urllib.parse.urlencode({
+        "Action": "login",
+        "Issuer": "open-aws-console",
+        "Destination": dest,
+        "SigninToken": token,
+    })
+)
+PYEOF
+) || return 1
+
+open "$url"
+echo "🌐 Opened AWS console for '$profile' ($region)"

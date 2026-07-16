@@ -1,5 +1,11 @@
 #!/usr/bin/env zsh
 
+# -c / --console: プロファイル設定後にマネジメントコンソールもブラウザで開く
+local open_console=false
+if [[ "${1:-}" == "-c" || "${1:-}" == "--console" ]]; then
+  open_console=true
+fi
+
 local selected_profile=$(aws configure list-profiles |
   grep -v "default" |
   sort |
@@ -61,3 +67,7 @@ elif [[ "$has_aws_vault_creds" == true ]]; then
 fi
 
 aws sts get-caller-identity
+
+if [[ "$open_console" == true ]]; then
+  open-aws-console "$selected_profile"
+fi
