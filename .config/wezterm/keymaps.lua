@@ -61,7 +61,7 @@ local keys = {
   -- アクティブペインのズーム切替（ペインが2つ以上の場合のみ）
   {
     key = "Z",
-    mods = "CTRL",
+    mods = "LEADER",
     action = wezterm.action_callback(function(window, pane)
       local tab = pane:tab()
       if #tab:panes() > 1 then

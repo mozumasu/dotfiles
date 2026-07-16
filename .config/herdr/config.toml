@@ -72,7 +72,7 @@ last_pane = "prefix+tab"          # optional, unset by default; bind e.g. "prefi
 split_vertical = "prefix+v"
 split_horizontal = "prefix+-"
 close_pane = "prefix+x"
-zoom = "prefix+z"
+zoom = "ctrl+shift+z"
 resize_mode = "" # default prefix+r
 
 toggle_sidebar = "prefix+b"
