@@ -1,4 +1,5 @@
 local wezterm = require("wezterm")
+local palette = require("colors")
 local module = {}
 
 -- =============================================================================
@@ -6,7 +7,7 @@ local module = {}
 -- =============================================================================
 
 local WORKSPACE_COLORS = {
-  default = "#80EBDF",
+  default = palette.accent,
   copy_mode = "#ffd700",
   setting_mode = "#39FF14",
 }

@@ -1,4 +1,4 @@
-local wezterm = require("wezterm")
+local palette = require("colors")
 local module = {}
 
 local appearance = {
@@ -10,10 +10,9 @@ local appearance = {
   window_close_confirmation = "NeverPrompt", -- AlwaysPrompt or NeverPrompt
 
   -- Pane
-  -- 非アクティブPaneを暗くして視認性を向上
-  -- アクティブPaneは青みがかった背景、非アクティブは暗くする
+  -- 非アクティブPaneの色相と彩度を下げてアクティブPaneと区別する
   inactive_pane_hsb = {
-    hue = 0.9, -- 色相を少しシフト（青みを抑える）
+    hue = 0.9,
     saturation = 0.9,
     brightness = 1.0,
   },
@@ -31,19 +30,16 @@ local appearance = {
     inactive_titlebar_bg = "none",
     active_titlebar_bg = "none",
   },
-  -- Hide borders between tabs
   colors = {
-    -- 青みがかった背景色（アクティブPaneで青く見える）
-    background = "#1a1a2e",
+    background = palette.background,
     -- use_fancy_tab_bar = falseの場合のタブバー透過設定
     tab_bar = {
       background = "none",
       inactive_tab_edge = "none",
     },
-    -- カーソルとコピーモード選択色（WezTermデフォルト）
-    cursor_bg = "#80EBDF",
+    cursor_bg = palette.accent,
     cursor_fg = "#000000",
-    cursor_border = "#80EBDF",
+    cursor_border = palette.accent,
     selection_bg = "#ffdd00",
     selection_fg = "#000000",
   },
