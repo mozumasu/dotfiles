@@ -1,4 +1,5 @@
 local wezterm = require("wezterm")
+local palette = require("colors")
 local module = {}
 
 -- Custom tab titles (tab_id -> string or nil)
@@ -24,7 +25,7 @@ local ICON_COLORS = {
   docker = "#4169e1",
   neovim = "#57A143",
   nb = "#9370DB",
-  ssh = "#ff6b6b",
+  ssh = palette.ssh,
   claude = "#D97757",
 }
 
@@ -33,8 +34,8 @@ local TAB_COLORS = {
   foreground_inactive = "#a0a9cb",
   background_inactive = "none",
   foreground_active = "#313244",
-  background_active = "#80EBDF",
-  background_ssh_active = "#ff6b6b",
+  background_active = palette.accent,
+  background_ssh_active = palette.ssh,
   foreground_ssh_active = "#ffffff",
 }
 
@@ -44,6 +45,9 @@ local DECORATIONS = {
   right_circle = wezterm.nerdfonts.ple_right_half_circle_thick,
 }
 
+-- pane_state の掃除を行う update-status イベントの間隔
+local PRUNE_INTERVAL = 100
+
 -- =============================================================================
 -- ヘルパー関数
 -- =============================================================================
@@ -52,25 +56,26 @@ local function basename(path)
   return string.gsub(path or "", "(.*[/\\])(.*)", "%2")
 end
 
-local function is_nb_process(process_name, cmdline, cwd)
-  return process_name == "nb"
-    or (cmdline and (cmdline:find("/nb") or cmdline:find("nb ")))
-    or (cwd and cwd:find("%.nb"))
+local function is_nb_process(process_name, cwd)
+  return process_name == "nb" or (cwd and cwd:find("%.nb") ~= nil)
 end
 
-local function is_ssh_process(process_name, cmdline, user_vars)
+local function is_ssh_process(process_name, user_vars)
   if user_vars.ssh_host and user_vars.ssh_host ~= "" then
     return true, user_vars.ssh_host
   end
-  if process_name:find("ssh") or (cmdline and cmdline:find("ssh")) then
-    local host = cmdline and cmdline:match("ssh%s+([%w_%-%.]+)")
-    return true, host
+  if process_name == "ssh" then
+    return true, nil
   end
   return false, nil
 end
 
+local function is_claude_title(pane_title)
+  return pane_title:find("^✳") ~= nil or pane_title:lower():find("claude", 1, true) ~= nil
+end
+
 local function is_claude_process(process_name, pane_title)
-  return process_name == "claude" or (pane_title and (pane_title:find("^✳") or pane_title:lower():find("claude")))
+  return process_name == "claude" or is_claude_title(pane_title)
 end
 
 local function extract_project_name(cwd)
@@ -79,8 +84,8 @@ local function extract_project_name(cwd)
   end
 
   local home = os.getenv("HOME")
-  if home and cwd:find("^" .. home) then
-    cwd = cwd:gsub("^" .. home, "~")
+  if home and cwd:sub(1, #home) == home then
+    cwd = "~" .. cwd:sub(#home + 1)
   end
 
   -- nbディレクトリ
@@ -99,25 +104,25 @@ local function extract_project_name(cwd)
   return cwd:match("([^/]+)$") or cwd
 end
 
-local function get_icon_and_color(process_name, pane_title, cmdline, cwd, is_ssh, is_active, is_claude)
-  if is_ssh then
-    local color = is_active and "#ffffff" or ICON_COLORS.ssh
+local function get_icon_and_color(ctx)
+  if ctx.is_ssh then
+    local color = ctx.is_active and TAB_COLORS.foreground_ssh_active or ICON_COLORS.ssh
     return ICONS.ssh, color
   end
 
-  if pane_title == "nvim" or process_name == "nvim" then
+  if ctx.pane_title == "nvim" or ctx.process_name == "nvim" then
     return ICONS.neovim, ICON_COLORS.neovim
   end
 
-  if is_nb_process(process_name, cmdline, cwd) then
+  if is_nb_process(ctx.process_name, ctx.cwd) then
     return ICONS.nb, ICON_COLORS.nb
   end
 
-  if is_claude then
+  if ctx.is_claude then
     return ICONS.claude, ICON_COLORS.claude
   end
 
-  if process_name == "docker" or (pane_title and pane_title:find("docker")) then
+  if ctx.process_name == "docker" or ctx.pane_title:find("docker", 1, true) then
     return ICONS.docker, ICON_COLORS.docker
   end
 
@@ -147,14 +152,39 @@ end
 -- =============================================================================
 
 function module.apply_to_config(config)
-  local title_cache = {}
-  local raw_cwd_cache = {}
-  local ssh_host_cache = {}
-  local claude_cache = {} -- pane_id -> bool (Claude Code検出キャッシュ)
+  -- pane_id -> { raw_cwd, title, ssh_host, is_claude }
+  local pane_state = {}
+  local update_count = 0
 
-  -- タイトルキャッシュの更新
+  local function get_state(pane_id)
+    local state = pane_state[pane_id]
+    if not state then
+      state = {}
+      pane_state[pane_id] = state
+    end
+    return state
+  end
+
+  -- 閉じた pane のエントリを削除する
+  local function prune_dead_panes()
+    local alive = {}
+    for _, mux_window in ipairs(wezterm.mux.all_windows()) do
+      for _, mux_tab in ipairs(mux_window:tabs()) do
+        for _, mux_pane in ipairs(mux_tab:panes()) do
+          alive[mux_pane:pane_id()] = true
+        end
+      end
+    end
+    for pane_id in pairs(pane_state) do
+      if not alive[pane_id] then
+        pane_state[pane_id] = nil
+      end
+    end
+  end
+
+  -- pane 状態キャッシュの更新
   wezterm.on("update-status", function(_, pane)
-    local pane_id = pane:pane_id()
+    local state = get_state(pane:pane_id())
     local user_vars = pane.user_vars or {}
 
     -- SSH中以外はタイトルキャッシュを更新
@@ -162,9 +192,9 @@ function module.apply_to_config(config)
       local cwd_url = pane:get_current_working_dir()
       local cwd = cwd_url and cwd_url.file_path
       -- cwd が変わった場合のみ extract_project_name を実行
-      if cwd ~= raw_cwd_cache[pane_id] then
-        raw_cwd_cache[pane_id] = cwd
-        title_cache[pane_id] = extract_project_name(cwd)
+      if cwd ~= state.raw_cwd then
+        state.raw_cwd = cwd
+        state.title = extract_project_name(cwd)
       end
     end
 
@@ -172,33 +202,39 @@ function module.apply_to_config(config)
     local process_name = basename(pane:get_foreground_process_name() or "")
     local pane_title = pane:get_title() or ""
     if is_claude_process(process_name, pane_title) then
-      claude_cache[pane_id] = true
-    elseif (process_name == "zsh" or process_name == "bash" or process_name == "fish")
-      and not (pane_title:find("^✳") or pane_title:lower():find("claude")) then
-      claude_cache[pane_id] = nil
+      state.is_claude = true
+    elseif
+      (process_name == "zsh" or process_name == "bash" or process_name == "fish")
+      and not is_claude_title(pane_title)
+    then
+      state.is_claude = nil
+    end
+
+    update_count = update_count + 1
+    if update_count % PRUNE_INTERVAL == 0 then
+      prune_dead_panes()
     end
   end)
 
   -- タブタイトルのフォーマット
   wezterm.on("format-tab-title", function(tab, _, _, _, _, max_width)
     local pane = tab.active_pane
-    local pane_id = pane.pane_id
+    local state = get_state(pane.pane_id)
     local process_name = basename(pane.foreground_process_name)
     local pane_title = pane.title or ""
-    local cmdline = pane.foreground_process_name or ""
     local user_vars = pane.user_vars or {}
-    local cached_cwd = title_cache[pane_id] or ""
+    local raw_cwd = state.raw_cwd
 
     -- SSH判定
-    local is_ssh, ssh_host = is_ssh_process(process_name, cmdline, user_vars)
+    local is_ssh, ssh_host = is_ssh_process(process_name, user_vars)
     if is_ssh and ssh_host then
-      ssh_host_cache[pane_id] = ssh_host
+      state.ssh_host = ssh_host
     elseif not is_ssh then
-      ssh_host_cache[pane_id] = nil
+      state.ssh_host = nil
     end
 
     -- Claude Code検出（update-statusでキャッシュ済み）
-    local is_claude = claude_cache[pane_id] or false
+    local is_claude = state.is_claude or false
 
     -- タブの色
     local background, foreground = get_tab_colors(tab.is_active, is_ssh)
@@ -207,16 +243,15 @@ function module.apply_to_config(config)
 
     -- タイトルテキスト（カスタムタイトル > CLI設定タイトル > SSH > nb > CWD）
     local title_text
-    local custom = module.custom_title[tab.tab_id]
-      or (tab.tab_title ~= "" and tab.tab_title or nil)
+    local custom = module.custom_title[tab.tab_id] or (tab.tab_title ~= "" and tab.tab_title or nil)
     if custom then
       title_text = custom
     elseif is_ssh then
-      title_text = ssh_host_cache[pane_id] or "ssh"
-    elseif is_nb_process(process_name, cmdline, cached_cwd) then
+      title_text = state.ssh_host or "ssh"
+    elseif is_nb_process(process_name, raw_cwd) then
       title_text = "nb"
     else
-      title_text = title_cache[pane_id] or "-"
+      title_text = state.title or "-"
     end
 
     -- Claude Code のタイトル追加（カスタムタイトル時はアイコンのみ）
@@ -226,7 +261,14 @@ function module.apply_to_config(config)
     end
 
     -- アイコン
-    local icon, icon_color = get_icon_and_color(process_name, pane_title, cmdline, cached_cwd, is_ssh, tab.is_active, is_claude)
+    local icon, icon_color = get_icon_and_color({
+      process_name = process_name,
+      pane_title = pane_title,
+      cwd = raw_cwd,
+      is_ssh = is_ssh,
+      is_active = tab.is_active,
+      is_claude = is_claude,
+    })
 
     -- ズームインジケーター
     local zoom_indicator = has_zoomed_pane(tab.panes) and (ICONS.zoom .. " ") or ""
