@@ -102,9 +102,6 @@ let
       ask = [
         "Bash(git rebase:*)"
         "Bash(git reset:*)"
-        "Bash(git commit:*)"
-        "Bash(gh pr create:*)"
-        "Bash(gh issue create:*)"
         "Bash(gh release create:*)"
         "Bash(aws s3 cp:*)"
         "Bash(aws s3 sync:*)"
