@@ -25,14 +25,14 @@ prefix = "ctrl+q"
 help = "prefix+?"
 settings = "prefix+s"
 detach = "prefix+q"
-reload_config = "prefix+shift+r"
+reload_config = ""
 open_notification_target = "prefix+o"
 
 # workspace
 workspace_picker = "prefix+w"
 goto = "prefix+g"
 new_workspace = "prefix+shift+n" # default prefix+shift+n
-rename_workspace = "prefix+shift+w"
+rename_workspace = "prefix+shift+r"
 close_workspace = "prefix+shift+d"
 previous_workspace = "prefix+p"
 next_workspace = "prefix+n"
@@ -110,7 +110,7 @@ sidebar_width = 26
 sidebar_min_width = 18
 sidebar_max_width = 36
 mobile_width_threshold = 64
-mouse_capture = false
+mouse_capture = true
 right_click_passthrough_modifier = ""
 redraw_on_focus_gained = true
 mouse_scroll_lines = 3
