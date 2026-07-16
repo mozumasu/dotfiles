@@ -78,11 +78,6 @@
 
 ## Setup (New Mac)
 
-### Prerequisites
-
-- macOS (Apple Silicon)
-- Git
-
 ### Installation
 
 ```bash
