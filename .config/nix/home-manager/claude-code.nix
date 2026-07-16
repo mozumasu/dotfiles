@@ -19,6 +19,7 @@ let
     model = "claude-fable-5[1m]";
     tui = "fullscreen";
     permissions = {
+      defaultMode = "auto";
       allow = [
         "Bash"
         "Read"
