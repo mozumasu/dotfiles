@@ -1,13 +1,8 @@
 local wezterm = require("wezterm")
 local act = wezterm.action
+local util = require("modules.util")
 
 local module = {}
-
--- シェル用の文字列エスケープ関数
-local function shell_escape(str)
-  -- シングルクォートでエスケープ（シングルクォート自体は'\''でエスケープ）
-  return "'" .. str:gsub("'", "'\\''") .. "'"
-end
 
 -- 選択テキストをplamo-translate-cliで翻訳してオーバーレイペインに表示
 local function translate_selection()
@@ -29,7 +24,7 @@ local function translate_selection()
     -- plamo-translateコマンドの構築
     -- shell_escape()で安全にエスケープ
     -- lessで結果を表示し続ける（qで閉じる）
-    local escaped_text = shell_escape(text)
+    local escaped_text = util.shell_escape(text)
     local command = string.format(
       "echo %s | plamo-translate --to Japanese | less -R",
       escaped_text
