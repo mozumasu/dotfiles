@@ -209,23 +209,14 @@ local keys = {
   -- Ctrl+q のバイト (0x11) をペインへ直接送る
   { key = "q", mods = "CTRL", action = act.SendString("\x11") },
 
-  -- kitty プロトコル下では ctrl+[ / 物理 Esc は素の 1b を送るが、
-  -- herdr は離しイベントが届くまで esc と確定せず、
-  -- nvim (0.10+ は kitty プロトコルを有効化) は素の 1b をシーケンス開始
-  -- バイトと解釈するため、曖昧さのない CSI 27u (kitty 形式の esc 押下) を送る。
-  -- kitty を使わないペインには CSI 27u がゴミ文字になるため SendKey (レガシー 1b) に落とす
-  {
-    key = "Escape",
-    mods = "NONE",
-    action = wezterm.action_callback(function(window, pane)
-      local proc = pane:get_foreground_process_name() or ""
-      if proc:match("herdr") or proc:match("nvim") then
-        window:perform_action(act.SendString("\x1b[27u"), pane)
-      else
-        window:perform_action(act.SendKey({ key = "Escape" }), pane)
-      end
-    end),
-  },
+  -- kitty プロトコル下では ctrl+[ は esc と別キー扱いになるため esc に変換する。
+  -- 合成キーには離しイベントがなく herdr が esc と確定できないため、
+  -- 曖昧さのない CSI 27u (kitty 形式の esc 押下) を送る。
+  -- kitty を使わないペインには CSI 27u がゴミ文字になるため SendKey (レガシー 1b) に落とす。
+  -- 修飾なしの Escape はここに定義してはいけない: キー割り当ては IME 転送より
+  -- 先に消費されるため、macSKK の Esc キャンセルが効かなくなる。
+  -- 物理 Esc は IME 素通り後に素の 1b + kitty 離しイベントとしてペインに届く
+  -- (herdr はこの形式を Esc として解釈できる必要がある)
   {
     key = "[",
     mods = "CTRL",
