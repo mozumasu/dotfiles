@@ -40,7 +40,7 @@ local appearance = {
     cursor_bg = palette.accent,
     cursor_fg = "#000000",
     cursor_border = palette.accent,
-    selection_bg = "#ffdd00",
+    selection_bg = palette.highlight,
     selection_fg = "#000000",
   },
 }
