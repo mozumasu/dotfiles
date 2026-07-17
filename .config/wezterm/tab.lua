@@ -233,7 +233,7 @@ function module.apply_to_config(config)
   -- pane 状態キャッシュの更新
   wezterm.on("update-status", function(_, pane)
     local state = get_state(pane:pane_id())
-    local user_vars = pane.user_vars or {}
+    local user_vars = pane:get_user_vars() or {}
 
     -- SSH中以外はタイトルキャッシュを更新
     if not (user_vars.ssh_host and user_vars.ssh_host ~= "") then
