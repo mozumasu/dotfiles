@@ -179,6 +179,27 @@ end
 -- =============================================================================
 
 function module.apply_to_config(config)
+  -- タブバー設定（format-tab-title の描画がモードや幅に依存するためここで持つ）
+  config.show_tabs_in_tab_bar = true
+  config.hide_tab_bar_if_only_one_tab = false
+  config.tab_bar_at_bottom = true
+  config.show_new_tab_button_in_tab_bar = false
+  config.show_close_tab_button_in_tabs = false -- Can only be used in nightly
+  config.tab_max_width = 30
+  config.use_fancy_tab_bar = true
+  -- use_fancy_tab_bar = trueの場合のタブバー透過設定
+  config.window_frame = {
+    inactive_titlebar_bg = "none",
+    active_titlebar_bg = "none",
+  }
+  -- use_fancy_tab_bar = falseの場合のタブバー透過設定
+  -- (config.colors はカーソル・選択色を持つ appearance.lua と共有のためマージする)
+  config.colors = config.colors or {}
+  config.colors.tab_bar = {
+    background = "none",
+    inactive_tab_edge = "none",
+  }
+
   -- pane_id -> { raw_cwd, title, ssh_host, is_claude }
   local pane_state = {}
   local update_count = 0

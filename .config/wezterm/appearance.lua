@@ -17,26 +17,10 @@ local appearance = {
     brightness = 1.0,
   },
 
-  -- Tab
-  show_tabs_in_tab_bar = true,
-  hide_tab_bar_if_only_one_tab = false,
-  tab_bar_at_bottom = true,
-  show_new_tab_button_in_tab_bar = false,
-  show_close_tab_button_in_tabs = false, -- Can only be used in nightly
-  tab_max_width = 30,
-  use_fancy_tab_bar = true,
-  -- use_fancy_tab_bar = trueの場合のタブバー透過設定
-  window_frame = {
-    inactive_titlebar_bg = "none",
-    active_titlebar_bg = "none",
-  },
+  -- タブバーの設定は tab.lua / examples/tab_simple.lua 側で持つ
+  -- (format-tab-title の描画前提とセットで管理するため)
   colors = {
     background = palette.background,
-    -- use_fancy_tab_bar = falseの場合のタブバー透過設定
-    tab_bar = {
-      background = "none",
-      inactive_tab_edge = "none",
-    },
     cursor_bg = palette.accent,
     cursor_fg = "#000000",
     cursor_border = palette.accent,
