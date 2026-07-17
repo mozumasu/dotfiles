@@ -54,7 +54,8 @@ config.quick_select_patterns = {
 require("keymaps").apply_to_config(config)
 require("workspace").apply_to_config(config)
 require("appearance").apply_to_config(config)
-require("tab").apply_to_config(config)
+-- require("tab").apply_to_config(config)
+require("examples.tab_simple").apply_to_config(config)
 require("statusbar").apply_to_config(config)
 
 -- オプショナルモジュール（keymapsの後に読み込む）
