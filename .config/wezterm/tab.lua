@@ -162,6 +162,9 @@ function module.rename_prompt_action()
             return
           end
           local t = inner_pane:tab()
+          if t == nil then
+            return
+          end
           if line == "" then
             module.custom_title[t:tab_id()] = nil
           else
