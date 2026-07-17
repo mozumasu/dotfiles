@@ -1,6 +1,5 @@
 local wezterm = require("wezterm")
 local act = wezterm.action
-local overlay = require("keymaps.overlay")
 local resize = require("keymaps.pane_resize")
 
 local module = {}
