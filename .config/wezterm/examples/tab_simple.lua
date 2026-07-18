@@ -19,14 +19,21 @@ local COLORS = {
   active_bg = "#80EBDF", -- 背景色
   active_fg = "#313244", -- 文字色
 
-  -- 非アクティブタブ
-  inactive_bg = "none", -- "none" で透過
+  -- 非アクティブタブ（背景を "none" にすると炎の縁取りも見えなくなる）
+  inactive_bg = "#313244",
   inactive_fg = "#a0a9cb",
 }
 
--- タブの左右につける半円（丸タブの見た目を作る）
-local LEFT_CIRCLE = wezterm.nerdfonts.ple_left_half_circle_thick
-local RIGHT_CIRCLE = wezterm.nerdfonts.ple_right_half_circle_thick
+-- タブの右端につける炎の縁取り
+local RIGHT_FLAME = wezterm.nerdfonts.ple_flame_thick
+
+-- -----------------------------------------------------------------------------
+-- アイコンの設定: タブごとにここからランダムで1つ選んで常時表示する
+-- -----------------------------------------------------------------------------
+local ICON_LIST = {
+  { glyph = wezterm.nerdfonts.custom_go, color = "#00ADD8" },
+  { glyph = wezterm.nerdfonts.dev_argocd, color = "#EF7B4D" },
+}
 
 -- -----------------------------------------------------------------------------
 -- リポジトリ名の検出
@@ -64,6 +71,21 @@ local function find_repo_name(cwd)
 end
 
 -- -----------------------------------------------------------------------------
+-- アイコンの抽選
+-- -----------------------------------------------------------------------------
+
+-- タブごとに一度だけ抽選した結果を覚えておく
+-- （再描画のたびに引き直すとアイコンがチカチカ切り替わってしまう）
+local tab_icon_cache = {}
+
+local function pick_icon(tab_id)
+  if not tab_icon_cache[tab_id] then
+    tab_icon_cache[tab_id] = ICON_LIST[math.random(#ICON_LIST)]
+  end
+  return tab_icon_cache[tab_id]
+end
+
+-- -----------------------------------------------------------------------------
 -- メイン処理
 -- -----------------------------------------------------------------------------
 function module.apply_to_config(config)
@@ -83,40 +105,50 @@ function module.apply_to_config(config)
   }
 
   -- タブのタイトルを描画する
-  wezterm.on("format-tab-title", function(tab, _, _, _, _, max_width)
+  wezterm.on("format-tab-title", function(tab, tabs, _, _, _, max_width)
     -- アクティブかどうかで色を切り替える
     local bg = tab.is_active and COLORS.active_bg or COLORS.inactive_bg
     local fg = tab.is_active and COLORS.active_fg or COLORS.inactive_fg
+
+    -- 右端の炎は次のタブの背景色の上に描くことで、タブ同士が繋がって見える
+    -- （tabs は 1 始まり、tab_index は 0 始まりなので +2 が次のタブ）
+    local next_tab = tabs[tab.tab_index + 2]
+    local flame_bg = "none"
+    if next_tab then
+      flame_bg = next_tab.is_active and COLORS.active_bg or COLORS.inactive_bg
+    end
 
     -- 表示名: git リポジトリ内ならリポジトリ名、それ以外はパネルのタイトル
     local cwd_url = tab.active_pane.current_working_dir
     local cwd = cwd_url and cwd_url.file_path
     local label = find_repo_name(cwd) or tab.active_pane.title
+    local icon = pick_icon(tab.tab_id)
+
+    -- アイコンの色: アクティブタブでは背景と同化しやすいので文字色に合わせる
+    local icon_color = tab.is_active and fg or icon.color
 
     -- タブ番号 + 表示名
-    -- 左の余白(1) + 左右の半円(2) のぶんを max_width から引いて切り詰めないと、
-    -- タブ幅の上限を超えて右の半円が切れる
+    -- 右の炎(1) + アイコン(3) のぶんを max_width から引いて切り詰めないと、
+    -- タブ幅の上限を超えて右の炎が切れる
     local title = string.format(" %d: %s ", tab.tab_index + 1, label)
-    title = wezterm.truncate_right(title, max_width - 3)
-
-    -- 半円はアクティブタブだけに付ける
-    local left = tab.is_active and LEFT_CIRCLE or ""
-    local right = tab.is_active and RIGHT_CIRCLE or ""
+    title = wezterm.truncate_right(title, max_width - 4)
 
     -- 描画パーツを順番に並べて返す
     return {
-      -- 左の半円（背景色を文字色として描くことで丸く見せる）
-      { Background = { Color = "none" } },
-      { Foreground = { Color = bg } },
-      { Text = " " .. left },
-      -- タイトル本体
+      -- アイコン
+      { Background = { Color = bg } },
+      { Foreground = { Color = icon_color } },
+      { Text = " " .. icon.glyph },
+      -- タイトル本体（アクティブタブは太字）
       { Background = { Color = bg } },
       { Foreground = { Color = fg } },
+      { Attribute = { Intensity = tab.is_active and "Bold" or "Normal" } },
       { Text = title },
-      -- 右の半円
-      { Background = { Color = "none" } },
+      { Attribute = { Intensity = "Normal" } },
+      -- 右の炎（次のタブとの区切り）
+      { Background = { Color = flame_bg } },
       { Foreground = { Color = bg } },
-      { Text = right },
+      { Text = RIGHT_FLAME },
     }
   end)
 end
