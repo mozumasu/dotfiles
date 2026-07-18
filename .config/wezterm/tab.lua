@@ -17,6 +17,8 @@ local ICONS = {
   nb = wezterm.nerdfonts.md_notebook,
   ssh = wezterm.nerdfonts.md_lan,
   claude = "✳",
+  go = wezterm.nerdfonts.custom_go,
+  argocd = wezterm.nerdfonts.dev_argocd,
   fallback = wezterm.nerdfonts.dev_terminal,
   zoom = wezterm.nerdfonts.md_magnify,
 }
@@ -28,6 +30,8 @@ local ICON_COLORS = {
   nb = palette.nb,
   ssh = palette.ssh,
   claude = "#D97757",
+  go = "#00ADD8",
+  argocd = "#EF7B4D",
 }
 
 -- Tab colors
@@ -125,6 +129,14 @@ local function get_icon_and_color(ctx)
 
   if ctx.process_name == "docker" or ctx.pane_title:find("docker", 1, true) then
     return ICONS.docker, ICON_COLORS.docker
+  end
+
+  if ctx.process_name == "argocd" or (ctx.cwd and ctx.cwd:find("argocd", 1, true)) then
+    return ICONS.argocd, ICON_COLORS.argocd
+  end
+
+  if ctx.process_name == "go" or ctx.is_go then
+    return ICONS.go, ICON_COLORS.go
   end
 
   return ICONS.fallback, TAB_COLORS.foreground_inactive
@@ -246,6 +258,11 @@ function module.apply_to_config(config)
       if cwd ~= state.raw_cwd then
         state.raw_cwd = cwd
         state.title = extract_project_name(cwd)
+        local go_mod = cwd and io.open(cwd .. "/go.mod", "r")
+        state.is_go = go_mod ~= nil
+        if go_mod then
+          go_mod:close()
+        end
       end
     end
 
@@ -319,6 +336,7 @@ function module.apply_to_config(config)
       is_ssh = is_ssh,
       is_active = tab.is_active,
       is_claude = is_claude,
+      is_go = state.is_go,
     })
 
     -- ズームインジケーター
