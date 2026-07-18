@@ -27,11 +27,25 @@ function module.apply_to_config(_)
     local key_table = window:active_key_table()
     local color = KEY_TABLE_COLORS[key_table] or KEY_TABLE_COLORS.default
 
+    -- 末尾の「>」型区切りは最初のタブの背景色で描き、タブへシームレスに繋げる
+    local first_tab_active = false
+    for _, tab_info in ipairs(window:mux_window():tabs_with_info()) do
+      if tab_info.index == 0 then
+        first_tab_active = tab_info.is_active
+        break
+      end
+    end
+    -- "#313244" は tab_simple.lua の非アクティブタブ背景色と揃えている
+    local divider_color = first_tab_active and palette.accent or "#313244"
+
     -- ワークスペース名の色を変更（全モード対応）
     window:set_left_status(wezterm.format({
       { Background = { Color = "transparent" } },
       { Foreground = { Color = color } },
-      { Text = "  " .. workspace .. "  " },
+      { Text = "  " .. workspace .. " " },
+      { Foreground = { Color = divider_color } },
+      -- 「>」の形に透過でくり抜かれた塗りつぶし glyph
+      { Text = wezterm.nerdfonts.ple_left_hard_divider_inverse },
     }))
 
     -- カーソル色変更（OSCエスケープシーケンスを使用）
