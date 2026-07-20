@@ -1,7 +1,8 @@
 # AI Coding Rules
 
 - Respond in Japanese.
-- Use sub-agents whenever possible.
+- 調査・コードリーディング・レビューなどコンテキストを消費する読み取り作業はサブエージェントに委譲する。
+  単純な 1 ファイルの編集や既知箇所の修正まで委譲しない。
 
 ## Git Commit Message Format
 
