@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  hostSpec,
   ...
 }:
 let
@@ -12,8 +13,9 @@ let
   publicSettings = {
     env = {
       MAX_THINKING_TOKENS = "31999";
-      # Findy AI+ Prompt & Session Log (OpenTelemetry) の env 一式は
-      # sops の claude-otel-env シークレットから activation 時にマージされる
+      # Findy AI+ Prompt & Session Log (OpenTelemetry) の env は
+      # ~/src/github.com/Findy/ 配下で起動したときだけ claude wrapper が
+      # sops の claude-otel-env シークレットから export する (下記 claudeWithOtel)
     };
     includeCoAuthoredBy = true;
     model = "claude-fable-5[1m]";
@@ -263,11 +265,39 @@ let
   otelEnvFile = "${config.xdg.configHome}/claude/.otel-env.json";
 
   settingsFile = pkgs.writeText "claude-settings.json" (builtins.toJSON publicSettings);
+
+  # Findy AI+ 向け OTel テレメトリは mocha (業務マシン) の
+  # Findy 配下のリポジトリで起動したセッションのみ対象にする。
+  # settings.json (ユーザーレベル) に置くと全セッションが収集されるため、
+  # 起動ディレクトリで判定する wrapper で env を注入する
+  enableFindyOtel = hostSpec.hostName == "F-00739-Mac";
+
+  claudeWithOtel = pkgs.symlinkJoin {
+    name = "claude-code-otel-scoped";
+    paths = [ pkgs.llm-agents.claude-code ];
+    postBuild = ''
+      rm $out/bin/claude
+      cat > $out/bin/claude <<WRAPPER
+      #!${pkgs.runtimeShell}
+      otel_env="${otelEnvFile}"
+      case "\$PWD/" in
+        "\$HOME/src/github.com/Findy/"*)
+          if [ -r "\$otel_env" ]; then
+            eval "\$(${pkgs.jq}/bin/jq -r \
+              '.env | to_entries[] | "export \(.key)=\(.value | @sh)"' "\$otel_env")"
+          fi
+          ;;
+      esac
+      exec ${pkgs.llm-agents.claude-code}/bin/claude "\$@"
+      WRAPPER
+      chmod +x $out/bin/claude
+    '';
+  };
 in
 {
   # Claude Code 本体は llm-agents.nix で管理（自動アップデータは wrapper 側で無効化済み）
-  home.packages = with pkgs; [
-    llm-agents.claude-code
+  home.packages = [
+    (if enableFindyOtel then claudeWithOtel else pkgs.llm-agents.claude-code)
   ];
 
   # ~/.config/claude/ は activation script で管理
@@ -294,12 +324,11 @@ in
 
     # settings.json は書き込み可能なファイルとしてコピー
     # Claude Code の /config エディタが書き戻せるようにするため
-    # privateMarketplaces と OTel env を順に deep merge する
+    # privateMarketplaces を deep merge する
+    # (OTel env は Findy 配下限定のため claude wrapper が注入し、ここでは merge しない)
     PRIVATE_FILE="${privateMarketplacesFile}"
-    OTEL_ENV_FILE="${otelEnvFile}"
     settings_files=("${settingsFile}")
     [ -f "$PRIVATE_FILE" ] && settings_files+=("$PRIVATE_FILE")
-    [ -f "$OTEL_ENV_FILE" ] && settings_files+=("$OTEL_ENV_FILE")
     if [ "''${#settings_files[@]}" -gt 1 ]; then
       ${pkgs.jq}/bin/jq -s 'reduce .[] as $x ({}; . * $x)' "''${settings_files[@]}" \
         > "$CLAUDE_DIR/settings.json"
