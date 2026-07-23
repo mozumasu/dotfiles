@@ -49,6 +49,7 @@
     # ビルドツール
     cmake
     ninja
+    just
 
     # インフラ/DevOps
     awscli2
