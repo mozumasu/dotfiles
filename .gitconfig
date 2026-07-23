@@ -4,7 +4,7 @@
 [user]
   name = mozumasu
   email = ouri1229@gmail.com
-	signingkey = /Users/ori.matsumoto/.ssh/id_ed25519.pub
+	signingkey = ~/.ssh/id_ed25519.pub
 
 [alias]
 	ci = commit
@@ -53,5 +53,7 @@
 	helper = 
 	helper = !/nix/store/0370cakz5b3yf6dlr2r75ybxsrjpp5k3-gh-2.96.0/bin/.gh-wrapped auth git-credential
 [credential "https://gist.github.com"]
-	helper = 
+	helper =
 	helper = !/nix/store/0370cakz5b3yf6dlr2r75ybxsrjpp5k3-gh-2.96.0/bin/.gh-wrapped auth git-credential
+[url "git@github.com:"]
+	insteadOf = https://github.com/
