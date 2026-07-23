@@ -6,6 +6,11 @@ let
   ];
 in
 {
+  programs.gh = {
+    enable = true;
+    gitCredentialHelper.enable = true;
+  };
+
   home.activation.installGhExtensions = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     GH=${pkgs.gh}/bin/gh
     installed="$($GH extension list 2>/dev/null || true)"

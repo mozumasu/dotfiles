@@ -49,11 +49,5 @@
 	driver = mergiraf merge --git %O %A %B -s %S -x %X -y %Y -p %P -l %L
 [branch]
 	autoSetupMerge = simple
-[credential "https://github.com"]
-	helper = 
-	helper = !/nix/store/0370cakz5b3yf6dlr2r75ybxsrjpp5k3-gh-2.96.0/bin/.gh-wrapped auth git-credential
-[credential "https://gist.github.com"]
-	helper =
-	helper = !/nix/store/0370cakz5b3yf6dlr2r75ybxsrjpp5k3-gh-2.96.0/bin/.gh-wrapped auth git-credential
 [url "git@github.com:"]
 	insteadOf = https://github.com/
