@@ -21,6 +21,9 @@
         HOMEBREW_NO_UPDATE_REPORT_NEW = "1";
         # analytics / donation などのヒント表示を抑制
         HOMEBREW_NO_ENV_HINTS = "1";
+        # darwin-rebuild 内では tap trust 情報が参照できないため無効化
+        # 通常ユーザーで trust 済みでも sudo 経由の activation では untrusted になる
+        HOMEBREW_NO_REQUIRE_TAP_TRUST = "1";
       };
     };
 
