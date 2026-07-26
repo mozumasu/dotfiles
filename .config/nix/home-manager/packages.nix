@@ -53,6 +53,7 @@
 
     # インフラ/DevOps
     awscli2
+    granted # AWS プロファイル切り替え (assume)
     k6
     vhs
     tfupdate

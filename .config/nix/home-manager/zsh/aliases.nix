@@ -20,6 +20,8 @@
     iam = "check-iam-policy";
     ssmdv = "view-ssm-document";
     ssmdsync = "sync-ssm-document";
+    # granted の assume は環境変数を export するため source で実行する
+    assume = ". assume";
     awsconfig = "v ~/.aws/config";
     awscredentials = "v ~/.aws/credentials";
 

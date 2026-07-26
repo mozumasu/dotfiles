@@ -44,6 +44,9 @@
     nodejs
     deno
     tree-sitter
+
+    # インフラ/DevOps
+    granted # AWS プロファイル切り替え (assume)
   ];
 
   # direnv + nix-direnv
