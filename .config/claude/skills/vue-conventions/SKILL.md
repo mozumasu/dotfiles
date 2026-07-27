@@ -4,7 +4,7 @@ description: >
   Vue 3 コンポーネント・composable を書く / レビューするときのコーディング規約。
   *.vue ファイルの作成・編集、「Vueコンポーネントを作って」「composableを書いて」
   「Vueのコードをレビューして」などのリクエストで使用する。
-  Slidev テーマのレイアウト実装にも適用する (Slidev 固有 API は slidev スキル参照)。
+  Slidev テーマのレイアウト実装にも適用する (Slidev 固有 API は slidev-theme-dev スキル参照)。
 ---
 
 # Vue 3 コーディング規約

@@ -1,16 +1,19 @@
 ---
-name: slidev
+name: slidev-theme-dev
 description: >
-  Slidev (sli.dev) でスライドの作成・編集、テーマ・アドオンの自作を行う。
-  「スライドを作って」「Slidevで発表資料を作りたい」「LT資料を作って」
-  「Slidevのテーマを作って」「レイアウトを追加して」「スライドをエクスポートして」
-  などのリクエスト、または slides.md や slidev-theme-* / slidev-addon-* を扱う作業で使用する。
+  Slidev のテーマ (slidev-theme-*)・アドオン (slidev-addon-*) の自作・開発と、
+  この環境固有の落とし穴 (rumdl hook との干渉、pnpm workspace 構成など) を扱う。
+  「Slidevのテーマを作って」「レイアウトを追加して」「アドオンを作りたい」などの
+  リクエスト、または slidev-theme-* / slidev-addon-* パッケージのコード編集で使用する。
+  スライド本体の執筆・エクスポート全般は公式の slidev:slidev スキルを使う
+  (その際もこのスキルの「落とし穴」は併読する)。
 ---
 
-# Slidev: スライド作成・テーマ開発
+# Slidev: テーマ・アドオン開発
 
 Slidev は Markdown + Vue でスライドを書くプレゼンテーションツール。
-このスキルはスライド執筆とテーマ・アドオン開発の両方をカバーする。
+このスキルはテーマ・アドオン開発と、実案件で踏んだ環境固有の知見をカバーする。
+スライド執筆の機能リファレンスは公式 slidev:slidev スキル側にある。
 
 ## 基本コマンド
 
