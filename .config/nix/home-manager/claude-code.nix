@@ -215,6 +215,7 @@ let
       "aws-core@agent-toolkit-for-aws" = true;
       "aws-data-analytics@agent-toolkit-for-aws" = true;
       "codex@openai-codex" = true;
+      "cloudflare@cloudflare" = true;
     }
     // lib.optionalAttrs (builtins.pathExists privateMarketplacesFile) (builtins.fromJSON (
       builtins.readFile privateMarketplacesFile
@@ -236,6 +237,12 @@ let
         source = {
           source = "github";
           repo = "openai/codex-plugin-cc";
+        };
+      };
+      cloudflare = {
+        source = {
+          source = "github";
+          repo = "cloudflare/skills";
         };
       };
     }
