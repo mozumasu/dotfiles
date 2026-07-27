@@ -17,6 +17,9 @@ snippets:
   - keyword: awsv
     snippet: aws-vault
 
+  - keyword: asc
+    snippet: assume -c
+
   - keyword: etr;
     snippet:
       aws ecs run-task \
@@ -60,6 +63,7 @@ completions:
   - name: aws profile
     patterns:
       - "aws-vault login( .*)? $"
+      - '^assume(\s+-[a-z-]+)*\s+$'
       - '^aws\b.*--profile(?:(?:=|\s+)([A-Za-z0-9._-]*))?\s*$'
       - '^\s*AWS_PROFILE=[A-Za-z0-9._-]*$'
     sourceCommand: "aws configure list-profiles"
