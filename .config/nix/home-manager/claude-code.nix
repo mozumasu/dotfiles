@@ -216,6 +216,7 @@ let
       "aws-data-analytics@agent-toolkit-for-aws" = true;
       "codex@openai-codex" = true;
       "cloudflare@cloudflare" = true;
+      "slidev@slidev-plugins" = true;
     }
     // lib.optionalAttrs (builtins.pathExists privateMarketplacesFile) (builtins.fromJSON (
       builtins.readFile privateMarketplacesFile
@@ -243,6 +244,12 @@ let
         source = {
           source = "github";
           repo = "cloudflare/skills";
+        };
+      };
+      slidev-plugins = {
+        source = {
+          source = "github";
+          repo = "slidevjs/slidev";
         };
       };
     }
