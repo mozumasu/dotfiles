@@ -201,11 +201,28 @@ async (page) => {
 
   2. HANG のタブを `POST http://localhost:9222/json/activate/<id>` で
      アクティブ化するとフリーズが解除される (ユーザーの前面タブが一瞬
-     切り替わるが実害なし)
+     切り替わるが実害なし)。この環境では curl が permission deny なので
+     node で送る:
+
+     ```sh
+     node -e 'fetch("http://localhost:9222/json/activate/<id>", { method: "POST" }).then(r => console.log(r.status))'
+     ```
+
   3. Playwright ツールを再実行 (MCP サーバーは呼び出しごとに再接続する)
+  4. **activate しても解凍されないタブがある** (200 が返るのに再プローブで
+     HANG のまま)。ページ自体のハングや Arc の即時再凍結が原因で、外からは
+     直せない。`/json/list` でそのタブの URL を確認し、**ユーザーに提示して
+     「そのタブを開くか閉じてほしい」と依頼する**。ユーザーのタブを勝手に
+     閉じないこと (タイトル空でも実ページのことがある。実例: 凍結した
+     勤怠 SaaS のタブ 1 つが全体をブロックし続けた)
 
   それでも直らない場合のみ、Arc の完全終了 →
   `! open -a "Arc" --args --remote-debugging-port=9222` での再起動を案内する
+
+  **復旧を待たない選択肢**: ログイン済みセッションが不要な用途
+  (localhost のレンダリング検証など) なら、Arc の復旧に固執せず
+  ヘッドレス Chromium に切り替えるほうが早い。デッキの devDependencies の
+  playwright-chromium を使う手順は slidev-deck-conventions スキル参照
 - **タブが閉じられる/CDP接続が切れる**: `Target page, context or browser has
   been closed` エラーが出たら、`browser_navigate` を再度叩くと再接続される
   ことが多い。`browser_tabs (list)` がタイムアウトする場合も同様
