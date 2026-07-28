@@ -31,15 +31,19 @@ Web UI のアップロード機構をそのまま使う。セッショントー�
 2. **dev サーバーの確認**: `portless list` / `ghost list` で対象 worktree のサーバーが
    起動済みか確認する。なければ background-process.md の規約どおり、デッキのディレクトリで
    `ghost run -- portless run pnpm dev` で起動し、`ghost log` でポートを確認する。
-3. **撮影**: Playwright MCP で `http://localhost:<port>/<スライド番号>` を開き、
+3. **撮影前のヘルスチェック**: 最初の撮影の前に `browser_tabs` (list) でブラウザ接続の
+   疎通を確認する。CDP エラーになったら 1 回だけ再接続を試し、それでも失敗したら
+   中断してユーザーに報告する (失敗したまま撮影を繰り返さない)。
+4. **撮影**: Playwright MCP で `http://localhost:<port>/<スライド番号>` を開き、
    `browser_take_screenshot` で `slide-<番号>.png` として撮影する (保存先は cwd 直下になる)。
-   撮影後は Read ツールで画像を開き、レイアウト崩れ・はみ出しがないか確認する
-   (崩れていたら報告し、貼る前に直すかユーザーに判断を仰ぐ)。
-4. **PR ページを新規タブで開く**: `browser_tabs` の `new` で PR の URL を開く。
+   撮影ごとに `ls -l` でファイルサイズが 0 バイトでないことを確認してから次へ進む
+   (0 バイトなら撮り直す)。撮影後は Read ツールで画像を開き、レイアウト崩れ・
+   はみ出しがないか確認する (崩れていたら報告し、貼る前に直すかユーザーに判断を仰ぐ)。
+5. **PR ページを新規タブで開く**: `browser_tabs` の `new` で PR の URL を開く。
    **ユーザーが使用中の既存タブを流用しない** (操作が競合する)。
-5. **本文の下書き**: コメント欄 textarea (`#new_comment_field`) に `browser_type` で
+6. **本文の下書き**: コメント欄 textarea (`#new_comment_field`) に `browser_type` で
    仮の見出し (例: `## 変更スライドの表示確認`) を入力する。
-6. **画像の添付**: ツールバーの Attach ボタンはバックグラウンドタブだと actionability
+7. **画像の添付**: ツールバーの Attach ボタンはバックグラウンドタブだと actionability
    チェック (visible/stable 待ち) で timeout するため、`browser_evaluate` で隠しファイル入力を
    直接クリックしてファイルチューザーを開く:
 
@@ -49,22 +53,22 @@ Web UI のアップロード機構をそのまま使う。セッショントー�
 
    Modal state が `[File chooser]` になったら `browser_file_upload` で png を
    全部まとめて渡す。
-7. **アップロード完了待ち**: 数秒待ってから `browser_evaluate` で
+8. **アップロード完了待ち**: 数秒待ってから `browser_evaluate` で
    `document.getElementById('new_comment_field').value` を読み、ファイル数ぶんの
    `<img ... src="https://github.com/user-attachments/assets/...">` が挿入されるまで待つ。
-8. **本文の整形**: 得られた `<img>` タグを使って、スライド番号ごとの見出し付き本文を組み立て、
+9. **本文の整形**: 得られた `<img>` タグを使って、スライド番号ごとの見出し付き本文を組み立て、
    `browser_type` で textarea に入力し直す (fill なので全置換される)。
-9. **送信**: Comment ボタンも actionability で timeout しやすいので `browser_evaluate` で送信する:
+10. **送信**: Comment ボタンも actionability で timeout しやすいので `browser_evaluate` で送信する:
 
-   ```js
-   () => { document.getElementById('new_comment_field').closest('form')
+    ```js
+    () => { document.getElementById('new_comment_field').closest('form')
      .querySelector('button[type="submit"].btn-primary').click(); }
-   ```
+    ```
 
-10. **投稿確認**: `gh pr view <番号> --json comments --jq '.comments[-1].body'` で
+11. **投稿確認**: `gh pr view <番号> --json comments --jq '.comments[-1].body'` で
     コメント本文が投稿されたことを確認してから完了報告する。
-11. **後片付け**: 撮影した png を削除し (リポジトリにはコミットしない)、
-    手順 4 で開いたタブを `browser_tabs` の `close` で閉じる。
+12. **後片付け**: 撮影した png を削除し (リポジトリにはコミットしない)、
+    手順 5 で開いたタブを `browser_tabs` の `close` で閉じる。
 
 ## 注意
 
