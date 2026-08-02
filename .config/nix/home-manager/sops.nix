@@ -35,6 +35,18 @@ in
       ${todayCalendarConfKey} = {
         path = "${config.xdg.configHome}/local/today-calendar.conf";
       };
+
+      # GitHub Packages (npm.pkg.github.com) 用 PAT (read:packages)
+      github-packages-token = { };
+    };
+
+    # npm の private registry 設定。user config は globalconfig より優先される
+    templates.".npmrc" = {
+      content = ''
+        registry=https://npm.flatt.tech/
+        //npm.pkg.github.com/:_authToken=${config.sops.placeholder.github-packages-token}
+      '';
+      path = "${config.home.homeDirectory}/.npmrc";
     };
   };
 

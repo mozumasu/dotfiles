@@ -37,10 +37,7 @@ in
     ".gitconfig".source = mkLink ".gitconfig";
     ".tmux.conf".source = mkLink ".tmux.conf";
     ".nbrc".source = mkLink ".nbrc";
-    # npm の private registry 設定。user config は globalconfig より優先される
-    ".npmrc".text = ''
-      registry=https://npm.flatt.tech/
-    '';
+    # .npmrc はトークンを含むため sops.nix (sops.templates) で管理
   };
 
   # macSKK dictionaries - copy instead of symlink due to sandbox restrictions
