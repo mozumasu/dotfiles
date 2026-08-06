@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ghost log *)",
+      "Bash(ghost list *)",
+      "Bash(portless list *)",
+      "Bash(aws cloudtrail lookup-events *)",
+      "Bash(aws configure list-profiles *)",
+      "Bash(aws sts get-caller-identity *)",
+      "Bash(aws logs tail *)",
+      "Bash(aws secretsmanager list-secrets *)",
+      "Bash(aws cloudwatch get-metric-statistics *)",
+      "Bash(aws ecs describe-services *)",
+      "Bash(gh run watch *)",
+      "Bash(gh variable get *)",
+      "Bash(gh secret list *)",
+      "Bash(gh search *)",
+      "Bash(pup metrics *)",
+      "Bash(pup logs *)",
+      "Bash(wezterm ls-fonts *)",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "mcp__plugin_slack_slack__slack_search_public_and_private",
+      "mcp__plugin_slack_slack__slack_read_channel"
+    ]
+  }
+}
