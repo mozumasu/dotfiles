@@ -20,6 +20,7 @@ let
     includeCoAuthoredBy = true;
     model = "claude-fable-5[1m]";
     tui = "fullscreen";
+    autoMemoryEnabled = false;
     permissions = {
       defaultMode = "auto";
       allow = [
