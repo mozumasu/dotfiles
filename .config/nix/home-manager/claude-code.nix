@@ -18,7 +18,6 @@ let
       # sops の claude-otel-env シークレットから export する (下記 claudeWithOtel)
     };
     includeCoAuthoredBy = true;
-    model = "claude-fable-5[1m]";
     tui = "fullscreen";
     autoMemoryEnabled = false;
     permissions = {
