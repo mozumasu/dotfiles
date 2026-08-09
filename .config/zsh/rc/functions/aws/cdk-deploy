@@ -1,0 +1,44 @@
+#!/usr/bin/env zsh
+
+# Run `cdk deploy` and send desktop notifications when the y/n approval
+# prompt appears and when the deploy finishes.
+# Usage: cdk-deploy [cdk deploy args...]
+
+if ! command -v expect >/dev/null; then
+  echo "cdk-deploy: expect not found" >&2
+  return 1
+fi
+
+# The "(y/n)" suffix is appended mechanically by CDK CLI's CliIoHost,
+# so it is a stable marker for the approval prompt.
+local expect_script='
+set timeout -1
+proc notify_prompt {} {
+  catch { exec terminal-notifier -title "cdk deploy" -message "確認待ち: y/n の入力が必要です" -sound Glass }
+}
+spawn cdk deploy {*}$argv
+expect {
+  -ex "(y/n)" {
+    notify_prompt
+    interact {
+      -o -ex "(y/n)" {
+        # interact -o consumes the matched text, so re-emit it to the user
+        send_user -- "(y/n)"
+        notify_prompt
+      }
+    }
+  }
+  eof {}
+}
+exit [lindex [wait] 3]
+'
+
+expect -f =(print -r -- "$expect_script") "$@"
+local rc=$?
+
+if (( rc == 0 )); then
+  terminal-notifier -title "cdk deploy" -message "デプロイ完了 ✅" -sound Glass >/dev/null
+else
+  terminal-notifier -title "cdk deploy" -message "デプロイ失敗 ❌ (exit $rc)" -sound Basso >/dev/null
+fi
+return $rc

@@ -54,6 +54,7 @@
     # インフラ/DevOps
     awscli2
     granted # AWS プロファイル切り替え (assume)
+    crane # コンテナレジストリ操作 CLI
     k6
     vhs
     tfupdate
