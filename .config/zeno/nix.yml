@@ -26,6 +26,11 @@ snippets:
     keyword: ngc
     snippet: nix-collect-garbage -d
 
+  # secrets (sops-nix)
+  - name: nix secrets edit
+    keyword: sops
+    snippet: nix run nixpkgs#sops -- edit ~/dotfiles/.config/nix/secrets/user-secrets.yaml
+
 completions:
   # nix run apps (dotfiles の flake apps を補完)
   - name: nix run apps
