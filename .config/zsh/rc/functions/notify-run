@@ -1,0 +1,60 @@
+#!/usr/bin/env zsh
+
+# Run any command and send desktop notifications when a y/n confirmation
+# prompt appears and when the command finishes.
+# Usage: notify-run <command> [args...]
+#   e.g. notify-run cdk deploy MyStack
+#        notify-run npm run deploy:stg
+
+if (( $# == 0 )); then
+  echo "usage: notify-run <command> [args...]" >&2
+  return 1
+fi
+
+if ! command -v expect >/dev/null; then
+  echo "notify-run: expect not found" >&2
+  return 1
+fi
+
+# Prompt markers are enumerated with -ex (exact match): -re patterns
+# inside interact buffer output and stall the passthrough.
+# Covers CDK CLI's "(y/n)" and common hand-rolled "[y/N]" style prompts.
+local expect_script='
+set timeout -1
+set cmd_name [lindex $argv 0]
+proc notify_prompt {} {
+  global cmd_name
+  catch { exec terminal-notifier -title $cmd_name -message "確認待ち: y/n の入力が必要です" -sound Glass }
+}
+spawn {*}$argv
+expect {
+  -ex "(y/n)" {}
+  -ex "(y/N)" {}
+  -ex "(Y/n)" {}
+  -ex {[y/N]} {}
+  -ex {[y/n]} {}
+  -ex {[Y/n]} {}
+  eof { exit [lindex [wait] 3] }
+}
+notify_prompt
+interact {
+  -o
+  -ex "(y/n)" { send_user -- "(y/n)"; notify_prompt }
+  -ex "(y/N)" { send_user -- "(y/N)"; notify_prompt }
+  -ex "(Y/n)" { send_user -- "(Y/n)"; notify_prompt }
+  -ex {[y/N]} { send_user -- {[y/N]}; notify_prompt }
+  -ex {[y/n]} { send_user -- {[y/n]}; notify_prompt }
+  -ex {[Y/n]} { send_user -- {[Y/n]}; notify_prompt }
+}
+exit [lindex [wait] 3]
+'
+
+expect -f =(print -r -- "$expect_script") "$@"
+local rc=$?
+
+if (( rc == 0 )); then
+  terminal-notifier -title "$1" -message "完了 ✅" -sound Glass >/dev/null
+else
+  terminal-notifier -title "$1" -message "失敗 ❌ (exit $rc)" -sound Basso >/dev/null
+fi
+return $rc
