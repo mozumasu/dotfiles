@@ -1,7 +1,0 @@
-#!/usr/bin/env zsh
-
-# Run `cdk deploy` with y/n prompt and completion notifications.
-# Usage: cdk-deploy [cdk deploy args...]
-
-(( $+functions[notify-run] )) || autoload -Uz notify-run
-notify-run cdk deploy "$@"
