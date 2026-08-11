@@ -85,9 +85,20 @@ local function get_git_root()
   return (result.code == 0 and vim.trim(result.stdout)) or LazyVim.root.get({ buf = 0 })
 end
 
+-- cwd が git worktree 内か判定する
+local function in_git_worktree(dir)
+  return vim.system(
+    { "git", "-C", dir, "rev-parse", "--is-inside-work-tree" },
+    { text = true, timeout = 3000 }
+  ):wait().code == 0
+end
+
 -- Swap LazyGit keymaps (gg: cwd, gG: root)
+-- cwd が git 外のとき (git 外から起動して nb ノートだけ開いた等) は
+-- 現在バッファの git root にフォールバックする
 keymap("n", "<leader>gg", function()
-  Snacks.lazygit({ cwd = vim.fn.getcwd() })
+  local cwd = vim.fn.getcwd()
+  Snacks.lazygit({ cwd = in_git_worktree(cwd) and cwd or get_git_root() })
 end, { desc = "LazyGit (cwd)" })
 keymap("n", "<leader>gG", function()
   Snacks.lazygit({ cwd = get_git_root() })
