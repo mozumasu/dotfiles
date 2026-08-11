@@ -23,6 +23,8 @@ in
     "zeno".source = mkLink ".config/zeno";
     "gomi".source = mkLink ".config/gomi";
     "mise".source = mkLink ".config/mise";
+    # rumdl のユーザーレベル設定 (プロジェクトに .rumdl.toml が無い場合のフォールバック)
+    "rumdl/rumdl.toml".source = mkLink ".config/rumdl/rumdl.toml";
     "ccsession".source = mkLink ".config/ccsession";
     # herdr は ~/.config/herdr/ にログ・ソケット等のランタイムファイルも
     # 書き込むため、config.toml のみリンクする
