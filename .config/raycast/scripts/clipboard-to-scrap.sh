@@ -64,7 +64,9 @@ if [ -n "$extra" ]; then
 $extra"
 fi
 
-result=$(printf '%s' "$input" | claude -p "$prompt" --model sonnet)
+# テキスト変換だけの用途。ツールとスキルを無効化しないと、プロンプトの語句に
+# 反応してスキル (nb-home 等) が発動しファイル作成までしてしまうことがある
+result=$(printf '%s' "$input" | claude -p "$prompt" --model sonnet --tools "" --disable-slash-commands)
 
 if [ -z "$result" ]; then
   echo "claude から出力が得られませんでした。"

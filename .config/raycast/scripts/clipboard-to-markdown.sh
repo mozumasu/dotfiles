@@ -49,7 +49,8 @@ if [ -n "$extra" ]; then
 - 追加の指示: $extra"
 fi
 
-result=$(printf '%s' "$input" | claude -p "$prompt" --model haiku)
+# テキスト変換だけの用途。スキル誤発動やツールによるファイル操作を防ぐ
+result=$(printf '%s' "$input" | claude -p "$prompt" --model haiku --tools "" --disable-slash-commands)
 
 if [ -z "$result" ]; then
   echo "claude から出力が得られませんでした。"

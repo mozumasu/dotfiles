@@ -60,7 +60,8 @@ if [ -n "$extra" ]; then
 $extra"
 fi
 
-result=$(printf '%s' "$input" | claude -p "$prompt" --model sonnet)
+# テキスト変換だけの用途。スキル誤発動やツールによるファイル操作を防ぐ
+result=$(printf '%s' "$input" | claude -p "$prompt" --model sonnet --tools "" --disable-slash-commands)
 
 if [ -z "$result" ]; then
   echo "claude から出力が得られませんでした。"
