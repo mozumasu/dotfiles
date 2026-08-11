@@ -23,6 +23,9 @@ export PATH="$HOME/.local/share/mise/shims:/etc/profiles/per-user/$USER/bin:/run
 # 認証情報は ~/.config/claude 配下にある (shell 設定と同じ値。無いと Not logged in になる)
 export CLAUDE_CONFIG_DIR="$HOME/.config/claude"
 
+# ロケール未設定だと pbpaste が日本語を Shift-JIS で出力し文字化けする
+export LC_CTYPE=UTF-8
+
 if ! command -v claude >/dev/null 2>&1; then
   echo "claude CLI が見つかりません。PATH を確認してください。"
   exit 1
