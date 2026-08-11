@@ -29,7 +29,6 @@
 
     # Terminal and editor
     neovim
-    wezterm
   ];
 
   # Automatic garbage collection
