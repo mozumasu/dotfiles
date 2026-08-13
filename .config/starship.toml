@@ -110,7 +110,9 @@ style = "bold fg:#ffcb6b"
 disabled = true
 
 [custom.gcloud]
-when = "command -v gcloud && command -v terraform"
+detect_extensions = ["tf"]
+detect_files = [".gcloudignore", "app.yaml"]
+detect_folders = [".terraform"]
 command = '''
 f=~/.config/gcloud/configurations/config_$(cat ~/.config/gcloud/active_config 2>/dev/null || echo default)
 a=$(perl -ne 'print $1 if /^account\s*=\s*[^@]*@(.+)/' "$f" 2>/dev/null)
