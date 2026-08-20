@@ -100,7 +100,6 @@ let
         "Edit(.env.*)"
         "Edit(~/.ssh/**)"
         "Edit(~/.aws/**)"
-        "Write(.env*)"
       ];
       ask = [
         "Bash(git rebase:*)"
