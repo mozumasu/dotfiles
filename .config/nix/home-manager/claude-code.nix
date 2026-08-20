@@ -19,6 +19,7 @@ let
     };
     includeCoAuthoredBy = true;
     tui = "fullscreen";
+    outputStyle = "Concise";
     autoMemoryEnabled = false;
     permissions = {
       defaultMode = "auto";
