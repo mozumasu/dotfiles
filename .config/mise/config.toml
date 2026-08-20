@@ -5,7 +5,6 @@ python = "3.13.3"
 
 # npm packages
 "npm:@aikidosec/safe-chain" = "latest"
-"npm:@anthropic-ai/claude-code" = "latest"
 "npm:@google/gemini-cli" = "latest"
 "npm:@sasazame/ccresume" = "latest"
 "npm:commitizen" = "latest"
