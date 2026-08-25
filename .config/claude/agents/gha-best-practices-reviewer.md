@@ -130,7 +130,7 @@ permissions:
 
 #### 3.5 Runner Selection
 
-- Flag `runs-on: ubuntu-latest` where `ubuntu-slim` would suffice (default policy: ubuntu-slim, fall back only when required tools are missing from the slim image)
+- Flag `runs-on: ubuntu-latest` where `ubuntu-slim` would suffice (default policy: ubuntu-slim; falling back is legitimate when required tools are missing from the slim image, or when the job's execution time / resource needs exceed slim's limits — see the `github-actions-conventions` skill for the authoritative policy)
 
 ### Step 4: Workflow Design
 
