@@ -34,6 +34,7 @@
     gh
     ghq
     delta
+    hunk # review-first diff viewer
     lazygit
 
     # ターミナル環境

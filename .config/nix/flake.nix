@@ -41,6 +41,10 @@
       url = "github:sorafujitani/ccsession";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    hunk = {
+      url = "github:modem-dev/hunk";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -58,16 +62,24 @@
       googleworkspace-cli,
       llm-agents,
       ccsession,
+      hunk,
       ...
     }:
     let
       system = "aarch64-darwin";
+
+      # hunk の flake は multi-system (aarch64-darwin / x86_64-linux) なので
+      # host の system で解決し、darwin と WSL の両方に適用できる
+      hunkOverlay = final: prev: {
+        hunk = hunk.packages.${final.stdenv.hostPlatform.system}.hunk;
+      };
 
       # WSL (robusta) 用。localOverlay は system が darwin 固定の
       # パッケージ (gws, version-lsp 等) を含むため適用しない
       linuxSystem = "x86_64-linux";
       pkgsLinux = import nixpkgs {
         system = linuxSystem;
+        overlays = [ hunkOverlay ];
         config.allowUnfree = true;
       };
 
@@ -122,6 +134,7 @@
         inherit system;
         overlays = [
           localOverlay
+          hunkOverlay
           kanata-darwin-nix.overlays.default
           llm-agents.overlays.shared-nixpkgs
         ];
@@ -155,6 +168,7 @@
         {
           nixpkgs.overlays = [
             localOverlay
+            hunkOverlay
             kanata-darwin-nix.overlays.default
             llm-agents.overlays.shared-nixpkgs
           ];

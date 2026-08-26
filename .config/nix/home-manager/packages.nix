@@ -19,6 +19,7 @@
     gh
     ghq
     delta # git-delta
+    hunk # review-first diff viewer
     tig
     gibo
     git-secrets
