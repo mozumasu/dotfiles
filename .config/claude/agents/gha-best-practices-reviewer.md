@@ -71,7 +71,7 @@ permissions:
 - Scan for direct use of untrusted inputs in `run:` blocks
 - Flag: `${{ github.event.* }}`, `${{ github.head_ref }}`, PR titles/bodies
 
-`${{ }}` 式を `run:` のコマンド文字列に直接埋め込むと、ワークフロー実行時にテキスト置換されてからシェルに渡される。値に任意のシェル制御文字が含まれていれば、そのままコマンドとして解釈されてしまう。`env` に渡してシェル変数 (`$VAR`) として参照すれば、値は単なる文字列として扱われるため安全。
+A `${{ }}` expression embedded directly in a `run:` command string is expanded by text substitution before the shell sees it, so any shell metacharacters in the value are interpreted as commands. Passing the value through `env` and referencing it as a shell variable (`$VAR`) keeps it a plain string.
 
 ```yaml
 # ❌ Vulnerable
