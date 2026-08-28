@@ -41,6 +41,7 @@
     tree-sitter
     deno
     rumdl # Markdown linter
+    suiko # 日本語文書の自然さ・読みやすさの linter
     nodejs # for Mason LSP servers
     playwright-cli
     go # for gopls etc.

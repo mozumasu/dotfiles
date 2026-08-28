@@ -74,12 +74,21 @@
         hunk = hunk.packages.${final.stdenv.hostPlatform.system}.hunk;
       };
 
-      # WSL (robusta) 用。localOverlay は system が darwin 固定の
-      # パッケージ (gws, version-lsp 等) を含むため適用しない
+      # localOverlay は system が darwin 固定のパッケージ (gws, version-lsp 等)
+      # を含むため WSL に適用できない。platform 非依存の自前パッケージは
+      # こちらに置き、darwin と WSL の両方へ適用する
+      portableOverlay = final: _prev: {
+        suiko = final.callPackage ./packages/suiko.nix { };
+      };
+
+      # WSL (robusta) 用
       linuxSystem = "x86_64-linux";
       pkgsLinux = import nixpkgs {
         system = linuxSystem;
-        overlays = [ hunkOverlay ];
+        overlays = [
+          hunkOverlay
+          portableOverlay
+        ];
         config.allowUnfree = true;
       };
 
@@ -135,6 +144,7 @@
         overlays = [
           localOverlay
           hunkOverlay
+          portableOverlay
           kanata-darwin-nix.overlays.default
           llm-agents.overlays.shared-nixpkgs
         ];
@@ -169,6 +179,7 @@
           nixpkgs.overlays = [
             localOverlay
             hunkOverlay
+            portableOverlay
             kanata-darwin-nix.overlays.default
             llm-agents.overlays.shared-nixpkgs
           ];

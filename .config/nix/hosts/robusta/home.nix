@@ -46,6 +46,9 @@
     deno
     tree-sitter
 
+    # ドキュメント
+    suiko # 日本語文書の自然さ・読みやすさの linter
+
     # インフラ/DevOps
     granted # AWS プロファイル切り替え (assume)
   ];
