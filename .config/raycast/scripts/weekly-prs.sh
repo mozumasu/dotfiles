@@ -8,7 +8,8 @@
 # Optional parameters:
 # @raycast.icon 🔀
 # @raycast.packageName Calendar
-# @raycast.description 今週 (月〜金) に対応した PR 一覧をクリップボードにコピー
+# @raycast.description 指定週 (月〜金) に対応した PR 一覧をクリップボードにコピー
+# @raycast.argument1 { "type": "text", "placeholder": "空=今週 / last / 2 (2週前) / 2026-08-24", "optional": true }
 #
 # Documentation:
 # @raycast.author mozumasu
@@ -29,14 +30,49 @@ if ! gh auth status >/dev/null 2>&1; then
   exit 1
 fi
 
-# 月曜当日は同日を返すため、これだけで今週の月曜になる
-monday=$(date -v -mon +'%Y-%m-%d')
+arg="${1:-}"
+
+case "$arg" in
+  ""|this|today|0)
+    weeks_ago=0
+    ;;
+  last)
+    weeks_ago=1
+    ;;
+  [0-9][0-9]-[0-9][0-9])
+    base_date="$(date +'%Y')-${arg}"
+    ;;
+  [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9])
+    base_date="$arg"
+    ;;
+  -[0-9]|-[0-9][0-9])
+    weeks_ago="${arg#-}"
+    ;;
+  [0-9]|[0-9][0-9])
+    weeks_ago="$arg"
+    ;;
+  *)
+    echo "引数の形式が不正です: $arg"
+    echo "使用可能: (空) / this / last / 2 / -2 / 08-24 / 2026-08-24"
+    exit 1
+    ;;
+esac
+
+# 月曜当日は同日を返すため、-v -mon だけでその週の月曜になる
+if [ -n "${base_date:-}" ]; then
+  if ! monday=$(date -j -v -mon -f '%Y-%m-%d' "$base_date" +'%Y-%m-%d' 2>/dev/null); then
+    echo "日付として解釈できません: $arg"
+    exit 1
+  fi
+else
+  monday=$(date -j -v -mon -v -"$((weeks_ago * 7))"d +'%Y-%m-%d')
+fi
 friday=$(date -j -v +4d -f '%Y-%m-%d' "$monday" +'%Y-%m-%d')
 range="${monday}..${friday}"
 
 login=$(gh api user --jq '.login')
 
-# 自分が作成し、今週更新のあった PR
+# 自分が作成し、対象週に更新のあった PR
 authored=$(gh search prs \
   --author=@me \
   --updated="$range" \
