@@ -93,6 +93,48 @@ deny contains msg if {
 **deny に倒す**。Terraform plan なら `after_unknown` のフィールド、K8s なら
 省略可能フィールドが該当する。fail-open は上記の巻き上げバグで無自覚に発生しやすい。
 
+## conftest の予約ルール名: deny / violation / warn
+
+conftest は `deny` だけでなく **`violation` と `warn` も違反ルールとして直接報告する**。
+deny への変換前の中間集合に `violation` と名付けると、conftest が中間集合を直接拾って
+FAIL にしてしまい、後段の変換 (免除判定など) が素通りされる (実測で確認済みの罠)。
+中間集合には予約語以外の名前 (`finding` 等) を使う。
+
+## 免除・集約は共通 deny 1 箇所に集める
+
+「各 deny ルールが免除ヘルパーを呼ぶ」規約は、呼び忘れ 1 箇所で allowlist が静かに
+無効化される (silent pass なのでエラーも出ない)。人間の規約ではなく構造で防ぐ:
+
+```rego
+# 各ポリシー: deny を書かず、構造化した finding を列挙するだけ
+finding contains v if {
+	<検査条件>
+	v := {"path": ..., "rule": "<識別子>", "msg": ...}
+}
+
+# 共通側 (1 箇所だけ): 免除判定を経て deny に変換
+deny contains v.msg if {
+	some v in finding
+	valid_finding(v)
+	not excepted(v.path, v.rule)
+}
+
+# fail-closed: 形が不正な finding は免除判定できないため deny に倒す
+deny contains msg if {
+	some v in finding
+	not valid_finding(v)
+	msg := sprintf("不正な finding: %v", [v])
+}
+```
+
+- finding ルールが 1 本も無くても deny がコンパイルできるよう、空の種
+  (`finding contains v if { some v in [] }`) を共通側に置く (未定義参照はコンパイルエラー)
+- 「共通ファイル以外での deny / violation / warn 定義を禁止」を CI の grep で機械検査すると
+  抜け道も塞げる
+- conftest 組み込みの `exception` ルールは評価 1 回分にしか効かないため、`--combine`
+  (全ファイルを 1 入力に束ねる) と併用すると 1 ファイル単位の免除ができない。
+  combine するなら免除は自前で持つ
+
 ## テスト規律: 最小 3 ケース
 
 `*_test.rego` に、コードパスごとに 1 件だけ書く。網羅はしない
@@ -133,6 +175,7 @@ Rego をレビューするときは以下を機械的に確認する:
 - [ ] 検査対象の抽出条件は適切か (例: Terraform なら `"create" in actions` は
       replace の `["delete","create"]` も拾う。update を含めるかは要件次第)
 - [ ] プレフィックス比較の末尾 (`"db.t4g"` は `db.t4gx` も通す → `"db.t4g."`)
+- [ ] conftest 利用時、中間集合に `violation` / `warn` の名前を使っていないか (直接報告される)
 - [ ] deny メッセージに修正方法が書かれているか
 - [ ] ルールの根拠 (社内標準・ドキュメント) がコメントに残っているか。
       標準の一般化 (例: 割当表 → /12 レンジ) は解釈であることを明記
