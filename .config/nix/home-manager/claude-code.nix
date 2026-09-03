@@ -217,6 +217,7 @@ let
       "codex@openai-codex" = true;
       "cloudflare@cloudflare" = true;
       "slidev@slidev-plugins" = true;
+      "mattpocock-skills@claude-plugins-official" = true;
     }
     // lib.optionalAttrs (builtins.pathExists privateMarketplacesFile) (builtins.fromJSON (
       builtins.readFile privateMarketplacesFile
