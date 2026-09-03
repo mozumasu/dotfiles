@@ -186,3 +186,13 @@ Rego をレビューするときは以下を機械的に確認する:
 `kubectl get -o json` 等)。フィールド名・ネスト構造・null と欠落の区別を推測で書くと、
 silent pass のせいで間違いに気づけない。Terraform plan なら
 `input.resource_changes[].change` の `actions` / `after` / `after_unknown` が主な検査対象。
+
+### conftest の hcl2 入力の罠 (実測済み)
+
+`.tf` を直接評価する場合は `conftest parse --parser hcl2 <file.tf>` で変換後 JSON を先に見る:
+
+- ブロックは **1 個でも配列化**される
+  (`terraform { cloud { workspaces {} } }` → `terraform[_].cloud[_].workspaces[_]`)
+- 非リテラル式は `"${var.x}"` という**文字列**になる。`name = "x-${var.y}"` の部分補間も
+  文字列として `is_string` を通過するため、「リテラルであること」の検査は
+  `is_string(v)` に加えて `not contains(v, "${")` が必要 (fail-closed が静かに抜ける)
