@@ -59,6 +59,11 @@ if echo "$COMMAND" | grep -qE '(^|[;&|] *)git\b'; then
   fi
 fi
 
+# gh で issue / PR の本文を投稿するコマンドのみ日本語 lint を実行
+if echo "$COMMAND" | grep -qE '(^|[;&|] *)gh\s+(issue|pr)\s+(create|comment|edit)\b'; then
+  run_check ~/.config/claude/hooks/suiko-gh-body.sh
+fi
+
 # terraform / terragrunt コマンドのみ apply チェックと Docker ルーティングを実行
 # コマンドとしての terraform にのみマッチ（ファイルパス中の terraform.tf 等は除外）
 if echo "$COMMAND" | grep -qE '(^|[;&|] *)(terraform|terragrunt)\b'; then

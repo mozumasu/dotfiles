@@ -28,6 +28,17 @@ case "$FILE_PATH" in
         rumdl fmt "$FILE_PATH"
       fi
     fi
+    # suiko は日本語散文向けなので、記事とノートだけを対象にする。
+    # SKILL.md や README のような箇条書き中心の文書では指摘がノイズになる。
+    case "$FILE_PATH" in
+      */zenn/articles/*|*/mozumasu/nb/*)
+        LABEL=$(basename "$FILE_PATH")
+        # 統計系の warn (機械的なリズム等) は書き直しが要るので止める
+        ~/.config/claude/hooks/suiko-lint.sh "$FILE_PATH" tech warn "$LABEL" block || exit 2
+        # 局所的な info (翻訳調・AI 定型) は執筆の手を止めずに伝える
+        ~/.config/claude/hooks/suiko-lint.sh "$FILE_PATH" tech info "$LABEL" hint
+        ;;
+    esac
     ;;
   *.nix)
     echo "$INPUT" | ~/.config/claude/hooks/format-nix.sh
