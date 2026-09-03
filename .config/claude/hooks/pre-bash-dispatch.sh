@@ -25,7 +25,9 @@ run_check() {
   exit_code=$?
 
   if [ "$exit_code" -eq 2 ]; then
-    echo "$output"
+    # exit 2 のブロック理由は stderr からしか Claude に届かない (stdout だと
+    # "No stderr output" になり指摘が見えないまま迂回される)
+    echo "$output" >&2
     exit 2
   fi
 
