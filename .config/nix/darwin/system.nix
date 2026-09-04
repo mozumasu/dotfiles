@@ -300,6 +300,13 @@
         Dragging = true;
         DragLock = false;
       };
+      # Homerow
+      "com.superultra.Homerow" = {
+        # ラベルに使う文字集合。空だとラベルに対応するキーが存在せずクリックできない
+        "label-characters" = "asdfghjklqwertyuiopzxcvbnm";
+        # 起動中だけ ABC に切り替える (macSKK 等の IME 経由だとラベルのキー入力が届かない)
+        "auto-switch-input-source-id" = "com.apple.keylayout.ABC";
+      };
     };
 
     # --------------------------------------------------------------------------
