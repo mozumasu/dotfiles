@@ -69,6 +69,7 @@
     ffmpeg
     imagemagick
     ghostscript
+    mermaid-cli # mmdc: Mermaid 図のレンダリング
     pngpaste # img-clip.nvim で画像をクリップボードから貼り付け
 
     # モニタリング/ユーティリティ
