@@ -130,6 +130,13 @@ let
               type = "command";
               command = "~/.config/claude/hooks/pre-bash-dispatch.sh";
             }
+            # Bash コマンドを rtk 版に書き換えて出力トークンを削る。
+            # 書き換え後のコマンドに対して permissions が評価されるため、
+            # deny/ask に載せているコマンドは rtk 側の exclude_commands で除外している
+            {
+              type = "command";
+              command = "${pkgs.rtk}/bin/rtk hook claude";
+            }
           ];
         }
         {
@@ -321,7 +328,21 @@ in
   # Claude Code 本体は llm-agents.nix で管理（自動アップデータは wrapper 側で無効化済み）
   home.packages = [
     (if enableFindyOtel then claudeWithOtel else pkgs.llm-agents.claude-code)
+    # PreToolUse hook が Bash コマンドを rtk 版に書き換えるため、
+    # エージェントが直接 rtk を叩けるよう PATH にも入れる
+    pkgs.rtk
   ];
+
+  # rtk は macOS で XDG ではなく ~/Library/Application Support を見る
+  home.file."Library/Application Support/rtk/config.toml".text = ''
+    [telemetry]
+    enabled = false
+
+    [hooks]
+    # rtk 版に書き換わると permissions の deny/ask パターン
+    # (Bash(aws s3 rm:*) 等) にマッチしなくなるため、それらのコマンドは除外する
+    exclude_commands = ["aws", "gh", "curl", "wget", "just"]
+  '';
 
   # ~/.config/claude/ は activation script で管理
   # xdg.configFile + mkOutOfStoreSymlink だと home-manager が
