@@ -218,6 +218,7 @@ let
       "cloudflare@cloudflare" = true;
       "slidev@slidev-plugins" = true;
       "mattpocock-skills@claude-plugins-official" = true;
+      "show-me@skills" = true;
     }
     // lib.optionalAttrs (builtins.pathExists privateMarketplacesFile) (builtins.fromJSON (
       builtins.readFile privateMarketplacesFile
@@ -251,6 +252,13 @@ let
         source = {
           source = "github";
           repo = "slidevjs/slidev";
+        };
+      };
+      # marketplace.json の name が "skills" のためキーもそれに合わせる (humanlayer/skills)
+      skills = {
+        source = {
+          source = "github";
+          repo = "humanlayer/skills";
         };
       };
     }
