@@ -1,6 +1,6 @@
 ---
 allowed-tools: Bash(~/.config/claude/scripts/copy-answer.sh:*)
-argument-hint: "[nth] [-c count | -n nth] [-t] [-b] [-o path] [-nb notebook]"
+argument-hint: "[nth] [-c count | -n nth] [-t] [-b] [-o path]"
 description: 直前のAI回答をトランスクリプトから抽出してクリップボードにコピー（本文は改変なし・ハルシネーション防止）
 ---
 
@@ -15,7 +15,6 @@ description: 直前のAI回答をトランスクリプトから抽出してク�
 - `-b` を付けるとコードブロック（``` フェンス内）のみ抽出。
 - `-l` でコードブロック一覧の表示のみ、`-B <k>` で k 番目のブロックだけコピー（対話選択は `/copy-pick`）。
 - `-o <path>` でクリップボードの代わりにファイルへ書き出し（SSH 環境など向け）。
-- `-nb <notebook>` でクリップボードの代わりに nb のノートとして保存（タイトル自動生成 + `#answer-log` タグ付き。例: `/copy-answer -nb log`）。`-b` / `-n` / `-c` と組み合わせ可、`-o` / `-l` とは排他。
 
 実行結果:
 
