@@ -108,6 +108,7 @@
         ntn = final.callPackage ./packages/ntn.nix { };
         playwright-cli = final.callPackage ./packages/playwright-cli.nix { };
         slack-cli = final.callPackage ./packages/slack-cli.nix { };
+        mermaid-cli = final.callPackage ./packages/mermaid-cli.nix { inherit (prev) mermaid-cli; };
         # Temporary: until gws is available in nixpkgs-unstable (PR #496806)
         gws = googleworkspace-cli.packages.${system}.default;
         version-lsp = version-lsp.packages.${system}.default;
