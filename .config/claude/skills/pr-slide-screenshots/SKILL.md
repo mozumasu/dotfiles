@@ -1,24 +1,29 @@
 ---
 name: pr-slide-screenshots
-description: Slidev スライドを変更した PR に、変更スライドのスクリーンショットを PR コメントとして残す。Playwright MCP でログイン済みブラウザから GitHub の Web UI に画像を添付する (トークン不要)。「スライドの画像を PR に貼って」「表示確認の画像を PR コメントに残して」などのリクエスト、またはスライド変更 PR の作成直後に使用する。
+description: Slidev スライドを変更した PR に、変更スライドのスクリーンショットを PR コメントとして残す。撮影は Playwright MCP、添付は `gh pr comment --attach` (gh 2.99.0 以降) で行う。「スライドの画像を PR に貼って」「表示確認の画像を PR コメントに残して」などのリクエスト、またはスライド変更 PR の作成直後に使用する。
 allowed-tools: |
+  Bash(gh --version)
   Bash(gh pr view *)
+  Bash(gh pr comment *)
   Bash(git diff *)
   Bash(portless list)
   Bash(ghost list)
   Bash(ghost log *)
+  Bash(ls -l *)
+  Bash(rm slide-*.png)
 ---
 
 # PR にスライドのスクリーンショットを貼る
 
 Slidev デッキの変更 PR に対して、変更されたスライドのスクリーンショットを撮影し、
-**Playwright MCP (ログイン済みブラウザに CDP 接続) で GitHub Web UI から画像を添付**して
-PR コメントとして残す。GitHub にはコメントへ画像を添付する公開 API がないため、
-Web UI のアップロード機構をそのまま使う。セッショントークンの抽出・保存は行わない。
+`gh pr comment --attach` で PR コメントとして残す。ブラウザで GitHub を操作する必要はない。
 
 ## 前提
 
-- Playwright MCP がユーザーのブラウザ (Arc 等) に接続でき、GitHub にログイン済みであること
+- `gh --version` が 2.99.0 以上であること (`--attach` フラグは 2.99.0 で追加)。
+  古ければ中断してアップグレードを案内する。
+- 対象が GitHub.com または GitHub Enterprise Cloud であること (GHES は `--attach` 非対応)
+- Playwright MCP で dev サーバーのスライドを撮影できること
 - `gh pr view --json number,url` で現在のブランチの PR を特定できること。
   PR がなければ中断して報告する (勝手に PR は作らない)
 
@@ -39,42 +44,39 @@ Web UI のアップロード機構をそのまま使う。セッショントー�
    撮影ごとに `ls -l` でファイルサイズが 0 バイトでないことを確認してから次へ進む
    (0 バイトなら撮り直す)。撮影後は Read ツールで画像を開き、レイアウト崩れ・
    はみ出しがないか確認する (崩れていたら報告し、貼る前に直すかユーザーに判断を仰ぐ)。
-5. **PR ページを新規タブで開く**: `browser_tabs` の `new` で PR の URL を開く。
-   **ユーザーが使用中の既存タブを流用しない** (操作が競合する)。
-6. **本文の下書き**: コメント欄 textarea (`#new_comment_field`) に `browser_type` で
-   仮の見出し (例: `## 変更スライドの表示確認`) を入力する。
-7. **画像の添付**: ツールバーの Attach ボタンはバックグラウンドタブだと actionability
-   チェック (visible/stable 待ち) で timeout するため、`browser_evaluate` で隠しファイル入力を
-   直接クリックしてファイルチューザーを開く:
+5. **本文の作成**: スライド番号ごとの見出しと画像参照を並べた Markdown を書く。
+   本文中で `![alt](./slide-N.png)` のようにローカルパスを参照しておくと、
+   `--attach` がその参照をアップロード先 URL に書き換える。
 
-   ```js
-   () => { document.getElementById('fc-new_comment_field').click(); }
+   ```markdown
+   ## 変更スライドの表示確認
+
+   ### 3 ページ目
+   ![slide 3](./slide-3.png)
+
+   ### 5 ページ目
+   ![slide 5](./slide-5.png)
    ```
 
-   Modal state が `[File chooser]` になったら `browser_file_upload` で png を
-   全部まとめて渡す。
-8. **アップロード完了待ち**: 数秒待ってから `browser_evaluate` で
-   `document.getElementById('new_comment_field').value` を読み、ファイル数ぶんの
-   `<img ... src="https://github.com/user-attachments/assets/...">` が挿入されるまで待つ。
-9. **本文の整形**: 得られた `<img>` タグを使って、スライド番号ごとの見出し付き本文を組み立て、
-   `browser_type` で textarea に入力し直す (fill なので全置換される)。
-10. **送信**: Comment ボタンも actionability で timeout しやすいので `browser_evaluate` で送信する:
+6. **投稿**: 本文をファイルに書き出し、撮影した png を `--attach` で全部渡す
+   (フラグは繰り返し指定。1 コマンド最大 50 ファイル)。
 
-    ```js
-    () => { document.getElementById('new_comment_field').closest('form')
-     .querySelector('button[type="submit"].btn-primary').click(); }
-    ```
+   ```sh
+   gh pr comment <番号> --body-file comment.md \
+     --attach './slide-3.png#slide 3' --attach './slide-5.png#slide 5'
+   ```
 
-11. **投稿確認**: `gh pr view <番号> --json comments --jq '.comments[-1].body'` で
-    コメント本文が投稿されたことを確認してから完了報告する。
-12. **後片付け**: 撮影した png を削除し (リポジトリにはコミットしない)、
-    手順 5 で開いたタブを `browser_tabs` の `close` で閉じる。
+   本文で参照していないファイルはコメント末尾に追記される。alt text は
+   `<path>#<alt>` の形式で指定でき、本文側に alt があればそちらが優先される。
+7. **投稿確認**: `gh pr view <番号> --json comments --jq '.comments[-1].body'` で
+   画像参照が `github.com/user-attachments/assets/...` の URL に置き換わっていることを確認してから完了報告する。
+8. **後片付け**: 撮影した png と `comment.md` を削除する (リポジトリにはコミットしない)。
 
 ## 注意
 
 - 画像の実体は `github.com/user-attachments/assets/...` にホストされ、可視性は
   リポジトリに従う (private リポジトリなら画像も private)。
-- GitHub のコメント UI の DOM (`new_comment_field` / `fc-new_comment_field`) が
-  変わったら snapshot を取り直して要素を特定し直す。
-- ユーザーがブラウザを操作中のことがある。タブ一覧が予期せず変わっても慌てず、
-  自分が開いたタブだけを操作する。
+- `--attach` は `gh pr create` / `gh pr edit` / `gh issue comment` でも使える。
+  PR 作成時に貼りたい場合は `gh pr create --attach ...` で本文に直接入れてよい。
+- ユーザーがブラウザを操作中のことがある。撮影で開いたタブだけを操作し、
+  終わったら `browser_tabs` の `close` で閉じる。
