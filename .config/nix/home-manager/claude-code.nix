@@ -13,6 +13,9 @@ let
   publicSettings = {
     env = {
       MAX_THINKING_TOKENS = "31999";
+      # 未ドキュメントの内部トグル。auto mode の bash-first 挙動を切り、
+      # Read/Edit ツールを使わせる
+      CLAUDE_CODE_THRIFTY_SONIC = "0";
       # Findy AI+ Prompt & Session Log (OpenTelemetry) の env は
       # ~/src/github.com/Findy/ 配下で起動したときだけ claude wrapper が
       # sops の claude-otel-env シークレットから export する (下記 claudeWithOtel)
