@@ -20,6 +20,15 @@
 3. **見える必要のない使い捨ての調査** (コードリーディング、grep、ドキュメント調査)
    → Agent ツールのサブエージェント。画面を占有しない分こちらが軽い。
 
+## herdr worktree create の注意
+
+- `herdr worktree create` は **cwd ではなく herdr のアクティブなワークスペースのリポジトリ**に
+  worktree を作る。別リポジトリ (例: talks を直しているのに Findy-Infra に作られた) で作業したいときは
+  `git -C <repo> worktree add <sibling-dir> -b <branch> origin/main` を使う。
+  誤って作ったら `herdr worktree remove --workspace <id>` と `git branch -D` で戻す。
+- `link:../../../findy-slidev/...` のような相対参照があるリポジトリは、worktree を元のリポジトリと
+  **同じ親ディレクトリの兄弟**に置く (`~/src/github.com/mozumasu/talks-<name>`)。
+
 ## worktree の後片付けと代替手段
 
 - 作業が終わった worktree は `herdr worktree remove --workspace ID` で片付ける。
