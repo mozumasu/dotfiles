@@ -221,8 +221,27 @@ async (page) => {
 
   **復旧を待たない選択肢**: ログイン済みセッションが不要な用途
   (localhost のレンダリング検証など) なら、Arc の復旧に固執せず
-  ヘッドレス Chromium に切り替えるほうが早い。デッキの devDependencies の
-  playwright-chromium を使う手順は slidev-deck-conventions スキル参照
+  ヘッドレス Chromium に切り替えるほうが早い (headless-render スキル参照)。
+  デッキの devDependencies の playwright-chromium を使う手順は
+  slidev-deck-conventions スキル参照
+
+  **Playwright を通さず、応答するタブに直接 CDP でつなぐ**: 凍結タブが
+  1 つでも残ると `connectOverCDP` は全体が止まるが、生の CDP はタブ単位
+  なので、応答するタブだけ使えば実 GPU での確認ができる (実例: 実機に近い
+  条件でスクロール中のスクリーンショットを撮った)。node の `WebSocket` で
+  `webSocketDebuggerUrl` に繋ぎ、`{id, method, params}` を送る。主なメソッド:
+  - `Page.navigate` / `Page.captureScreenshot` (大きなビューポートでは
+    タイムアウトすることがあるので、送信側に timeout を付ける)
+  - `Runtime.evaluate` (`awaitPromise: true, returnByValue: true`)
+  - `Emulation.setDeviceMetricsOverride`
+    (`{width:390,height:844,deviceScaleFactor:3,mobile:true}`) でスマホ表示を
+    再現。終わったら `Emulation.clearDeviceMetricsOverride`
+  - タブが無ければ `PUT http://localhost:9222/json/new?about:blank` で作れる
+    (ユーザーの Arc に新しいタブが開く)
+
+  注意: Arc のウィンドウが前面にないと rAF が 30fps に固定され、フレーム
+  レートは負荷の指標にならない。`gl.finish()` の所要時間も GPU の実行を
+  待たずに返るので、GPU 負荷はこの方法では測れない
 - **タブが閉じられる/CDP接続が切れる**: `Target page, context or browser has
   been closed` エラーが出たら、`browser_navigate` を再度叩くと再接続される
   ことが多い。`browser_tabs (list)` がタイムアウトする場合も同様
