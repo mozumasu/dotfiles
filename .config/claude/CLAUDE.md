@@ -14,6 +14,16 @@ hooks が何も返さない場合のデフォルト:
 - Format: `<type>: <emoji> <description>`
 - Type と Emoji: feat: ✨ / fix: 🐛 / docs: 📝 / style: 💄 / refactor: ♻️ / perf: ⚡️ / test: ✅ / build: 👷 / ci: 🎡 / chore: 🔧
 
+コミット履歴が無い新規リポジトリでは hook が英語・絵文字なしの既定値を返すことがある。
+その場合は同じオーナーの既存リポジトリ (`git log` で確認) のスタイルに合わせる。mozumasu/* は日本語 + gitmoji。
+
+## PR 本文
+
+- `gh pr create` / `gh pr edit` の本文は hook (suiko) が日本語の文体を検査し、単調なリズムだとコマンドごと拒否される。
+  短い文と長い文を混ぜ、体言止めや一言の文を挟む。
+- 本文は heredoc でコマンドに埋め込まず、Write でファイルに書いて `--body-file` で渡す
+  (拒否されても git 操作が巻き添えにならない)。
+
 ## Text Processing
 
 - **MUST**: Use `perl` instead of `sed` or `awk` for text processing.
