@@ -299,6 +299,24 @@ return {
   end,
   keys = {
     {
+      "zi",
+      function()
+        local ufo = require("ufo")
+        local lnum = 1
+        local lastLine = vim.api.nvim_buf_line_count(0)
+        while lnum <= lastLine do
+          local closedEnd = vim.fn.foldclosedend(lnum)
+          if closedEnd ~= -1 then
+            ufo.openAllFolds()
+            return
+          end
+          lnum = lnum + 1
+        end
+        ufo.closeAllFolds()
+      end,
+      desc = "Toggle all folds",
+    },
+    {
       "zR",
       function()
         require("ufo").openAllFolds()
