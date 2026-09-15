@@ -400,6 +400,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-deno": {
+      "locked": {
+        "lastModified": 1788652442,
+        "narHash": "sha256-7CySjNtDGxdMWjIDZNHZeWarNgnEGyXSeJwdwS+na3Y=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "f5f41d5cdfadcfedb240dcaf7ab67770e8ac423c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "f5f41d5cdfadcfedb240dcaf7ab67770e8ac423c",
+        "type": "github"
+      }
+    },
     "nixpkgs-lib": {
       "locked": {
         "lastModified": 1769909678,
@@ -474,6 +490,7 @@
         "llm-agents": "llm-agents",
         "nix-homebrew": "nix-homebrew",
         "nixpkgs": "nixpkgs_3",
+        "nixpkgs-deno": "nixpkgs-deno",
         "sops-nix": "sops-nix",
         "treefmt-nix": "treefmt-nix_3",
         "version-lsp": "version-lsp"

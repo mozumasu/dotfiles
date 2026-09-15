@@ -3,6 +3,9 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    # Temporary: deno 2.9.6 は `deno run <flags> -- script.ts` の `--` を無視して
+    # zeno.zsh が壊れる (denoland/deno#36792)。修正版が出るまで 2.9.5 に固定
+    nixpkgs-deno.url = "github:nixos/nixpkgs/f5f41d5cdfadcfedb240dcaf7ab67770e8ac423c";
     # Temporary: until gws (googleworkspace/cli) is available in nixpkgs-unstable (PR #496806)
     googleworkspace-cli = {
       url = "github:googleworkspace/cli";
@@ -51,6 +54,7 @@
     {
       self,
       nixpkgs,
+      nixpkgs-deno,
       home-manager,
       darwin,
       treefmt-nix,
@@ -81,6 +85,11 @@
         suiko = final.callPackage ./packages/suiko.nix { };
       };
 
+      # llm-agents の shared-nixpkgs overlay が deno を上書きするため、その後ろに置く
+      denoPinOverlay = final: _prev: {
+        deno = nixpkgs-deno.legacyPackages.${final.stdenv.hostPlatform.system}.deno;
+      };
+
       # WSL (robusta) 用
       linuxSystem = "x86_64-linux";
       pkgsLinux = import nixpkgs {
@@ -88,6 +97,7 @@
         overlays = [
           hunkOverlay
           portableOverlay
+          denoPinOverlay
         ];
         config.allowUnfree = true;
       };
@@ -148,6 +158,7 @@
           portableOverlay
           kanata-darwin-nix.overlays.default
           llm-agents.overlays.shared-nixpkgs
+          denoPinOverlay
         ];
         config.allowUnfree = true;
       };
@@ -183,6 +194,7 @@
             portableOverlay
             kanata-darwin-nix.overlays.default
             llm-agents.overlays.shared-nixpkgs
+            denoPinOverlay
           ];
           nixpkgs.config.allowUnfree = true;
         }
