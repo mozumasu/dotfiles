@@ -37,6 +37,7 @@
       "betterdisplay"
       "keycastr"
       "shottr"
+      "adrafinil" # AI エージェント稼働中だけスリープを抑止 (macOS 26.4+)
 
       # Input methods
       "macskk"

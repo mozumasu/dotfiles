@@ -124,94 +124,141 @@ let
         "~/src/github.com/mozumasu/zenn/articles"
       ];
     };
-    hooks = {
-      PreToolUse = [
-        {
-          matcher = "Bash";
-          hooks = [
-            {
-              type = "command";
-              command = "~/.config/claude/hooks/pre-bash-dispatch.sh";
-            }
-            # Bash コマンドを rtk 版に書き換えて出力トークンを削る。
-            # 書き換え後のコマンドに対して permissions が評価されるため、
-            # deny/ask に載せているコマンドは rtk 側の exclude_commands で除外している
-            {
-              type = "command";
-              command = "${pkgs.rtk}/bin/rtk hook claude";
-            }
-          ];
-        }
-        {
-          matcher = "Write|Edit|MultiEdit";
-          hooks = [
-            {
-              type = "command";
-              command = "~/.config/claude/hooks/pre-write-dispatch.sh";
-            }
-          ];
-        }
-      ];
-      # herdr integration 用 (エージェントの状態を herdr に通知する)
-      SessionStart = [
-        {
-          matcher = "*";
-          hooks = [
-            {
-              type = "command";
-              command = "bash '/Users/ori.matsumoto/.config/claude/hooks/herdr-agent-state.sh' session";
-              timeout = 10;
-            }
-          ];
-        }
-      ];
-      Stop = [
-        {
-          matcher = "";
-          hooks = [
-            {
-              type = "command";
-              command = "~/.config/claude/hooks/check-settings-drift.sh";
-            }
-            {
-              type = "command";
-              command = ''~/.config/claude/scripts/notify.sh "Claude"'';
-            }
-          ];
-        }
-      ];
-      Notification = [
-        {
-          matcher = "";
-          hooks = [
-            {
-              type = "command";
-              command = ''~/.config/claude/scripts/notify.sh "Claude Notification"'';
-            }
-          ];
-        }
-      ];
-      PostToolUse = [
-        {
-          matcher = "Write|Edit|MultiEdit";
-          hooks = [
-            {
-              type = "command";
-              command = "~/.config/claude/hooks/post-write-dispatch.sh";
-            }
-          ];
-        }
-        {
-          matcher = "Write|Edit|MultiEdit";
-          hooks = [
-            {
-              type = "command";
-              command = "~/.config/claude/hooks/check-tf-provider-versions.sh";
-            }
-          ];
-        }
-      ];
-    };
+    hooks =
+      let
+        # Adrafinil (Homebrew cask): エージェントの作業中だけ Mac のスリープを抑止する。
+        # アプリ内蔵の installer は settings.json を直接書くので、ここで同じ hook を宣言する。
+        # UserPromptSubmit → acquire / Stop → release の turn 単位。SessionEnd と
+        # SessionStart(clear) は /clear 等でセッション ID が付け替わるときの取りこぼし対策。
+        adrafinil = "/Applications/Adrafinil.app/Contents/Helpers/adrafinil";
+        adrafinilHook = op: {
+          type = "command";
+          command = "${adrafinil} ${op} $CLAUDE_CODE_SESSION_ID --tool claude-code";
+        };
+        adrafinilSubagentHook = op: {
+          type = "command";
+          command = "${adrafinil} ${op} --tool claude-code --subagent";
+        };
+      in
+      {
+        UserPromptSubmit = [
+          {
+            hooks = [ (adrafinilHook "acquire") ];
+          }
+        ];
+        SubagentStart = [
+          {
+            hooks = [ (adrafinilSubagentHook "acquire") ];
+          }
+        ];
+        SubagentStop = [
+          {
+            hooks = [ (adrafinilSubagentHook "release") ];
+          }
+        ];
+        SessionEnd = [
+          {
+            hooks = [ (adrafinilHook "release") ];
+          }
+        ];
+        PreToolUse = [
+          {
+            matcher = "Bash";
+            hooks = [
+              {
+                type = "command";
+                command = "~/.config/claude/hooks/pre-bash-dispatch.sh";
+              }
+              # Bash コマンドを rtk 版に書き換えて出力トークンを削る。
+              # 書き換え後のコマンドに対して permissions が評価されるため、
+              # deny/ask に載せているコマンドは rtk 側の exclude_commands で除外している
+              {
+                type = "command";
+                command = "${pkgs.rtk}/bin/rtk hook claude";
+              }
+            ];
+          }
+          {
+            matcher = "Write|Edit|MultiEdit";
+            hooks = [
+              {
+                type = "command";
+                command = "~/.config/claude/hooks/pre-write-dispatch.sh";
+              }
+            ];
+          }
+        ];
+        # herdr integration 用 (エージェントの状態を herdr に通知する)
+        SessionStart = [
+          {
+            matcher = "*";
+            hooks = [
+              {
+                type = "command";
+                command = "bash '/Users/ori.matsumoto/.config/claude/hooks/herdr-agent-state.sh' session";
+                timeout = 10;
+              }
+            ];
+          }
+          # plan 承認 + clear context 後の自動実行は UserPromptSubmit を経由しないため、ここで acquire する
+          {
+            matcher = "clear";
+            hooks = [ (adrafinilHook "acquire") ];
+          }
+        ];
+        Stop = [
+          {
+            matcher = "";
+            hooks = [
+              {
+                type = "command";
+                command = "~/.config/claude/hooks/check-settings-drift.sh";
+              }
+              {
+                type = "command";
+                command = ''~/.config/claude/scripts/notify.sh "Claude"'';
+              }
+              (adrafinilHook "release")
+            ];
+          }
+        ];
+        Notification = [
+          {
+            matcher = "";
+            hooks = [
+              {
+                type = "command";
+                command = ''~/.config/claude/scripts/notify.sh "Claude Notification"'';
+              }
+            ];
+          }
+          # Esc 中断は Stop を発火しないので、idle_prompt 通知で早めに release する
+          {
+            matcher = "idle_prompt";
+            hooks = [ (adrafinilHook "release") ];
+          }
+        ];
+        PostToolUse = [
+          {
+            matcher = "Write|Edit|MultiEdit";
+            hooks = [
+              {
+                type = "command";
+                command = "~/.config/claude/hooks/post-write-dispatch.sh";
+              }
+            ];
+          }
+          {
+            matcher = "Write|Edit|MultiEdit";
+            hooks = [
+              {
+                type = "command";
+                command = "~/.config/claude/hooks/check-tf-provider-versions.sh";
+              }
+            ];
+          }
+        ];
+      };
     statusLine = {
       type = "command";
       command = "npx ccusage@latest statusline";
