@@ -1085,3 +1085,7 @@ ESO
 SecretStore
 ExternalSecret
 bool
+tfenv
+conftest
+Rego
+OPA
