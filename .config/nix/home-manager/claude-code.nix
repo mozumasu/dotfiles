@@ -276,6 +276,7 @@ let
       "slidev@slidev-plugins" = true;
       "mattpocock-skills@claude-plugins-official" = true;
       "show-me@skills" = true;
+      "ponytail@ponytail" = true;
     }
     // lib.optionalAttrs (builtins.pathExists privateMarketplacesFile) (builtins.fromJSON (
       builtins.readFile privateMarketplacesFile
@@ -316,6 +317,12 @@ let
         source = {
           source = "github";
           repo = "humanlayer/skills";
+        };
+      };
+      ponytail = {
+        source = {
+          source = "github";
+          repo = "DietrichGebert/ponytail";
         };
       };
     }
