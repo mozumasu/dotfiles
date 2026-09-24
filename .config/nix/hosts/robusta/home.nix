@@ -29,6 +29,7 @@
     ripgrep
     tree
     zoxide
+    zsh-bench # 対話 zsh の起動レイテンシ計測
 
     # Git 関連
     gh

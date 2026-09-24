@@ -83,6 +83,7 @@
       # こちらに置き、darwin と WSL の両方へ適用する
       portableOverlay = final: _prev: {
         suiko = final.callPackage ./packages/suiko.nix { };
+        zsh-bench = final.callPackage ./packages/zsh-bench.nix { };
       };
 
       # llm-agents の shared-nixpkgs overlay が deno を上書きするため、その後ろに置く

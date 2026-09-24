@@ -8,6 +8,7 @@
     fzf
     hyperfine
     ripgrep
+    zsh-bench # 対話 zsh の起動レイテンシ計測
     zoxide
     tree
     wget
