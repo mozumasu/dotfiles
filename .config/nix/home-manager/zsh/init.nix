@@ -153,6 +153,9 @@
           zcompile "$_comp_dump"
         fi
         unset _comp_dump
+        # _history_complete_word の「#compdef -K」は既存バインドを無視して
+        # ^[, と ^[/ を上書きするため、compinit の後で張り直す。
+        bindkey "^[," copy-earlier-word
       }
       zsh-defer _deferred_compinit
 
