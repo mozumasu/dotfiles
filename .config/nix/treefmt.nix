@@ -7,7 +7,8 @@ let
   '';
 in
 {
-  projectRootFile = "flake.nix";
+  # tree root は ~/dotfiles (flake のある .config/nix ではない)。includes のパスはこの root 基準
+  projectRootFile = ".git/config";
 
   programs = {
     # Nix
