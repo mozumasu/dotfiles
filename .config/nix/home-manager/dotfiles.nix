@@ -58,9 +58,12 @@ in
     NB_DIR="$HOME/src/github.com/mozumasu/nb"
     mkdir -p "$NB_DIR"
 
+    # private repo (かつ .gitconfig の insteadOf で ssh に書き換わる) なので、
+    # 鍵が未配置の初回 switch でも activation を止めない
     if [ ! -d "$NB_DIR/home/.git" ]; then
       rm -rf "$NB_DIR/home"
-      ${pkgs.git}/bin/git clone https://github.com/mozumasu/nb-home.git "$NB_DIR/home"
+      ${pkgs.git}/bin/git clone https://github.com/mozumasu/nb-home.git "$NB_DIR/home" \
+        || echo "warning: nb-home clone failed (SSH key not set up?). Re-run switch after ~/.ssh is in place." >&2
     fi
   '';
 }
