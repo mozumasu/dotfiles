@@ -93,15 +93,18 @@ sudo mv /etc/zshrc /etc/zshrc.before-nix-darwin
 
 # 4. Apply nix-darwin configuration (first time)
 # Note: $HOME is expanded before sudo runs, so the path is correct
-# Replace <hostname> with your host name (geisha, bourbon, etc.)
+# Replace <hostname> with a key from "Available Hosts" below
 sudo nix run \
   --extra-experimental-features nix-command \
   --extra-experimental-features flakes \
   nix-darwin -- switch --flake "$HOME/dotfiles/.config/nix#<hostname>"
 
 # After initial setup, use:
-# nix-switch (or darwin-rebuild switch --flake ~/dotfiles/.config/nix#<hostname>)
+# nix run ~/dotfiles/.config/nix#switch <hostname>
 ```
+
+> The first `switch` clones the private `nb-home` repo. Put `~/.ssh` (and `~/.config/sops/age/keys.txt`) in place first,
+> or the clone is skipped with a warning and you re-run `switch` after the keys are set up.
 
 > Homebrew is automatically installed via [nix-homebrew](https://github.com/zhaofengli/nix-homebrew)
 
@@ -111,6 +114,8 @@ sudo nix run \
 | ------ | ------------- |
 | `geisha` | Main Mac |
 | `bourbon` | Second Mac |
+| `mocha` | Work Mac (`isWork = true`) |
+| `robusta` | WSL (home-manager only, `nix run .#switch` on Linux) |
 
 ### What's Managed by Nix
 
@@ -129,20 +134,25 @@ sudo nix run \
 | ------ | -------- |
 | Apple ID | Security |
 | App Logins | Authentication |
-| SSH Keys | `~/.ssh/` not managed |
-| AWS/Git Credentials | Sensitive data |
+| SSH Keys | `~/.ssh/` not managed (also used for commit signing) |
+| age key | `~/.config/sops/age/keys.txt` decrypts every sops secret |
+| `~/.gitconfig.local` | Included from `.gitconfig`, not tracked |
+| AWS/Git Credentials | Sensitive data (`~/.aws/config`, aws-vault Keychain) |
 
 ### Daily Commands
 
 ```bash
-# Apply configuration changes
-nix-switch
+cd ~/dotfiles/.config/nix
 
-# Update flake inputs
-nfu
+# Apply configuration changes (host defaults to geisha)
+nix run .#switch mocha
 
-# Garbage collection
-ngc
+# Update flake inputs and rebuild
+nix run .#update mocha
+
+# Build / check without switching
+nix run .#build mocha
+nix run .#check mocha
 ```
 
 ---

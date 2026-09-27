@@ -70,7 +70,7 @@ today-calendar-conf-personal: |
 ### 2. home-manager 反映
 
 ```sh
-~/dotfiles/mozumasu.sh
+nix run ~/dotfiles/.config/nix#switch <hostname>
 ```
 
 これで以下が同時に揃う:
