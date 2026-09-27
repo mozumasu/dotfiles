@@ -195,7 +195,7 @@ let
             hooks = [
               {
                 type = "command";
-                command = "bash '/Users/ori.matsumoto/.config/claude/hooks/herdr-agent-state.sh' session";
+                command = "bash '${config.home.homeDirectory}/.config/claude/hooks/herdr-agent-state.sh' session";
                 timeout = 10;
               }
             ];
