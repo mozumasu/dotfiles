@@ -70,7 +70,8 @@ allowed-tools: Read, Write, Bash(node -e *), mcp__plugin_playwright_playwright__
   heading と違って `##` などの記号を含める。エディタを開いた直後にこれと照合し、違えばキャンセルして
   中断する。本文と返信の取り違え防止の要。
 - `__TEXT_JSON__`: 本文は段落から始める (先頭の非見出し行を投稿後の検証 marker に使うため。
-  コードフェンスや `:::` から始まると検証が偽陰性になる)。
+  コードフェンスや `:::` から始まると検証が偽陰性になる)。**上限 20,000 文字**。設定ファイルの全文など
+  収まらないものは GitHub のリンクにする (スクリプトは超過時に `text too long` で止まる)。
 
 例 (Nix スレッドの返信を差し替える):
 
@@ -99,6 +100,8 @@ Write → `browser_run_code_unsafe` に `filename: ".playwright-mcp/zenn-<op>.js
 | `error: "unexpected editor content, cancelled"` | **再実行しない**。`before` をユーザーに見せ、`__TARGET__` / `__EXPECT__` を見直す |
 | `error: "candidate changed since dry run"` | DOM が変わった。dry run からやり直す |
 | `error: "… head mismatch"` | フォームが開いたまま (edit は自動キャンセル済み)。`cancel.js` → 1 回だけ再試行 |
+| `error: "text too long"` | 本文が 20,000 文字超。分割するかリンクにする |
+| `ok: false` かつ `editorsOpen` に `内容を編集` が残る | 保存が拒否された (文字数超過など)。画面のエラー文を確認し `cancel.js` で閉じる (confirm ダイアログは自動受諾) |
 | `error: "submit button"` | フォームが複数開いている。`cancel.js` で閉じて inspect からやり直す |
 
 ### 5. 確認して報告する

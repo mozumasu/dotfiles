@@ -15,9 +15,14 @@ async (page) => {
   const expect = __EXPECT_JSON__.replace(/\s+/g, "");
   const text = __TEXT_JSON__;
 
-  const cancelOpen = async () => page.evaluate(() => {
-    Array.from(document.querySelectorAll("button")).filter((b) => b.innerText.trim() === "キャンセル" && b.offsetParent !== null).forEach((b) => b.click());
-  });
+  // 本文を書き換えた後のキャンセルは confirm「変更が保存されていません…」が出るので自動で受諾する
+  const cancelOpen = async () => {
+    page.once("dialog", (d) => d.accept());
+    await page.evaluate(() => {
+      Array.from(document.querySelectorAll("button")).filter((b) => b.innerText.trim() === "キャンセル" && b.offsetParent !== null).forEach((b) => b.click());
+    });
+  };
+  if (text.length > 20000) return { error: "text too long", length: text.length, note: "zenn のコメント本文は 20,000 文字まで。分割するかリンクにする" };
 
   const opened = await page.evaluate(({ url, target, thread, marker }) => {
     if (!location.href.startsWith(url)) return { error: "wrong page", href: location.href, expected: url };

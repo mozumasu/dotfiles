@@ -7,6 +7,7 @@ async (page) => {
   const url = __URL_JSON__;
   const thread = __THREAD_JSON__;
   const text = __TEXT_JSON__;
+  if (text.length > 20000) return { error: "text too long", length: text.length, note: "zenn のコメント本文は 20,000 文字まで。分割するかリンクにする" };
 
   const opened = await page.evaluate(({ url, thread }) => {
     if (!location.href.startsWith(url)) return { error: "wrong page", href: location.href, expected: url };

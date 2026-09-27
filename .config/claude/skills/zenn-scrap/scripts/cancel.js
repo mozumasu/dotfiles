@@ -2,6 +2,9 @@
 // プレースホルダ: __URL_JSON__
 async (page) => {
   const url = __URL_JSON__;
+  // 本文入力済みのフォームをキャンセルすると confirm「変更が保存されていません。内容を破棄しますか？」が出る。
+  // ネイティブダイアログが残ると CDP が固まるので、先に自動で受諾する
+  page.once("dialog", (d) => d.accept());
   const r = await page.evaluate((url) => {
     if (!location.href.startsWith(url)) return { error: "wrong page", href: location.href, expected: url };
     const btns = Array.from(document.querySelectorAll("button")).filter((b) => b.innerText.trim() === "キャンセル" && b.offsetParent !== null);
