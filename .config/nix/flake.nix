@@ -165,8 +165,8 @@
       };
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
 
-      # Flake directory path (using self to get the flake's own path)
-      flakeDir = "${self}";
+      # ストアパス (self) だと darwin-rebuild が flake metadata を読めず、nix flake update も書き込めない
+      flakeDir = "$HOME/dotfiles/.config/nix";
 
       # Helper to create app
       mkApp = name: script: {
@@ -252,27 +252,27 @@
 
       apps = {
         ${system} = {
-          # nix run .#switch
+          # nix run .#switch [host]  (host は darwinConfigurations のキー。省略時 geisha)
           switch = mkApp "darwin-switch" ''
-            sudo darwin-rebuild switch --flake "${flakeDir}#geisha"
+            sudo darwin-rebuild switch --flake "${flakeDir}#''${1:-geisha}"
           '';
 
-          # nix run .#build
+          # nix run .#build [host]
           build = mkApp "darwin-build" ''
-            darwin-rebuild build --flake "${flakeDir}#geisha"
+            darwin-rebuild build --flake "${flakeDir}#''${1:-geisha}"
           '';
 
-          # nix run .#check
+          # nix run .#check [host]
           check = mkApp "darwin-check" ''
-            darwin-rebuild check --flake "${flakeDir}#geisha"
+            darwin-rebuild check --flake "${flakeDir}#''${1:-geisha}"
           '';
 
-          # nix run .#update
+          # nix run .#update [host]
           update = mkApp "darwin-update" ''
             echo "Updating flake..."
             nix flake update --flake "${flakeDir}"
             echo "Rebuilding nix-darwin (includes home-manager)..."
-            sudo darwin-rebuild switch --flake "${flakeDir}#geisha"
+            sudo darwin-rebuild switch --flake "${flakeDir}#''${1:-geisha}"
             echo "Update complete!"
           '';
         };
