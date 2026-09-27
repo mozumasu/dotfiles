@@ -138,6 +138,7 @@ sudo nix run \
 | age key | `~/.config/sops/age/keys.txt` decrypts every sops secret |
 | `~/.gitconfig.local` | Included from `.gitconfig`, not tracked |
 | AWS/Git Credentials | Sensitive data (`~/.aws/config`, aws-vault Keychain) |
+| VPN profile (work) | `open ~/.config/local/vpn.mobileconfig` then install it in System Settings > General > Device Management (`profiles install` cannot add user profiles on macOS 11+) |
 
 ### Daily Commands
 
