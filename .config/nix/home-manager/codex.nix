@@ -1,6 +1,6 @@
 { pkgs, config, ... }:
 let
-  modelName = "gpt-5.4";
+  modelName = "gpt-5.6";
 in
 {
   home.packages = with pkgs; [
